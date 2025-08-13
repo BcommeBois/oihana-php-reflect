@@ -53,7 +53,7 @@ Search.appendIndex(
         },                {
             "fqsen": "\\oihana\\reflect\\Reflection",
             "name": "Reflection",
-            "summary": "",
+            "summary": "High\u002Dlevel\u0020helper\u0020over\u0020PHP\u0027s\u0020Reflection\u0020API\u0020and\u0020a\u0020robust\u0020array\u002Dto\u002Dobject\u0020hydrator.",
             "url": "classes/oihana-reflect-Reflection.html"
         },                {
             "fqsen": "\\oihana\\reflect\\Reflection\u003A\u003Aconstants\u0028\u0029",
@@ -143,7 +143,7 @@ Search.appendIndex(
         },                {
             "fqsen": "\\oihana\\reflect\\traits\\ConstantsTrait",
             "name": "ConstantsTrait",
-            "summary": "The\u0020helper\u0020to\u0020creates\u0020constants\u0020enumeration\u0020classes.",
+            "summary": "Enum\u002Dlike\u0020utilities\u0020for\u0020classes\u0020that\u0020expose\u0020a\u0020set\u0020of\u0020public\u0020constants.",
             "url": "classes/oihana-reflect-traits-ConstantsTrait.html"
         },                {
             "fqsen": "\\oihana\\reflect\\traits\\ConstantsTrait\u003A\u003Aenums\u0028\u0029",

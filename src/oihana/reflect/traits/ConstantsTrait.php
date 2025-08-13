@@ -7,9 +7,44 @@ use ReflectionClass;
 use oihana\reflect\exceptions\ConstantException;
 
 /**
- * The helper to creates constants enumeration classes.
+ * Enum-like utilities for classes that expose a set of public constants.
  *
- * @package oihana\traits\exceptions
+ * Responsibilities:
+ * - Extract all constants of the using class with caching ({@see getAll()})
+ * - Provide a flattened, unique, sorted list of values ({@see enums()})
+ * - Reverse lookup constant name(s) from a value ({@see getConstant()})
+ * - Validate membership ({@see validate()}) and perform inclusion checks ({@see includes()})
+ * - Reset internal caches when needed ({@see resetCaches()})
+ *
+ * Behavior and notes:
+ * - Supports constants whose values are scalars or arrays
+ * - If a constant value is a string that encodes multiple values (e.g. "one,two,three"),
+ *   {@see getConstant()} and {@see includes()} can split the string using a separator
+ *   or an array of separators, enabling multi-token lookups
+ * - Reverse lookup cache is keyed by the separator configuration for performance
+ *
+ * Typical usage:
+ * ```php
+ * final class Status
+ * {
+ *     use ConstantsTrait;
+ *     public const string OPEN  = 'open';
+ *     public const string CLOSE = 'close';
+ * }
+ *
+ * Status::includes('open');    // true
+ * Status::getConstant('open'); // 'OPEN'
+ * Status::enums();             // ['close','open'] (sorted)
+ * ```
+ *
+ * Caching:
+ * - {@see $ALL} holds the raw constants map (name => value)
+ * - {@see $CONSTANTS} holds reverse lookup tables by separator key
+ *
+ * @see ConstantException Thrown by {@see validate()} when the value is not part of the enum
+ * @see ReflectionClass Used internally to extract class constants
+ *
+ * @package oihana\reflect\traits
  * @author Marc Alcaraz (ekameleon)
  * @since 1.0.0
  */

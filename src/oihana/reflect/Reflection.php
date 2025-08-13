@@ -21,8 +21,37 @@ use oihana\reflect\attributes\HydrateWith;
 use function oihana\core\arrays\isAssociative;
 
 /**
+ * High-level helper over PHP's Reflection API and a robust array-to-object hydrator.
+ *
+ * Responsibilities:
+ * - Introspect classes: list constants, methods and properties with visibility filters
+ * - Inspect method parameters: type, default value, nullability, optionality, variadic
+ * - Describe any callable's parameters (closures, functions, methods, and invokable objects)
+ * - Hydrate objects from associative arrays (recursively), including arrays of objects
+ *
+ * Hydration features:
+ * - Honors union types and nullability
+ * - Attribute-based mapping support:
+ *   - {@see HydrateKey} to map incoming keys to a different property name
+ *   - {@see HydrateWith} to hydrate arrays of objects (supports polymorphic items)
+ *   - {@see HydrateAs} to enforce a target class for ambiguous property types
+ * - PHPDoc support for array element types via `@var Type[]` and `@var array<Type>`
+ * - Assigns public properties only (private/protected are ignored by design)
+ *
+ * Caching:
+ * - Internally caches {@see \ReflectionClass} instances per fully-qualified class name for better performance
+ *
+ * Limitations and notes:
+ * - Hydration relies on property names (or aliases via attributes) and only sets public properties
+ * - When multiple target classes are provided in {@see HydrateWith}, selection is based on
+ *   an explicit discriminator (`@type` or `type`) or by best-guess using matching property names
  *
  * @package oihana\reflect
+ * @see ReflectionTrait Convenience trait wrapping this class in userland objects
+ * @see ConstantsTrait Constants utilities available in this package
+ * @see HydrateKey
+ * @see HydrateWith
+ * @see HydrateAs
  * @author Marc Alcaraz (ekameleon)
  * @since 1.0.0
  */

@@ -116,12 +116,44 @@
         <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/Reflection.php"><a href="files/src-oihana-reflect-reflection.html"><abbr title="src/oihana/reflect/Reflection.php">Reflection.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">29</span>
+    <span class="phpdocumentor-element-found-in__line">58</span>
 
     </aside>
 
-        
+            <p class="phpdocumentor-summary">High-level helper over PHP&#039;s Reflection API and a robust array-to-object hydrator.</p>
 
+
+    <section class="phpdocumentor-description"><p>Responsibilities:</p>
+<ul>
+<li>Introspect classes: list constants, methods and properties with visibility filters</li>
+<li>Inspect method parameters: type, default value, nullability, optionality, variadic</li>
+<li>Describe any callable's parameters (closures, functions, methods, and invokable objects)</li>
+<li>Hydrate objects from associative arrays (recursively), including arrays of objects</li>
+</ul>
+<p>Hydration features:</p>
+<ul>
+<li>Honors union types and nullability</li>
+<li>Attribute-based mapping support:
+<ul>
+<li><a href="classes/oihana-reflect-attributes-HydrateKey.html"><abbr title="\oihana\reflect\attributes\HydrateKey">HydrateKey</abbr></a> to map incoming keys to a different property name</li>
+<li><a href="classes/oihana-reflect-attributes-HydrateWith.html"><abbr title="\oihana\reflect\attributes\HydrateWith">HydrateWith</abbr></a> to hydrate arrays of objects (supports polymorphic items)</li>
+<li><a href="classes/oihana-reflect-attributes-HydrateAs.html"><abbr title="\oihana\reflect\attributes\HydrateAs">HydrateAs</abbr></a> to enforce a target class for ambiguous property types</li>
+</ul>
+</li>
+<li>PHPDoc support for array element types via <code class="prettyprint">@var Type[]</code> and <code class="prettyprint">@var array&lt;Type&gt;</code></li>
+<li>Assigns public properties only (private/protected are ignored by design)</li>
+</ul>
+<p>Caching:</p>
+<ul>
+<li>Internally caches <abbr title="\ReflectionClass">ReflectionClass</abbr> instances per fully-qualified class name for better performance</li>
+</ul>
+<p>Limitations and notes:</p>
+<ul>
+<li>Hydration relies on property names (or aliases via attributes) and only sets public properties</li>
+<li>When multiple target classes are provided in <a href="classes/oihana-reflect-attributes-HydrateWith.html"><abbr title="\oihana\reflect\attributes\HydrateWith">HydrateWith</abbr></a>, selection is based on
+an explicit discriminator (<code class="prettyprint">@type</code> or <code class="prettyprint">type</code>) or by best-guess using matching property names</li>
+</ul>
+</section>
 
 
     <h5 class="phpdocumentor-tag-list__heading" id="tags">
@@ -131,6 +163,50 @@
     </h5>
     <dl class="phpdocumentor-tag-list">
                                     <dt class="phpdocumentor-tag-list__entry">
+                    <span class="phpdocumentor-tag__name">see</span>
+                </dt>
+                <dd class="phpdocumentor-tag-list__definition">
+                                                                                    <span class="phpdocumentor-tag-link"><abbr title="\oihana\reflect\ReflectionTrait">ReflectionTrait</abbr></span>
+                                        
+                                                 <section class="phpdocumentor-description"><p>Convenience trait wrapping this class in userland objects</p>
+</section>
+
+                                    </dd>
+                            <dt class="phpdocumentor-tag-list__entry">
+                    <span class="phpdocumentor-tag__name">see</span>
+                </dt>
+                <dd class="phpdocumentor-tag-list__definition">
+                                                                                    <span class="phpdocumentor-tag-link"><abbr title="\oihana\reflect\ConstantsTrait">ConstantsTrait</abbr></span>
+                                        
+                                                 <section class="phpdocumentor-description"><p>Constants utilities available in this package</p>
+</section>
+
+                                    </dd>
+                            <dt class="phpdocumentor-tag-list__entry">
+                    <span class="phpdocumentor-tag__name">see</span>
+                </dt>
+                <dd class="phpdocumentor-tag-list__definition">
+                                                                                    <span class="phpdocumentor-tag-link"><a href="classes/oihana-reflect-attributes-HydrateKey.html"><abbr title="\oihana\reflect\attributes\HydrateKey">HydrateKey</abbr></a></span>
+                                        
+                                             
+                                    </dd>
+                            <dt class="phpdocumentor-tag-list__entry">
+                    <span class="phpdocumentor-tag__name">see</span>
+                </dt>
+                <dd class="phpdocumentor-tag-list__definition">
+                                                                                    <span class="phpdocumentor-tag-link"><a href="classes/oihana-reflect-attributes-HydrateWith.html"><abbr title="\oihana\reflect\attributes\HydrateWith">HydrateWith</abbr></a></span>
+                                        
+                                             
+                                    </dd>
+                            <dt class="phpdocumentor-tag-list__entry">
+                    <span class="phpdocumentor-tag__name">see</span>
+                </dt>
+                <dd class="phpdocumentor-tag-list__definition">
+                                                                                    <span class="phpdocumentor-tag-link"><a href="classes/oihana-reflect-attributes-HydrateAs.html"><abbr title="\oihana\reflect\attributes\HydrateAs">HydrateAs</abbr></a></span>
+                                        
+                                             
+                                    </dd>
+                                                <dt class="phpdocumentor-tag-list__entry">
                     <span class="phpdocumentor-tag__name">author</span>
                 </dt>
                 <dd class="phpdocumentor-tag-list__definition">
@@ -331,7 +407,7 @@ based on the presence of matching properties in the provided input array.</dd>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/Reflection.php"><a href="files/src-oihana-reflect-reflection.html"><abbr title="src/oihana/reflect/Reflection.php">Reflection.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">746</span>
+    <span class="phpdocumentor-element-found-in__line">775</span>
 
     </aside>
 
@@ -375,7 +451,7 @@ based on the presence of matching properties in the provided input array.</dd>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/Reflection.php"><a href="files/src-oihana-reflect-reflection.html"><abbr title="src/oihana/reflect/Reflection.php">Reflection.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">51</span>
+    <span class="phpdocumentor-element-found-in__line">80</span>
 
     </aside>
 
@@ -473,7 +549,7 @@ print_r($constants);
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/Reflection.php"><a href="files/src-oihana-reflect-reflection.html"><abbr title="src/oihana/reflect/Reflection.php">Reflection.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">89</span>
+    <span class="phpdocumentor-element-found-in__line">118</span>
 
     </aside>
 
@@ -583,7 +659,7 @@ print_r($ref-&gt;describeCallableParameters(new Greeter()));
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/Reflection.php"><a href="files/src-oihana-reflect-reflection.html"><abbr title="src/oihana/reflect/Reflection.php">Reflection.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">179</span>
+    <span class="phpdocumentor-element-found-in__line">208</span>
 
     </aside>
 
@@ -683,7 +759,7 @@ print_r($ref-&gt;describeCallableParameters(new Greeter()));
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/Reflection.php"><a href="files/src-oihana-reflect-reflection.html"><abbr title="src/oihana/reflect/Reflection.php">Reflection.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">303</span>
+    <span class="phpdocumentor-element-found-in__line">332</span>
 
     </aside>
 
@@ -925,7 +1001,7 @@ var_dump($profile-&gt;bio); // null
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/Reflection.php"><a href="files/src-oihana-reflect-reflection.html"><abbr title="src/oihana/reflect/Reflection.php">Reflection.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">459</span>
+    <span class="phpdocumentor-element-found-in__line">488</span>
 
     </aside>
 
@@ -1032,7 +1108,7 @@ var_dump($ref-&gt;isParameterNullable(Example::class, 'demo', 'age'));  // bool(
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/Reflection.php"><a href="files/src-oihana-reflect-reflection.html"><abbr title="src/oihana/reflect/Reflection.php">Reflection.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">495</span>
+    <span class="phpdocumentor-element-found-in__line">524</span>
 
     </aside>
 
@@ -1140,7 +1216,7 @@ var_dump($ref-&gt;isParameterOptional(Example::class, 'demo', 'nickname')); // b
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/Reflection.php"><a href="files/src-oihana-reflect-reflection.html"><abbr title="src/oihana/reflect/Reflection.php">Reflection.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">530</span>
+    <span class="phpdocumentor-element-found-in__line">559</span>
 
     </aside>
 
@@ -1247,7 +1323,7 @@ var_dump($ref-&gt;isParameterVariadic(Example::class, 'demo', 'tags')); // bool(
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/Reflection.php"><a href="files/src-oihana-reflect-reflection.html"><abbr title="src/oihana/reflect/Reflection.php">Reflection.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">566</span>
+    <span class="phpdocumentor-element-found-in__line">595</span>
 
     </aside>
 
@@ -1348,7 +1424,7 @@ foreach ($methods as $method)
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/Reflection.php"><a href="files/src-oihana-reflect-reflection.html"><abbr title="src/oihana/reflect/Reflection.php">Reflection.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">594</span>
+    <span class="phpdocumentor-element-found-in__line">623</span>
 
     </aside>
 
@@ -1456,7 +1532,7 @@ var_dump($ref-&gt;parameterDefaultValue(Example::class, 'testMethod', 'misc')); 
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/Reflection.php"><a href="files/src-oihana-reflect-reflection.html"><abbr title="src/oihana/reflect/Reflection.php">Reflection.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">625</span>
+    <span class="phpdocumentor-element-found-in__line">654</span>
 
     </aside>
 
@@ -1551,7 +1627,7 @@ foreach ($params as $param)
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/Reflection.php"><a href="files/src-oihana-reflect-reflection.html"><abbr title="src/oihana/reflect/Reflection.php">Reflection.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">661</span>
+    <span class="phpdocumentor-element-found-in__line">690</span>
 
     </aside>
 
@@ -1660,7 +1736,7 @@ var_dump($ref-&gt;parameterType(Example::class, 'testMethod', 'misc')); // outpu
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/Reflection.php"><a href="files/src-oihana-reflect-reflection.html"><abbr title="src/oihana/reflect/Reflection.php">Reflection.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">694</span>
+    <span class="phpdocumentor-element-found-in__line">723</span>
 
     </aside>
 
@@ -1758,7 +1834,7 @@ foreach ($props as $prop) {
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/Reflection.php"><a href="files/src-oihana-reflect-reflection.html"><abbr title="src/oihana/reflect/Reflection.php">Reflection.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">712</span>
+    <span class="phpdocumentor-element-found-in__line">741</span>
 
     </aside>
 
@@ -1841,7 +1917,7 @@ echo $reflectionClass-&gt;getName(); // 'App\Entity\User'
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/Reflection.php"><a href="files/src-oihana-reflect-reflection.html"><abbr title="src/oihana/reflect/Reflection.php">Reflection.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">737</span>
+    <span class="phpdocumentor-element-found-in__line">766</span>
 
     </aside>
 
@@ -1924,7 +2000,7 @@ echo $reflectionClass-&gt;getName(); // 'App\Entity\User'
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/Reflection.php"><a href="files/src-oihana-reflect-reflection.html"><abbr title="src/oihana/reflect/Reflection.php">Reflection.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">755</span>
+    <span class="phpdocumentor-element-found-in__line">784</span>
 
     </aside>
 
@@ -1995,7 +2071,7 @@ echo $reflectionClass-&gt;getName(); // 'App\Entity\User'
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/Reflection.php"><a href="files/src-oihana-reflect-reflection.html"><abbr title="src/oihana/reflect/Reflection.php">Reflection.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">830</span>
+    <span class="phpdocumentor-element-found-in__line">859</span>
 
     </aside>
 

@@ -20,7 +20,7 @@ use function oihana\core\arrays\compress;
  *
  * It can be used in any class that needs reflection-based utilities without directly instantiating `Reflection` everywhere.
  *
- * @package oihana\traits\exceptions
+ * @package oihana\reflect\traits
  * @author Marc Alcaraz (ekameleon)
  * @since 1.0.0
  */
