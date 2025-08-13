@@ -101,6 +101,23 @@
 
 </br>
 
+<p>
+	<a href="https://packagist.org/packages/oihana/php-reflect" target="_blank">
+		<img alt="Latest Version" src="https://img.shields.io/packagist/v/oihana/php-reflect.svg?style=flat-square"/>
+	</a>
+	<a href="https://packagist.org/packages/oihana/php-reflect" target="_blank">
+		<img alt="Total Downloads" src="https://img.shields.io/packagist/dt/oihana/php-reflect.svg?style=flat-square"/>
+	</a>
+	<a href="LICENSE" target="_blank">
+		<img alt="License" src="https://img.shields.io/packagist/l/oihana/php-reflect.svg?style=flat-square"/>
+	</a>
+</p>
+
+<p>Lightweight reflection and hydration helpers for modern PHP, part of the Oihana PHP ecosystem.</p>
+
+<h3>📚 Documentation</h3>
+<p>Full documentation: <a href="https://bcommebois.github.io/oihana-php-reflect" target="_blank">https://bcommebois.github.io/oihana-php-reflect</a></p>
+
 <h3>🔗 Project on GitHub</h3>
 <p>View the full source code and contribute on GitHub:</p>
 <p>
@@ -112,6 +129,144 @@
 <h3>📦 Installation</h3>
 <p>This library requires <a href="https://php.net/releases/" target="_blank">PHP 8.4+</a> and is installed via <a href="https://getcomposer.org/" target="_blank">Composer</a>:</p>
 <pre class="language-bash prettyprint">composer require oihana/php-reflect</pre>
+
+<h3>✨ Features</h3>
+<h4>Reflection helpers</h4>
+<ul>
+	<li>List constants, methods, properties with visibility filters</li>
+	<li>Inspect method parameters: type, default, nullable, optional, variadic</li>
+	<li>Describe any callable’s parameters (<code>describeCallableParameters</code>)</li>
+	<li>Cached <code>ReflectionClass</code> instances</li>
+</ul>
+
+<h4>Hydration</h4>
+<ul>
+	<li>Instantiate and hydrate objects from associative arrays (recursively)</li>
+	<li>Supports union types and nullability</li>
+	<li>Attribute-based mapping:
+		<ul>
+			<li><code>#[HydrateKey('source_key')]</code> to rename incoming keys</li>
+			<li><code>#[HydrateWith(Foo::class, Bar::class)]</code> for arrays of objects, including polymorphism via <code>@type</code>/<code>type</code> or property-guessing</li>
+			<li><code>#[HydrateAs(Foo::class)]</code> to override ambiguous types (<code>object</code>, <code>array</code>, <code>mixed</code>, unions)</li>
+		</ul>
+	</li>
+	<li>PHPDoc <code>@var Type[]</code> and <code>@var array&lt;Type&gt;</code> support for array element types</li>
+</ul>
+
+<h4>Traits</h4>
+<ul>
+	<li><code>ReflectionTrait</code> convenience layer and <code>jsonSerializeFromPublicProperties()</code> (with optional reduction)</li>
+	<li><code>ConstantsTrait</code> utilities over class constants: <code>getAll</code>, <code>includes</code>, <code>enums</code>, <code>getConstant</code>, <code>validate</code></li>
+</ul>
+
+<h4>Value objects</h4>
+<ul>
+	<li><code>Version</code> packs major/minor/build/revision into a 32-bit int with configurable string output</li>
+</ul>
+
+<h3>🚀 Quick start</h3>
+
+<h4>Reflection basics</h4>
+<pre class="language-php prettyprint">use oihana\reflect\Reflection;
+
+$ref = new Reflection();
+
+// Constants
+$constants = $ref->constants(MyEnum::class); // ['ACTIVE' => 'active']
+
+// Methods / Properties
+$methods = $ref->methods(MyClass::class);
+$props   = $ref->properties(MyDto::class);
+
+// Parameters inspection
+$type     = $ref->parameterType(MyClass::class, 'setName', 'name'); // 'string'
+$default  = $ref->parameterDefaultValue(MyClass::class, 'setAge', 'age'); // 30
+$nullable = $ref->isParameterNullable(MyClass::class, 'setNickname', 'nickname'); // true</pre>
+
+<h4>Describe any callable</h4>
+<pre class="language-php prettyprint">$fn = fn(string $name, int $age = 42, ...$tags) => null;
+$params = (new Reflection())->describeCallableParameters($fn);
+/*
+[
+  ['name' => 'name', 'type' => 'string', 'optional' => false, 'nullable' => false, 'variadic' => false],
+  ['name' => 'age',  'type' => 'int',    'optional' => true,  'nullable' => false, 'variadic' => false, 'default' => 42],
+  ['name' => 'tags', 'type' => null,     'optional' => false, 'nullable' => false, 'variadic' => true],
+]
+*/</pre>
+
+<h4>Hydration: flat and nested</h4>
+<pre class="language-php prettyprint">class Address { public string $city; }
+class User { public string $name; public ?Address $address = null; }
+
+$data = ['name' => 'Alice', 'address' => ['city' => 'Paris']];
+$user = (new Reflection())->hydrate($data, User::class);</pre>
+
+<h4>Hydration with attributes</h4>
+<pre class="language-php prettyprint">use oihana\reflect\attributes\{HydrateKey, HydrateWith, HydrateAs};
+
+class WithKey { #[HydrateKey('user_name')] public string $name; }
+// Maps input key 'user_name' to property 'name'
+
+class Geo { #[HydrateWith(Address::class)] public array $locations = []; }
+// Hydrates each element of an array property as Address
+
+class Wrapper { #[HydrateAs(Address::class)] public object $payload; }
+// Overrides ambiguous type (object/array/mixed/union)</pre>
+
+<h4>Arrays of objects via PHPDoc</h4>
+<pre class="language-php prettyprint">class Address { public string $city; }
+class Geo { /** @var Address[] */ public array $locations = []; }
+
+$geo = (new Reflection())->hydrate(
+  ['locations' => [ ['city' => 'Lyon'], ['city' => 'Nice'] ]],
+  Geo::class
+);</pre>
+
+<h4>Polymorphic arrays with HydrateWith</h4>
+<pre class="language-php prettyprint">class A { public string $type = 'A'; }
+class B { public string $type = 'B'; }
+class Box { #[HydrateWith(A::class, B::class)] public array $items = []; }
+
+// Chooses the right class using '@type' or 'type', or best-guess by properties</pre>
+
+<h4>Trait: ReflectionTrait</h4>
+<pre class="language-php prettyprint">use oihana\reflect\traits\ReflectionTrait;
+
+class Product {
+    use ReflectionTrait;
+    public string $name = 'Book';
+    public ?string $desc = null;
+}
+
+$p = new Product();
+$data = $p->jsonSerializeFromPublicProperties(Product::class, true); // ['name' => 'Book']</pre>
+
+<h4>Trait: ConstantsTrait</h4>
+<pre class="language-php prettyprint">use oihana\reflect\traits\ConstantsTrait;
+
+final class Status { use ConstantsTrait; public const string OPEN = 'open'; public const string CLOSED = 'closed'; }
+
+Status::includes('open'); // true
+Status::enums();           // ['closed', 'open'] (sorted unique values)
+Status::getConstant('open'); // 'OPEN'</pre>
+
+<h4>Value object: Version</h4>
+<pre class="language-php prettyprint">use oihana\reflect\Version;
+
+$v = new Version(1, 2, 3, 4);
+$v->fields = 3;            // print as 1.2.3
+echo (string) $v;          // "1.2.3"
+$v->major = 2;             // mutate safely
+$n = $v->valueOf();        // packed 32-bit int</pre>
+
+<h3>✅ Running Unit Tests</h3>
+<pre class="language-bash prettyprint">composer test</pre>
+<p>Run a specific test file:</p>
+<pre class="language-bash prettyprint">composer test ./tests/oihana/reflect/VersionTest.php</pre>
+
+<h3>🛠️ Generate the API Docs</h3>
+<p>We use phpDocumentor to generate the HTML docs into <code>./docs</code>.</p>
+<pre class="language-bash prettyprint">composer doc</pre>
 
 <h3>📄 License</h3>
 <p>This project is licensed under the <strong><a href="https://www.mozilla.org/en-US/MPL/2.0/" target="_blank">Mozilla Public License 2.0 (MPL-2.0)</a></strong>.</p>
