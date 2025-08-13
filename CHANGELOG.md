@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+## [1.0.2] - 2025-08-13
+
+### Fixed
+- Fix the Version class
+
 ## [1.0.1] - 2025-08-13
 
 ### Added

@@ -2,7 +2,6 @@
 
 namespace oihana\reflect;
 
-use oihana\enums\Char;
 use oihana\interfaces\Equatable;
 
 /**
@@ -74,7 +73,7 @@ class Version implements Equatable
      *
      * @var string
      */
-    public string $separator = Char::DOT ;
+    public string $separator = '.' ;
 
     /**
      * Checks whether the current instance is equal to another version.
@@ -161,9 +160,9 @@ class Version implements Equatable
      * @param string $separator The separator to use (defaults to `.`).
      * @return string|null      A stringified version object or null if parsing fails.
      */
-    public static function fromString( string $value , string $separator = Char::DOT ) :?string
+    public static function fromString( string $value , string $separator = '.' ) :?string
     {
-        if( $value == null || $value == Char::EMPTY )
+        if( $value == null || $value == '' )
         {
             return null ;
         }
