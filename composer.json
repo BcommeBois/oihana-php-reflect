@@ -25,7 +25,10 @@
         "psr-4" :
         {
             "oihana\\reflect\\": "src/oihana/reflect"
-        }
+        },
+        "files": [
+            "src/oihana/reflect/helpers/getFunctionInfo.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {

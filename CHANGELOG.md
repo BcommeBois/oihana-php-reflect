@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+## [1.0.1] - 2025-08-13
+
+### Added
+- Helpers:
+    -  `oihana\reflect\helpers\getFunctionInfo` to returns detailed reflection information about a given function or method.
+- Documentation generated with phpDocumentor and published site
+- PHPUnit test suite and development tooling
+
 ## [1.0.0] - 2025-08-13
 
 ### Added
@@ -18,7 +26,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
  - Hydration attributes:
    - `#[oihana\reflect\attributes\HydrateKey]` to rename incoming keys
    - `#[oihana\reflect\attributes\HydrateWith]` to hydrate arrays of objects (including polymorphism via `@type`/`type` or property-guessing)
-   - `#[oihana\reflect\attributes\HydrateAs]` to disambiguate `object`/`array`/`mixed`/unions
+   - `#[oihana\reflect\attributes\HydrateAs]` to disambiguate `object`/`array`/`mixed`/unions 
  - Traits:
    - `oihana\reflect\traits\ReflectionTrait` with `jsonSerializeFromPublicProperties()` (optional reduction)
    - `oihana\reflect\traits\ConstantsTrait` with helpers `getAll`, `includes`, `enums`, `getConstant`, `validate`
