@@ -70,7 +70,7 @@ class Reflection
      * @throws InvalidArgumentException If the callable is invalid.
      *
      * @example
-     * ```
+     * ```php
      * $ref = new \oihana\reflect\Reflection();
      * print_r($ref->describeCallableParameters([MyClass::class, 'doSomething']));
      *
