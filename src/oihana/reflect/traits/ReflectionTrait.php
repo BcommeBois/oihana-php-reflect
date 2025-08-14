@@ -37,12 +37,12 @@ trait ReflectionTrait
     private ?string $__shortName  = null ;
 
     /**
-     * The internal Reflection reference.
-     * @var ?Reflection
+     * Get the internal Reflection instance.
+     * @return Reflection
      */
-    protected ?Reflection $reflection
+    public function reflection(): Reflection
     {
-        get => $this->__reflection ??= new Reflection() ;
+        return $this->__reflection ??= new Reflection() ;
     }
 
     /**
@@ -65,7 +65,7 @@ trait ReflectionTrait
      */
     public function getConstants( object|string $class ) : array
     {
-        return $this->reflection->constants($class);
+        return $this->reflection()->constants( $class ) ;
     }
 
     /**
@@ -88,7 +88,7 @@ trait ReflectionTrait
      */
     public function getPublicProperties( object|string $class ) : array
     {
-        return $this->reflection->properties($class);
+        return $this->reflection()->properties($class);
     }
 
     /**
@@ -107,7 +107,7 @@ trait ReflectionTrait
      */
     public function getShortName( object|string $class ) : string
     {
-        return $this->__shortName ??= $this->reflection->shortName($class);
+        return $this->__shortName ??= $this->reflection()->shortName($class);
     }
 
     /**
@@ -129,7 +129,7 @@ trait ReflectionTrait
      */
     public function getMethodParameters( object|string $class, string $method ): array
     {
-        return $this->reflection->parameters($class, $method);
+        return $this->reflection()->parameters($class, $method);
     }
 
     /**
@@ -151,7 +151,7 @@ trait ReflectionTrait
      */
     public function getParameterType(object|string $class, string $method, string $param): ?string
     {
-        return $this->reflection->parameterType($class, $method, $param);
+        return $this->reflection()->parameterType($class, $method, $param);
     }
 
     /**
@@ -174,7 +174,7 @@ trait ReflectionTrait
      */
     public function getParameterDefaultValue(object|string $class, string $method, string $param): mixed
     {
-        return $this->reflection->parameterDefaultValue($class, $method, $param);
+        return $this->reflection()->parameterDefaultValue($class, $method, $param);
     }
 
     /**
@@ -197,7 +197,7 @@ trait ReflectionTrait
      */
     public function hasParameter(object|string $class, string $method, string $param): bool
     {
-        return $this->reflection->hasParameter($class, $method, $param);
+        return $this->reflection()->hasParameter($class, $method, $param);
     }
 
     /**
@@ -218,7 +218,7 @@ trait ReflectionTrait
      */
     public function isParameterNullable( object|string $class, string $method, string $param ): bool
     {
-        return $this->reflection->isParameterNullable( $class , $method , $param );
+        return $this->reflection()->isParameterNullable( $class , $method , $param );
     }
 
     /**
@@ -240,7 +240,7 @@ trait ReflectionTrait
      */
     public function isParameterOptional( object|string $class, string $method, string $param ): bool
     {
-        return $this->reflection->isParameterOptional( $class , $method , $param ) ;
+        return $this->reflection()->isParameterOptional( $class , $method , $param ) ;
     }
 
     /**
@@ -262,7 +262,7 @@ trait ReflectionTrait
      */
     public function isParameterVariadic(object|string $class, string $method, string $param): bool
     {
-        return $this->reflection->isParameterVariadic($class, $method, $param);
+        return $this->reflection()->isParameterVariadic($class, $method, $param);
     }
 
     /**
@@ -288,7 +288,7 @@ trait ReflectionTrait
      */
     public function hydrate( array $thing , string $class ): object
     {
-        return $this->reflection->hydrate( $thing , $class ) ;
+        return $this->reflection()->hydrate( $thing , $class ) ;
     }
 
     /**

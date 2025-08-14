@@ -175,13 +175,6 @@
 
 </h4>
 <dl class="phpdocumentor-table-of-contents">
-            <dt class="phpdocumentor-table-of-contents__entry -property -protected">
-    <a class="" href="classes/oihana-reflect-traits-ReflectionTrait.html#property_reflection">$reflection</a>
-    <span>
-                        &nbsp;: <a href="classes/oihana-reflect-Reflection.html"><abbr title="\oihana\reflect\Reflection">Reflection</abbr></a>|null            </span>
-</dt>
-<dd>The internal Reflection reference.</dd>
-
             <dt class="phpdocumentor-table-of-contents__entry -property -private">
     <a class="" href="classes/oihana-reflect-traits-ReflectionTrait.html#property___reflection">$__reflection</a>
     <span>
@@ -288,6 +281,13 @@
 </dt>
 <dd>Generates an associative array from the public properties of a given class or object.</dd>
 
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a class="" href="classes/oihana-reflect-traits-ReflectionTrait.html#method_reflection">reflection()</a>
+    <span>
+                                &nbsp;: <a href="classes/oihana-reflect-Reflection.html"><abbr title="\oihana\reflect\Reflection">Reflection</abbr></a>    </span>
+</dt>
+<dd>Get the internal Reflection instance.</dd>
+
     </dl>
 
 
@@ -302,62 +302,6 @@
             <a href="classes/oihana-reflect-traits-ReflectionTrait.html#properties" class="headerlink"><i class="fas fa-link"></i></a>
 
         </h3>
-                    <article
-        class="
-            phpdocumentor-element
-            -property
-            -protected
-                                                -read-only            -virtual        "
->
-    <h4 class="phpdocumentor-element__name" id="property_reflection">
-        $reflection
-        <a href="classes/oihana-reflect-traits-ReflectionTrait.html#property_reflection" class="headerlink"><i class="fas fa-link"></i></a>
-
-        <span class="phpdocumentor-element__modifiers">
-                        <small class="phpdocumentor-element__modifier">read-only</small>            <small class="phpdocumentor-element__modifier">virtual</small>        </span>
-    </h4>
-    <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/traits/ReflectionTrait.php"><a href="files/src-oihana-reflect-traits-reflectiontrait.html"><abbr title="src/oihana/reflect/traits/ReflectionTrait.php">ReflectionTrait.php</abbr></a></abbr>
-    :
-    <span class="phpdocumentor-element-found-in__line">43</span>
-
-    </aside>
-
-        <p class="phpdocumentor-summary">The internal Reflection reference.</p>
-
-    
-    <code class="phpdocumentor-code phpdocumentor-signature ">
-        <span class="phpdocumentor-signature__visibility">protected</span>
-            <span class="phpdocumentor-signature__type"><a href="classes/oihana-reflect-Reflection.html"><abbr title="\oihana\reflect\Reflection">Reflection</abbr></a>|null</span>
-    <span class="phpdocumentor-signature__name">$reflection</span>
-    </code>
-
-    
-    
-    
-
-    
-
-        <h5>Hooks</h5>
-            <code class="phpdocumentor-code phpdocumentor-signature ">
-    <span class="phpdocumentor-signature__visibility">protected</span>
-                <span class="phpdocumentor-signature__type"><a href="classes/oihana-reflect-Reflection.html"><abbr title="\oihana\reflect\Reflection">Reflection</abbr></a>|null</span>
-        <span class="phpdocumentor-signature__name">get</span>
-</code>
-
-
-
-
-
-
-
-
-
-
-
-    
-
-</article>
                     <article
         class="
             phpdocumentor-element
@@ -1590,6 +1534,45 @@ $helper-&gt;jsonSerializeFromPublicProperties(Product::class, fn($k,$v) =&gt; is
             </section>
 
 </article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="method_reflection">
+        reflection()
+        <a href="classes/oihana-reflect-traits-ReflectionTrait.html#method_reflection" class="headerlink"><i class="fas fa-link"></i></a>
+
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/traits/ReflectionTrait.php"><a href="files/src-oihana-reflect-traits-reflectiontrait.html"><abbr title="src/oihana/reflect/traits/ReflectionTrait.php">ReflectionTrait.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">43</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Get the internal Reflection instance.</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+                    <span class="phpdocumentor-signature__name">reflection</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type"><a href="classes/oihana-reflect-Reflection.html"><abbr title="\oihana\reflect\Reflection">Reflection</abbr></a></span></code>
+
+    <div class="phpdocumentor-label-line">
+        </div>
+    
+    
+    
+    
+
+    
+
+            <section>
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+        <span class="phpdocumentor-signature__response_type"><a href="classes/oihana-reflect-Reflection.html"><abbr title="\oihana\reflect\Reflection">Reflection</abbr></a></span>
+            </section>
+
+</article>
             </section>
 
         <div class="phpdocumentor-modal" id="source-view">
@@ -1704,7 +1687,6 @@ $helper-&gt;jsonSerializeFromPublicProperties(Product::class, fn($k,$v) =&gt; is
                                     <li class="phpdocumentor-on-this-page-section__title">Properties</li>
             <li>
                 <ul class="phpdocumentor-list -clean">
-                                            <li class=""><a href="classes/oihana-reflect-traits-ReflectionTrait.html#property_reflection">$reflection</a></li>
                                             <li class=""><a href="classes/oihana-reflect-traits-ReflectionTrait.html#property___reflection">$__reflection</a></li>
                                             <li class=""><a href="classes/oihana-reflect-traits-ReflectionTrait.html#property___shortName">$__shortName</a></li>
                                     </ul>
@@ -1724,6 +1706,7 @@ $helper-&gt;jsonSerializeFromPublicProperties(Product::class, fn($k,$v) =&gt; is
                                             <li class=""><a href="classes/oihana-reflect-traits-ReflectionTrait.html#method_isParameterOptional">isParameterOptional()</a></li>
                                             <li class=""><a href="classes/oihana-reflect-traits-ReflectionTrait.html#method_isParameterVariadic">isParameterVariadic()</a></li>
                                             <li class=""><a href="classes/oihana-reflect-traits-ReflectionTrait.html#method_jsonSerializeFromPublicProperties">jsonSerializeFromPublicProperties()</a></li>
+                                            <li class=""><a href="classes/oihana-reflect-traits-ReflectionTrait.html#method_reflection">reflection()</a></li>
                                     </ul>
             </li>
                     </ul>

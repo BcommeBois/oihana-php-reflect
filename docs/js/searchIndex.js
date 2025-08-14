@@ -201,6 +201,11 @@ Search.appendIndex(
             "summary": "Provides\u0020helper\u0020methods\u0020for\u0020working\u0020with\u0020PHP\u0020reflection.",
             "url": "classes/oihana-reflect-traits-ReflectionTrait.html"
         },                {
+            "fqsen": "\\oihana\\reflect\\traits\\ReflectionTrait\u003A\u003Areflection\u0028\u0029",
+            "name": "reflection",
+            "summary": "Get\u0020the\u0020internal\u0020Reflection\u0020instance.",
+            "url": "classes/oihana-reflect-traits-ReflectionTrait.html#method_reflection"
+        },                {
             "fqsen": "\\oihana\\reflect\\traits\\ReflectionTrait\u003A\u003AgetConstants\u0028\u0029",
             "name": "getConstants",
             "summary": "Returns\u0020all\u0020constants\u0020of\u0020a\u0020given\u0020class\u0020or\u0020object.",
@@ -270,11 +275,6 @@ Search.appendIndex(
             "name": "__shortName",
             "summary": "Cached\u0020short\u0020class\u0020name\u0020for\u0020performance.",
             "url": "classes/oihana-reflect-traits-ReflectionTrait.html#property___shortName"
-        },                {
-            "fqsen": "\\oihana\\reflect\\traits\\ReflectionTrait\u003A\u003A\u0024reflection",
-            "name": "reflection",
-            "summary": "The\u0020internal\u0020Reflection\u0020reference.",
-            "url": "classes/oihana-reflect-traits-ReflectionTrait.html#property_reflection"
         },                {
             "fqsen": "\\oihana\\reflect\\Version",
             "name": "Version",
