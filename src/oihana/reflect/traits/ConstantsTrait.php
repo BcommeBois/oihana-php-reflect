@@ -132,6 +132,49 @@ trait ConstantsTrait
      *     - If an array of strings, each separator is applied iteratively.
      *
      * @return string|string[]|null The constant name(s) matching the value, or null if none found.
+     *
+     * @example
+     * ```php
+     * use oihana\reflect\traits\ConstantsTrait ;
+     *
+     * final class Status
+     * {
+     *     use ConstantsTrait;
+     *
+     *     public const string OPEN   = 'open';
+     *     public const string CLOSE  = 'close';
+     *     public const string MIXED  = 'draft,open,closed';
+     * }
+     *
+     * // Basic lookup without separator
+     * echo Status::getConstant('open'); // 'OPEN'
+     *
+     * // Lookup when multiple constants share the same value
+     *
+     * final class Codes
+     * {
+     *     use ConstantsTrait;
+     *
+     *     public const int OK      = 200;
+     *     public const int ALSO_OK = 200;
+     *     public const int FAIL    = 500;
+     * }
+     *
+     * var_dump( Codes::getConstant( 200 ) ) ; // ['OK', 'ALSO_OK']
+     *
+     * // Using separator to match sub-values inside a string constant
+     * echo Status::getConstant('draft', ',');
+     * // 'MIXED'
+     *
+     * // Using multiple separators
+     * final class Multi
+     * {
+     *     use ConstantsTrait;
+     *     public const string ALPHA = 'a|b,c';
+     * }
+     * echo Multi::getConstant('b', [',', '|']);
+     * // 'ALPHA'
+     * ```
      */
     public static function getConstant( string $value , array|string|null $separator = null ): string|array|null
     {
@@ -224,6 +267,50 @@ trait ConstantsTrait
         }
 
         return $result ;
+    }
+
+    /**
+     * Returns all constant names (keys) in this class.
+     *
+     * @return string[]
+     *
+     * @example
+     * ```php
+     * final class Status
+     * {
+     *     use ConstantsTrait;
+     *     public const OPEN  = 'open';
+     *     public const CLOSE = 'close';
+     * }
+     * print_r(Status::getConstantKeys());
+     * // ['OPEN','CLOSE']
+     * ```
+     */
+    public static function getConstantKeys(): array
+    {
+        return array_keys( static::getAll() ) ;
+    }
+
+    /**
+     * Returns all constant values in this class.
+     *
+     * @return array
+     *
+     * @example
+     * ```php
+     * final class Status
+     * {
+     *     use ConstantsTrait;
+     *     public const OPEN  = 'open';
+     *     public const CLOSE = 'close';
+     * }
+     * print_r(Status::getConstantValues());
+     * // ['open','close']
+     * ```
+     */
+    public static function getConstantValues(): array
+    {
+        return array_values( static::getAll() ) ;
     }
 
     /**

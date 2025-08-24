@@ -32,10 +32,14 @@ class ConstantsTraitTest extends TestCase
     {
         $all = ConstantsTraitTestClass::getAll();
 
-        $this->assertIsArray($all);
-        $this->assertArrayHasKey('FOO', $all);
-        $this->assertArrayHasKey('BAZ', $all);
-        $this->assertIsArray($all['BAZ']);
+        $this->assertIsArray( $all );
+
+        $this->assertArrayHasKey('FOO' , $all ) ;
+        $this->assertArrayHasKey('BAZ' , $all ) ;
+
+
+        $this->assertIsArray( $all['BAZ'] );
+
         $this->assertEquals(['baz1', 'baz2', 'baz3'], $all['BAZ']);
     }
 

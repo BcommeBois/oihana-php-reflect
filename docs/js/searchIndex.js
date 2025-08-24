@@ -46,6 +46,36 @@ Search.appendIndex(
             "summary": "",
             "url": "classes/oihana-reflect-attributes-HydrateWith.html#property_classes"
         },                {
+            "fqsen": "\\oihana\\reflect\\enums\\CaseEnum",
+            "name": "CaseEnum",
+            "summary": "Enumeration\u0020for\u0020case\u0020options.",
+            "url": "classes/oihana-reflect-enums-CaseEnum.html"
+        },                {
+            "fqsen": "\\oihana\\reflect\\enums\\CaseEnum\u003A\u003ALOWER",
+            "name": "LOWER",
+            "summary": "The\u0020\u0027lower\u0027\u0020case\u0020usage.",
+            "url": "classes/oihana-reflect-enums-CaseEnum.html#constant_LOWER"
+        },                {
+            "fqsen": "\\oihana\\reflect\\enums\\CaseEnum\u003A\u003AUPPER",
+            "name": "UPPER",
+            "summary": "The\u0020\u0027upper\u0027\u0020case\u0020usage.",
+            "url": "classes/oihana-reflect-enums-CaseEnum.html#constant_UPPER"
+        },                {
+            "fqsen": "\\oihana\\reflect\\enums\\FunctionEnum",
+            "name": "FunctionEnum",
+            "summary": "Enumeration\u0020for\u0020function\u0020options.",
+            "url": "classes/oihana-reflect-enums-FunctionEnum.html"
+        },                {
+            "fqsen": "\\oihana\\reflect\\enums\\FunctionEnum\u003A\u003AARGUMENTS",
+            "name": "ARGUMENTS",
+            "summary": "The\u0020function\u0020\u0027arguments\u0027\u0020definition.",
+            "url": "classes/oihana-reflect-enums-FunctionEnum.html#constant_ARGUMENTS"
+        },                {
+            "fqsen": "\\oihana\\reflect\\enums\\FunctionEnum\u003A\u003AFUNCTION",
+            "name": "FUNCTION",
+            "summary": "The\u0020\u0027function\u0027\u0020name\u0020definition.",
+            "url": "classes/oihana-reflect-enums-FunctionEnum.html#constant_FUNCTION"
+        },                {
             "fqsen": "\\oihana\\reflect\\exceptions\\ConstantException",
             "name": "ConstantException",
             "summary": "Exception\u0020thrown\u0020when\u0020a\u0020class\u0020or\u0020enum\u0020constant\u0020fails\u0020validation.",
@@ -171,6 +201,16 @@ Search.appendIndex(
             "summary": "Returns\u0020the\u0020constant\u0020name\u0028s\u0029\u0020associated\u0020with\u0020the\u0020given\u0020value.",
             "url": "classes/oihana-reflect-traits-ConstantsTrait.html#method_getConstant"
         },                {
+            "fqsen": "\\oihana\\reflect\\traits\\ConstantsTrait\u003A\u003AgetConstantKeys\u0028\u0029",
+            "name": "getConstantKeys",
+            "summary": "Returns\u0020all\u0020constant\u0020names\u0020\u0028keys\u0029\u0020in\u0020this\u0020class.",
+            "url": "classes/oihana-reflect-traits-ConstantsTrait.html#method_getConstantKeys"
+        },                {
+            "fqsen": "\\oihana\\reflect\\traits\\ConstantsTrait\u003A\u003AgetConstantValues\u0028\u0029",
+            "name": "getConstantValues",
+            "summary": "Returns\u0020all\u0020constant\u0020values\u0020in\u0020this\u0020class.",
+            "url": "classes/oihana-reflect-traits-ConstantsTrait.html#method_getConstantValues"
+        },                {
             "fqsen": "\\oihana\\reflect\\traits\\ConstantsTrait\u003A\u003Aincludes\u0028\u0029",
             "name": "includes",
             "summary": "Checks\u0020if\u0020a\u0020given\u0020value\u0020is\u0020valid\u0020\u0028exists\u0020as\u0020a\u0020constant\u0020in\u0020this\u0020class\u0029.",
@@ -195,6 +235,46 @@ Search.appendIndex(
             "name": "CONSTANTS",
             "summary": "The\u0020flipped\u0020list\u0020of\u0020all\u0020constants.",
             "url": "classes/oihana-reflect-traits-ConstantsTrait.html#property_CONSTANTS"
+        },                {
+            "fqsen": "\\oihana\\reflect\\traits\\FunctionCallTrait",
+            "name": "FunctionCallTrait",
+            "summary": "Utility\u0020methods\u0020for\u0020detecting,\u0020parsing,\u0020validating,\u0020and\u0020manipulating\nexpressions\u0020written\u0020in\u0020a\u0020functional\u0020call\u0020format,\u0020e.g.\u0020\u0060APPEND\u0028\u005B1,2\u005D,\u00203\u0029\u0060.",
+            "url": "classes/oihana-reflect-traits-FunctionCallTrait.html"
+        },                {
+            "fqsen": "\\oihana\\reflect\\traits\\FunctionCallTrait\u003A\u003AgetFunctionName\u0028\u0029",
+            "name": "getFunctionName",
+            "summary": "Extract\u0020the\u0020function\u0020name\u0020from\u0020a\u0020given\u0020expression.",
+            "url": "classes/oihana-reflect-traits-FunctionCallTrait.html#method_getFunctionName"
+        },                {
+            "fqsen": "\\oihana\\reflect\\traits\\FunctionCallTrait\u003A\u003AgetArguments\u0028\u0029",
+            "name": "getArguments",
+            "summary": "Extract\u0020the\u0020arguments\u0020from\u0020a\u0020function\u0020call\u0020expression.",
+            "url": "classes/oihana-reflect-traits-FunctionCallTrait.html#method_getArguments"
+        },                {
+            "fqsen": "\\oihana\\reflect\\traits\\FunctionCallTrait\u003A\u003AisValidArguments\u0028\u0029",
+            "name": "isValidArguments",
+            "summary": "Check\u0020if\u0020the\u0020number\u0020of\u0020arguments\u0020in\u0020a\u0020function\u0020call\u0020is\u0020within\u0020a\u0020valid\u0020range.",
+            "url": "classes/oihana-reflect-traits-FunctionCallTrait.html#method_isValidArguments"
+        },                {
+            "fqsen": "\\oihana\\reflect\\traits\\FunctionCallTrait\u003A\u003AisFunctionCall\u0028\u0029",
+            "name": "isFunctionCall",
+            "summary": "Check\u0020if\u0020the\u0020given\u0020expression\u0020matches\u0020a\u0020known\u0020function\u0020call.",
+            "url": "classes/oihana-reflect-traits-FunctionCallTrait.html#method_isFunctionCall"
+        },                {
+            "fqsen": "\\oihana\\reflect\\traits\\FunctionCallTrait\u003A\u003AsplitExpression\u0028\u0029",
+            "name": "splitExpression",
+            "summary": "Split\u0020an\u0020expression\u0020into\u0020its\u0020function\u0020name\u0020and\u0020arguments.",
+            "url": "classes/oihana-reflect-traits-FunctionCallTrait.html#method_splitExpression"
+        },                {
+            "fqsen": "\\oihana\\reflect\\traits\\FunctionCallTrait\u003A\u003AtoCanonicalExpression\u0028\u0029",
+            "name": "toCanonicalExpression",
+            "summary": "Convert\u0020a\u0020function\u0020expression\u0020into\u0020its\u0020canonical\u0020representation.",
+            "url": "classes/oihana-reflect-traits-FunctionCallTrait.html#method_toCanonicalExpression"
+        },                {
+            "fqsen": "\\oihana\\reflect\\traits\\FunctionCallTrait\u003A\u003AreplaceArguments\u0028\u0029",
+            "name": "replaceArguments",
+            "summary": "Replace\u0020the\u0020arguments\u0020of\u0020a\u0020function\u0020call\u0020and\u0020return\u0020the\u0020new\u0020expression.",
+            "url": "classes/oihana-reflect-traits-FunctionCallTrait.html#method_replaceArguments"
         },                {
             "fqsen": "\\oihana\\reflect\\traits\\ReflectionTrait",
             "name": "ReflectionTrait",
@@ -355,6 +435,11 @@ Search.appendIndex(
             "name": "attributes",
             "summary": "",
             "url": "namespaces/oihana-reflect-attributes.html"
+        },                {
+            "fqsen": "\\oihana\\reflect\\enums",
+            "name": "enums",
+            "summary": "",
+            "url": "namespaces/oihana-reflect-enums.html"
         },                {
             "fqsen": "\\oihana\\reflect\\exceptions",
             "name": "exceptions",

@@ -97,92 +97,54 @@
                                         <ul class="phpdocumentor-breadcrumbs">
             <li class="phpdocumentor-breadcrumb"><a href="namespaces/oihana.html">oihana</a></li>
             <li class="phpdocumentor-breadcrumb"><a href="namespaces/oihana-reflect.html">reflect</a></li>
-            <li class="phpdocumentor-breadcrumb"><a href="namespaces/oihana-reflect-traits.html">traits</a></li>
+            <li class="phpdocumentor-breadcrumb"><a href="namespaces/oihana-reflect-enums.html">enums</a></li>
     </ul>
 
-    <article class="phpdocumentor-element -trait">
+    <article class="phpdocumentor-element -class">
         <h2 class="phpdocumentor-content__title">
-    ConstantsTrait
+    FunctionEnum
+
+    
+    
+    
+            <span class="phpdocumentor-element__extends">
+            uses
+                            <a href="classes/oihana-reflect-traits-ConstantsTrait.html"><abbr title="\oihana\reflect\traits\ConstantsTrait">ConstantsTrait</abbr></a>                    </span>
     </h2>
 
+<div class="phpdocumentor-label-line">
+
+
+</div>
+
         <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/traits/ConstantsTrait.php"><a href="files/src-oihana-reflect-traits-constantstrait.html"><abbr title="src/oihana/reflect/traits/ConstantsTrait.php">ConstantsTrait.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/enums/FunctionEnum.php"><a href="files/src-oihana-reflect-enums-functionenum.html"><abbr title="src/oihana/reflect/enums/FunctionEnum.php">FunctionEnum.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">51</span>
+    <span class="phpdocumentor-element-found-in__line">16</span>
 
     </aside>
 
-            <p class="phpdocumentor-summary">Enum-like utilities for classes that expose a set of public constants.</p>
+            <p class="phpdocumentor-summary">Enumeration for function options.</p>
 
 
-    <section class="phpdocumentor-description"><p>Responsibilities:</p>
-<ul>
-<li>Extract all constants of the using class with caching (<abbr title="\oihana\reflect\traits\getAll()">getAll()</abbr>)</li>
-<li>Provide a flattened, unique, sorted list of values (<abbr title="\oihana\reflect\traits\enums()">enums()</abbr>)</li>
-<li>Reverse lookup constant name(s) from a value (<abbr title="\oihana\reflect\traits\getConstant()">getConstant()</abbr>)</li>
-<li>Validate membership (<abbr title="\oihana\reflect\traits\validate()">validate()</abbr>) and perform inclusion checks (<abbr title="\oihana\reflect\traits\includes()">includes()</abbr>)</li>
-<li>Reset internal caches when needed (<abbr title="\oihana\reflect\traits\resetCaches()">resetCaches()</abbr>)</li>
-</ul>
-<p>Behavior and notes:</p>
-<ul>
-<li>Supports constants whose values are scalars or arrays</li>
-<li>If a constant value is a string that encodes multiple values (e.g. &quot;one,two,three&quot;),
-<abbr title="\oihana\reflect\traits\getConstant()">getConstant()</abbr> and <abbr title="\oihana\reflect\traits\includes()">includes()</abbr> can split the string using a separator
-or an array of separators, enabling multi-token lookups</li>
-<li>Reverse lookup cache is keyed by the separator configuration for performance</li>
-</ul>
-<p>Typical usage:</p>
-<pre class="prettyprint"><code class="language-php">final class Status
-{
-    use ConstantsTrait;
-    public const string OPEN  = 'open';
-    public const string CLOSE = 'close';
-}
-
-Status::includes('open');    // true
-Status::getConstant('open'); // 'OPEN'
-Status::enums();             // ['close','open'] (sorted)
-</code></pre>
-<p>Caching:</p>
-<ul>
-<li>$ALL holds the raw constants map (name =&gt; value)</li>
-<li>$CONSTANTS holds reverse lookup tables by separator key</li>
+    <section class="phpdocumentor-description"><ul>
+<li>Provides constants for 'function' and 'arguments' definitions.</li>
 </ul>
 </section>
 
 
     <h5 class="phpdocumentor-tag-list__heading" id="tags">
         Tags
-        <a href="classes/oihana-reflect-traits-ConstantsTrait.html#tags" class="headerlink"><i class="fas fa-link"></i></a>
+        <a href="classes/oihana-reflect-enums-FunctionEnum.html#tags" class="headerlink"><i class="fas fa-link"></i></a>
 
     </h5>
     <dl class="phpdocumentor-tag-list">
                                     <dt class="phpdocumentor-tag-list__entry">
-                    <span class="phpdocumentor-tag__name">see</span>
-                </dt>
-                <dd class="phpdocumentor-tag-list__definition">
-                                                                                    <span class="phpdocumentor-tag-link"><a href="classes/oihana-reflect-exceptions-ConstantException.html"><abbr title="\oihana\reflect\exceptions\ConstantException">ConstantException</abbr></a></span>
-                                        
-                                                 <section class="phpdocumentor-description"><p>Thrown by <abbr title="\oihana\reflect\traits\validate()">validate()</abbr> when the value is not part of the enum</p>
-</section>
-
-                                    </dd>
-                            <dt class="phpdocumentor-tag-list__entry">
-                    <span class="phpdocumentor-tag__name">see</span>
-                </dt>
-                <dd class="phpdocumentor-tag-list__definition">
-                                                                                    <span class="phpdocumentor-tag-link"><abbr title="\ReflectionClass">ReflectionClass</abbr></span>
-                                        
-                                                 <section class="phpdocumentor-description"><p>Used internally to extract class constants</p>
-</section>
-
-                                    </dd>
-                                                <dt class="phpdocumentor-tag-list__entry">
                     <span class="phpdocumentor-tag__name">author</span>
                 </dt>
                 <dd class="phpdocumentor-tag-list__definition">
                                                                                 
-                                                 <section class="phpdocumentor-description"><p>Marc Alcaraz (ekameleon)</p>
+                                                 <section class="phpdocumentor-description"><p>Marc Alcaraz</p>
 </section>
 
                                     </dd>
@@ -190,7 +152,7 @@ Status::enums();             // ['close','open'] (sorted)
                     <span class="phpdocumentor-tag__name">since</span>
                 </dt>
                 <dd class="phpdocumentor-tag-list__definition">
-                                            <span class="phpdocumentor-tag-link">1.0.0</span>
+                                            <span class="phpdocumentor-tag-link">1.0.3</span>
                                                                                 
                                              
                                     </dd>
@@ -202,7 +164,7 @@ Status::enums();             // ['close','open'] (sorted)
 
 <h3 id="toc">
     Table of Contents
-    <a href="classes/oihana-reflect-traits-ConstantsTrait.html#toc" class="headerlink"><i class="fas fa-link"></i></a>
+    <a href="classes/oihana-reflect-enums-FunctionEnum.html#toc" class="headerlink"><i class="fas fa-link"></i></a>
 
 </h3>
 
@@ -212,11 +174,32 @@ Status::enums();             // ['close','open'] (sorted)
 
 
 
+<h4 id="toc-constants">
+    Constants
+    <a href="classes/oihana-reflect-enums-FunctionEnum.html#toc-constants" class="headerlink"><i class="fas fa-link"></i></a>
+
+</h4>
+<dl class="phpdocumentor-table-of-contents">
+            <dt class="phpdocumentor-table-of-contents__entry -constant -public">
+    <a class="" href="classes/oihana-reflect-enums-FunctionEnum.html#constant_ARGUMENTS">ARGUMENTS</a>
+    <span>
+        &nbsp;= &#039;arguments&#039;                            </span>
+</dt>
+<dd>The function &#039;arguments&#039; definition.</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -constant -public">
+    <a class="" href="classes/oihana-reflect-enums-FunctionEnum.html#constant_FUNCTION">FUNCTION</a>
+    <span>
+        &nbsp;= &#039;function&#039;                            </span>
+</dt>
+<dd>The &#039;function&#039; name definition.</dd>
+
+    </dl>
 
 
 <h4 id="toc-properties">
     Properties
-    <a href="classes/oihana-reflect-traits-ConstantsTrait.html#toc-properties" class="headerlink"><i class="fas fa-link"></i></a>
+    <a href="classes/oihana-reflect-enums-FunctionEnum.html#toc-properties" class="headerlink"><i class="fas fa-link"></i></a>
 
 </h4>
 <dl class="phpdocumentor-table-of-contents">
@@ -238,7 +221,7 @@ Status::enums();             // ['close','open'] (sorted)
 
 <h4 id="toc-methods">
     Methods
-    <a href="classes/oihana-reflect-traits-ConstantsTrait.html#toc-methods" class="headerlink"><i class="fas fa-link"></i></a>
+    <a href="classes/oihana-reflect-enums-FunctionEnum.html#toc-methods" class="headerlink"><i class="fas fa-link"></i></a>
 
 </h4>
 <dl class="phpdocumentor-table-of-contents">
@@ -309,14 +292,84 @@ Status::enums();             // ['close','open'] (sorted)
 
 
 
-
         
+    <section class="phpdocumentor-constants">
+        <h3 class="phpdocumentor-elements__header" id="constants">
+            Constants
+            <a href="classes/oihana-reflect-enums-FunctionEnum.html#constants" class="headerlink"><i class="fas fa-link"></i></a>
+
+        </h3>
+                    <article class="phpdocumentor-element -constant -public ">
+    <h4 class="phpdocumentor-element__name" id="constant_ARGUMENTS">
+        ARGUMENTS
+        <a href="classes/oihana-reflect-enums-FunctionEnum.html#constant_ARGUMENTS" class="headerlink"><i class="fas fa-link"></i></a>
+
+    </h4>
+
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/enums/FunctionEnum.php"><a href="files/src-oihana-reflect-enums-functionenum.html"><abbr title="src/oihana/reflect/enums/FunctionEnum.php">FunctionEnum.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">23</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">The function &#039;arguments&#039; definition.</p>
+
+    
+    <code class="phpdocumentor-signature phpdocumentor-code ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+        <span class="phpdocumentor-signature__type">mixed</span>
+    <span class="phpdocumentor-signature__name">ARGUMENTS</span>
+    = <span class="phpdocumentor-signature__default-value">&#039;arguments&#039;</span>
+</code>
+
+
+    
+    
+    
+
+    
+
+</article>
+                    <article class="phpdocumentor-element -constant -public ">
+    <h4 class="phpdocumentor-element__name" id="constant_FUNCTION">
+        FUNCTION
+        <a href="classes/oihana-reflect-enums-FunctionEnum.html#constant_FUNCTION" class="headerlink"><i class="fas fa-link"></i></a>
+
+    </h4>
+
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/enums/FunctionEnum.php"><a href="files/src-oihana-reflect-enums-functionenum.html"><abbr title="src/oihana/reflect/enums/FunctionEnum.php">FunctionEnum.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">28</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">The &#039;function&#039; name definition.</p>
+
+    
+    <code class="phpdocumentor-signature phpdocumentor-code ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+        <span class="phpdocumentor-signature__type">mixed</span>
+    <span class="phpdocumentor-signature__name">FUNCTION</span>
+    = <span class="phpdocumentor-signature__default-value">&#039;function&#039;</span>
+</code>
+
+
+    
+    
+    
+
+    
+
+</article>
+            </section>
 
         
     <section class="phpdocumentor-properties">
         <h3 class="phpdocumentor-elements__header" id="properties">
             Properties
-            <a href="classes/oihana-reflect-traits-ConstantsTrait.html#properties" class="headerlink"><i class="fas fa-link"></i></a>
+            <a href="classes/oihana-reflect-enums-FunctionEnum.html#properties" class="headerlink"><i class="fas fa-link"></i></a>
 
         </h3>
                     <article
@@ -402,7 +455,7 @@ Status::enums();             // ['close','open'] (sorted)
             <section class="phpdocumentor-methods">
         <h3 class="phpdocumentor-elements__header" id="methods">
             Methods
-            <a href="classes/oihana-reflect-traits-ConstantsTrait.html#methods" class="headerlink"><i class="fas fa-link"></i></a>
+            <a href="classes/oihana-reflect-enums-FunctionEnum.html#methods" class="headerlink"><i class="fas fa-link"></i></a>
 
         </h3>
                     <article
@@ -1015,7 +1068,7 @@ types of the needle in the haystack.</p>
     <div class="phpdocumentor-modal-bg" data-exit-button></div>
     <div class="phpdocumentor-modal-container">
         <div class="phpdocumentor-modal-content">
-            <pre style="max-height: 500px; overflow-y: scroll" data-src="files/src/oihana/reflect/traits/ConstantsTrait.php.txt" class="language-php line-numbers linkable-line-numbers"></pre>
+            <pre style="max-height: 500px; overflow-y: scroll" data-src="files/src/oihana/reflect/enums/FunctionEnum.php.txt" class="language-php line-numbers linkable-line-numbers"></pre>
         </div>
         <button data-exit-button class="phpdocumentor-modal__close">&times;</button>
     </div>
@@ -1116,18 +1169,28 @@ types of the needle in the haystack.</p>
             <li class="phpdocumentor-on-this-page-section__title">Table Of Contents</li>
             <li>
                 <ul class="phpdocumentor-list -clean">
-                                                            <li><a href="classes/oihana-reflect-traits-ConstantsTrait.html#toc-properties">Properties</a></li>
-                                                            <li><a href="classes/oihana-reflect-traits-ConstantsTrait.html#toc-methods">Methods</a></li>
+                                        <li><a href="classes/oihana-reflect-enums-FunctionEnum.html#toc-constants">Constants</a></li>
+                                                            <li><a href="classes/oihana-reflect-enums-FunctionEnum.html#toc-properties">Properties</a></li>
+                                                            <li><a href="classes/oihana-reflect-enums-FunctionEnum.html#toc-methods">Methods</a></li>
                                     </ul>
             </li>
-                                    <li class="phpdocumentor-on-this-page-section__title">Properties</li>
-            <li>
-                <ul class="phpdocumentor-list -clean">
-                                            <li class=""><a href="classes/oihana-reflect-traits-ConstantsTrait.html#property_ALL">$ALL</a></li>
-                                            <li class=""><a href="classes/oihana-reflect-traits-ConstantsTrait.html#property_CONSTANTS">$CONSTANTS</a></li>
-                                    </ul>
-            </li>
-                                    <li class="phpdocumentor-on-this-page-section__title">Methods</li>
+                            <li class="phpdocumentor-on-this-page-section__title">Constants</li>
+                <li>
+                    <ul class="phpdocumentor-list -clean">
+                                                    <li class=""><a href="classes/oihana-reflect-enums-FunctionEnum.html#constant_ARGUMENTS">ARGUMENTS</a></li>
+                                                    <li class=""><a href="classes/oihana-reflect-enums-FunctionEnum.html#constant_FUNCTION">FUNCTION</a></li>
+                                            </ul>
+                </li>
+            
+                            <li class="phpdocumentor-on-this-page-section__title">Properties</li>
+                <li>
+                    <ul class="phpdocumentor-list -clean">
+                                                    <li class=""><a href="classes/oihana-reflect-traits-ConstantsTrait.html#property_ALL">$ALL</a></li>
+                                                    <li class=""><a href="classes/oihana-reflect-traits-ConstantsTrait.html#property_CONSTANTS">$CONSTANTS</a></li>
+                                            </ul>
+                </li>
+            
+                        <li class="phpdocumentor-on-this-page-section__title">Methods</li>
             <li>
                 <ul class="phpdocumentor-list -clean">
                                             <li class=""><a href="classes/oihana-reflect-traits-ConstantsTrait.html#method_enums">enums()</a></li>
@@ -1158,7 +1221,7 @@ types of the needle in the haystack.</p>
     </section>
 </section>
         </div>
-        <a href="classes/oihana-reflect-traits-ConstantsTrait.html#top" class="phpdocumentor-back-to-top"><i class="fas fa-chevron-circle-up"></i></a>
+        <a href="classes/oihana-reflect-enums-FunctionEnum.html#top" class="phpdocumentor-back-to-top"><i class="fas fa-chevron-circle-up"></i></a>
 
     </main>
 

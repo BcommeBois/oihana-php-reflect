@@ -102,87 +102,103 @@
 
     <article class="phpdocumentor-element -trait">
         <h2 class="phpdocumentor-content__title">
-    ConstantsTrait
+    FunctionCallTrait
+            <span class="phpdocumentor-trait__extends">
+            uses
+                            <a href="classes/oihana-reflect-traits-ConstantsTrait.html"><abbr title="\oihana\reflect\traits\ConstantsTrait">trait:short</abbr></a>                    </span>
     </h2>
 
         <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/traits/ConstantsTrait.php"><a href="files/src-oihana-reflect-traits-constantstrait.html"><abbr title="src/oihana/reflect/traits/ConstantsTrait.php">ConstantsTrait.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/traits/FunctionCallTrait.php"><a href="files/src-oihana-reflect-traits-functioncalltrait.html"><abbr title="src/oihana/reflect/traits/FunctionCallTrait.php">FunctionCallTrait.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">51</span>
+    <span class="phpdocumentor-element-found-in__line">82</span>
 
     </aside>
 
-            <p class="phpdocumentor-summary">Enum-like utilities for classes that expose a set of public constants.</p>
+            <p class="phpdocumentor-summary">Utility methods for detecting, parsing, validating, and manipulating
+expressions written in a functional call format, e.g. `APPEND([1,2], 3)`.</p>
 
 
-    <section class="phpdocumentor-description"><p>Responsibilities:</p>
+    <section class="phpdocumentor-description"><p>Depends on ConstantsTrait for retrieving the list of known valid functions.</p>
+<p>This trait provides:</p>
 <ul>
-<li>Extract all constants of the using class with caching (<abbr title="\oihana\reflect\traits\getAll()">getAll()</abbr>)</li>
-<li>Provide a flattened, unique, sorted list of values (<abbr title="\oihana\reflect\traits\enums()">enums()</abbr>)</li>
-<li>Reverse lookup constant name(s) from a value (<abbr title="\oihana\reflect\traits\getConstant()">getConstant()</abbr>)</li>
-<li>Validate membership (<abbr title="\oihana\reflect\traits\validate()">validate()</abbr>) and perform inclusion checks (<abbr title="\oihana\reflect\traits\includes()">includes()</abbr>)</li>
-<li>Reset internal caches when needed (<abbr title="\oihana\reflect\traits\resetCaches()">resetCaches()</abbr>)</li>
+<li>Extraction of function name and arguments</li>
+<li>Validation of argument counts</li>
+<li>Case-sensitive or case-insensitive function recognition</li>
+<li>Conversion to canonical expression</li>
+<li>Replacement of arguments in function calls</li>
 </ul>
-<p>Behavior and notes:</p>
+<p>Case handling:</p>
 <ul>
-<li>Supports constants whose values are scalars or arrays</li>
-<li>If a constant value is a string that encodes multiple values (e.g. &quot;one,two,three&quot;),
-<abbr title="\oihana\reflect\traits\getConstant()">getConstant()</abbr> and <abbr title="\oihana\reflect\traits\includes()">includes()</abbr> can split the string using a separator
-or an array of separators, enabling multi-token lookups</li>
-<li>Reverse lookup cache is keyed by the separator configuration for performance</li>
+<li>Optional <code class="prettyprint">$case</code> parameter in most methods (<code class="prettyprint">'upper'</code> or <code class="prettyprint">'lower'</code>)
+allows enforcing the desired case for the function name during validation
+and extraction.</li>
 </ul>
-<p>Typical usage:</p>
-<pre class="prettyprint"><code class="language-php">final class Status
-{
-    use ConstantsTrait;
-    public const string OPEN  = 'open';
-    public const string CLOSE = 'close';
+<p>Examples:</p>
+<pre class="prettyprint"><code class="language-php">final class MyFunctions {
+    use FunctionCallTrait;
+
+    public const string APPEND = 'APPEND';
+    public const string MERGE  = 'MERGE';
 }
 
-Status::includes('open');    // true
-Status::getConstant('open'); // 'OPEN'
-Status::enums();             // ['close','open'] (sorted)
+$expr = 'append([1,2], 3)';
+
+// Basic function name extraction
+FunctionCallTrait::getFunctionName($expr);            // 'append'
+FunctionCallTrait::getFunctionName($expr, 'upper');   // 'APPEND'
+FunctionCallTrait::getFunctionName($expr, 'lower');   // 'append'
+
+// Argument extraction
+FunctionCallTrait::getArguments($expr);              // ['[1,2]', '3']
+FunctionCallTrait::getArguments($expr, 'upper');     // ['[1,2]', '3'] (case affects validation only)
+
+// Validation of function call
+FunctionCallTrait::isFunctionCall($expr);            // true
+FunctionCallTrait::isFunctionCall($expr, 'upper');   // true
+FunctionCallTrait::isFunctionCall('unknown(1)');     // false
+
+// Split expression into function and arguments
+FunctionCallTrait::splitExpression($expr);
+// [
+//     'function'  =&gt; 'append',
+//     'arguments' =&gt; ['[1,2]', '3']
+// ]
+
+FunctionCallTrait::splitExpression($expr, 'upper');
+// [
+//     'function'  =&gt; 'APPEND',
+//     'arguments' =&gt; ['[1,2]', '3']
+// ]
+
+// Convert to canonical expression
+FunctionCallTrait::toCanonicalExpression($expr);           // 'APPEND([1,2], 3)'
+FunctionCallTrait::toCanonicalExpression($expr, 'lower');  // 'append([1,2], 3)'
+
+// Replace arguments in a function call
+FunctionCallTrait::replaceArguments($expr, ['[4,5]', '6']);
+// 'APPEND([4,5], 6)'
+
+// Check argument counts
+FunctionCallTrait::isValidArguments($expr, 2);             // true
+FunctionCallTrait::isValidArguments($expr, 2, 3);          // true
+FunctionCallTrait::isValidArguments($expr, 3);             // false
 </code></pre>
-<p>Caching:</p>
-<ul>
-<li>$ALL holds the raw constants map (name =&gt; value)</li>
-<li>$CONSTANTS holds reverse lookup tables by separator key</li>
-</ul>
 </section>
 
 
     <h5 class="phpdocumentor-tag-list__heading" id="tags">
         Tags
-        <a href="classes/oihana-reflect-traits-ConstantsTrait.html#tags" class="headerlink"><i class="fas fa-link"></i></a>
+        <a href="classes/oihana-reflect-traits-FunctionCallTrait.html#tags" class="headerlink"><i class="fas fa-link"></i></a>
 
     </h5>
     <dl class="phpdocumentor-tag-list">
                                     <dt class="phpdocumentor-tag-list__entry">
-                    <span class="phpdocumentor-tag__name">see</span>
-                </dt>
-                <dd class="phpdocumentor-tag-list__definition">
-                                                                                    <span class="phpdocumentor-tag-link"><a href="classes/oihana-reflect-exceptions-ConstantException.html"><abbr title="\oihana\reflect\exceptions\ConstantException">ConstantException</abbr></a></span>
-                                        
-                                                 <section class="phpdocumentor-description"><p>Thrown by <abbr title="\oihana\reflect\traits\validate()">validate()</abbr> when the value is not part of the enum</p>
-</section>
-
-                                    </dd>
-                            <dt class="phpdocumentor-tag-list__entry">
-                    <span class="phpdocumentor-tag__name">see</span>
-                </dt>
-                <dd class="phpdocumentor-tag-list__definition">
-                                                                                    <span class="phpdocumentor-tag-link"><abbr title="\ReflectionClass">ReflectionClass</abbr></span>
-                                        
-                                                 <section class="phpdocumentor-description"><p>Used internally to extract class constants</p>
-</section>
-
-                                    </dd>
-                                                <dt class="phpdocumentor-tag-list__entry">
                     <span class="phpdocumentor-tag__name">author</span>
                 </dt>
                 <dd class="phpdocumentor-tag-list__definition">
                                                                                 
-                                                 <section class="phpdocumentor-description"><p>Marc Alcaraz (ekameleon)</p>
+                                                 <section class="phpdocumentor-description"><p>Marc Alcaraz</p>
 </section>
 
                                     </dd>
@@ -190,7 +206,7 @@ Status::enums();             // ['close','open'] (sorted)
                     <span class="phpdocumentor-tag__name">since</span>
                 </dt>
                 <dd class="phpdocumentor-tag-list__definition">
-                                            <span class="phpdocumentor-tag-link">1.0.0</span>
+                                            <span class="phpdocumentor-tag-link">1.0.3</span>
                                                                                 
                                              
                                     </dd>
@@ -202,7 +218,7 @@ Status::enums();             // ['close','open'] (sorted)
 
 <h3 id="toc">
     Table of Contents
-    <a href="classes/oihana-reflect-traits-ConstantsTrait.html#toc" class="headerlink"><i class="fas fa-link"></i></a>
+    <a href="classes/oihana-reflect-traits-FunctionCallTrait.html#toc" class="headerlink"><i class="fas fa-link"></i></a>
 
 </h3>
 
@@ -216,7 +232,7 @@ Status::enums();             // ['close','open'] (sorted)
 
 <h4 id="toc-properties">
     Properties
-    <a href="classes/oihana-reflect-traits-ConstantsTrait.html#toc-properties" class="headerlink"><i class="fas fa-link"></i></a>
+    <a href="classes/oihana-reflect-traits-FunctionCallTrait.html#toc-properties" class="headerlink"><i class="fas fa-link"></i></a>
 
 </h4>
 <dl class="phpdocumentor-table-of-contents">
@@ -238,7 +254,7 @@ Status::enums();             // ['close','open'] (sorted)
 
 <h4 id="toc-methods">
     Methods
-    <a href="classes/oihana-reflect-traits-ConstantsTrait.html#toc-methods" class="headerlink"><i class="fas fa-link"></i></a>
+    <a href="classes/oihana-reflect-traits-FunctionCallTrait.html#toc-methods" class="headerlink"><i class="fas fa-link"></i></a>
 
 </h4>
 <dl class="phpdocumentor-table-of-contents">
@@ -264,6 +280,13 @@ Status::enums();             // ['close','open'] (sorted)
 <dd>Returns an array of constants in this class.</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a class="" href="classes/oihana-reflect-traits-FunctionCallTrait.html#method_getArguments">getArguments()</a>
+    <span>
+                                &nbsp;: array&lt;string|int, mixed&gt;|null    </span>
+</dt>
+<dd>Extract the arguments from a function call expression.</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a class="" href="classes/oihana-reflect-traits-ConstantsTrait.html#method_getConstant">getConstant()</a>
     <span>
                                 &nbsp;: string|array&lt;string|int, string&gt;|null    </span>
@@ -285,6 +308,13 @@ Status::enums();             // ['close','open'] (sorted)
 <dd>Returns all constant values in this class.</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a class="" href="classes/oihana-reflect-traits-FunctionCallTrait.html#method_getFunctionName">getFunctionName()</a>
+    <span>
+                                &nbsp;: string|null    </span>
+</dt>
+<dd>Extract the function name from a given expression.</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a class="" href="classes/oihana-reflect-traits-ConstantsTrait.html#method_includes">includes()</a>
     <span>
                                 &nbsp;: bool    </span>
@@ -292,11 +322,46 @@ Status::enums();             // ['close','open'] (sorted)
 <dd>Checks if a given value is valid (exists as a constant in this class).</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a class="" href="classes/oihana-reflect-traits-FunctionCallTrait.html#method_isFunctionCall">isFunctionCall()</a>
+    <span>
+                                &nbsp;: bool    </span>
+</dt>
+<dd>Check if the given expression matches a known function call.</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a class="" href="classes/oihana-reflect-traits-FunctionCallTrait.html#method_isValidArguments">isValidArguments()</a>
+    <span>
+                                &nbsp;: bool    </span>
+</dt>
+<dd>Check if the number of arguments in a function call is within a valid range.</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a class="" href="classes/oihana-reflect-traits-FunctionCallTrait.html#method_replaceArguments">replaceArguments()</a>
+    <span>
+                                &nbsp;: string|null    </span>
+</dt>
+<dd>Replace the arguments of a function call and return the new expression.</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a class="" href="classes/oihana-reflect-traits-ConstantsTrait.html#method_resetCaches">resetCaches()</a>
     <span>
                                 &nbsp;: void    </span>
 </dt>
 <dd>Reset the internal cache of the static methods.</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a class="" href="classes/oihana-reflect-traits-FunctionCallTrait.html#method_splitExpression">splitExpression()</a>
+    <span>
+                                &nbsp;: array&lt;string|int, mixed&gt;|null    </span>
+</dt>
+<dd>Split an expression into its function name and arguments.</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a class="" href="classes/oihana-reflect-traits-FunctionCallTrait.html#method_toCanonicalExpression">toCanonicalExpression()</a>
+    <span>
+                                &nbsp;: string|null    </span>
+</dt>
+<dd>Convert a function expression into its canonical representation.</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
     <a class="" href="classes/oihana-reflect-traits-ConstantsTrait.html#method_validate">validate()</a>
@@ -316,7 +381,7 @@ Status::enums();             // ['close','open'] (sorted)
     <section class="phpdocumentor-properties">
         <h3 class="phpdocumentor-elements__header" id="properties">
             Properties
-            <a href="classes/oihana-reflect-traits-ConstantsTrait.html#properties" class="headerlink"><i class="fas fa-link"></i></a>
+            <a href="classes/oihana-reflect-traits-FunctionCallTrait.html#properties" class="headerlink"><i class="fas fa-link"></i></a>
 
         </h3>
                     <article
@@ -402,7 +467,7 @@ Status::enums();             // ['close','open'] (sorted)
             <section class="phpdocumentor-methods">
         <h3 class="phpdocumentor-elements__header" id="methods">
             Methods
-            <a href="classes/oihana-reflect-traits-ConstantsTrait.html#methods" class="headerlink"><i class="fas fa-link"></i></a>
+            <a href="classes/oihana-reflect-traits-FunctionCallTrait.html#methods" class="headerlink"><i class="fas fa-link"></i></a>
 
         </h3>
                     <article
@@ -551,6 +616,91 @@ Comparison type flags:</p>
             <section>
         <h5 class="phpdocumentor-return-value__heading">Return values</h5>
         <span class="phpdocumentor-signature__response_type">array&lt;string, string&gt;</span>
+            </section>
+
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                    -static                    "
+>
+    <h4 class="phpdocumentor-element__name" id="method_getArguments">
+        getArguments()
+        <a href="classes/oihana-reflect-traits-FunctionCallTrait.html#method_getArguments" class="headerlink"><i class="fas fa-link"></i></a>
+
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/traits/FunctionCallTrait.php"><a href="files/src-oihana-reflect-traits-functioncalltrait.html"><abbr title="src/oihana/reflect/traits/FunctionCallTrait.php">FunctionCallTrait.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">136</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Extract the arguments from a function call expression.</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+            <span class="phpdocumentor-signature__static">static</span>        <span class="phpdocumentor-signature__name">getArguments</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$expression</span></span><span class="phpdocumentor-signature__argument"><span>[</span><span>, </span><span class="phpdocumentor-signature__argument__return-type">string|null&nbsp;</span><span class="phpdocumentor-signature__argument__name">$case</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">null</span><span> ]</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">array&lt;string|int, mixed&gt;|null</span></code>
+
+    <div class="phpdocumentor-label-line">
+        </div>
+    
+    
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$expression</span>
+                : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>The function call expression.</p>
+</section>
+
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$case</span>
+                : <span class="phpdocumentor-signature__argument__return-type">string|null</span>
+                 = <span class="phpdocumentor-signature__argument__default-value">null</span>            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>Optional: 'upper' or 'lower' to force case comparison.</p>
+</section>
+
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="classes/oihana-reflect-traits-FunctionCallTrait.html#method_getArguments#tags" class="headerlink"><i class="fas fa-link"></i></a>
+
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                    <dt class="phpdocumentor-tag-list__entry">
+                    <span class="phpdocumentor-tag__name">example</span>
+                </dt>
+                <dd class="phpdocumentor-tag-list__definition">
+                                                                                
+                                                 <section class="phpdocumentor-description"><pre class="prettyprint"><code class="language-php">FunctionCallTrait::getArguments('APPEND([1,2], 3)');
+// Returns: ['[1,2]', '3']
+
+FunctionCallTrait::getArguments('MERGE({a:1}, {b:2})');
+// Returns: ['{a:1}', '{b:2}']
+</code></pre>
+</section>
+
+                                    </dd>
+                                            </dl>
+
+    
+
+            <section>
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+        <span class="phpdocumentor-signature__response_type">array&lt;string|int, mixed&gt;|null</span>
+                    &mdash;
+                <section class="phpdocumentor-description"><p>Returns an array of arguments or null if invalid.</p>
+</section>
+
             </section>
 
 </article>
@@ -822,6 +972,88 @@ print_r(Status::getConstantValues());
             -public
                                     -static                    "
 >
+    <h4 class="phpdocumentor-element__name" id="method_getFunctionName">
+        getFunctionName()
+        <a href="classes/oihana-reflect-traits-FunctionCallTrait.html#method_getFunctionName" class="headerlink"><i class="fas fa-link"></i></a>
+
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/traits/FunctionCallTrait.php"><a href="files/src-oihana-reflect-traits-functioncalltrait.html"><abbr title="src/oihana/reflect/traits/FunctionCallTrait.php">FunctionCallTrait.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">100</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Extract the function name from a given expression.</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+            <span class="phpdocumentor-signature__static">static</span>        <span class="phpdocumentor-signature__name">getFunctionName</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$expression</span></span><span class="phpdocumentor-signature__argument"><span>[</span><span>, </span><span class="phpdocumentor-signature__argument__return-type">string|null&nbsp;</span><span class="phpdocumentor-signature__argument__name">$case</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">null</span><span> ]</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">string|null</span></code>
+
+    <div class="phpdocumentor-label-line">
+        </div>
+    
+    
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$expression</span>
+                : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>The expression to parse.</p>
+</section>
+
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$case</span>
+                : <span class="phpdocumentor-signature__argument__return-type">string|null</span>
+                 = <span class="phpdocumentor-signature__argument__default-value">null</span>            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>Optional: 'upper' or 'lower' to force case comparison.</p>
+</section>
+
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="classes/oihana-reflect-traits-FunctionCallTrait.html#method_getFunctionName#tags" class="headerlink"><i class="fas fa-link"></i></a>
+
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                    <dt class="phpdocumentor-tag-list__entry">
+                    <span class="phpdocumentor-tag__name">example</span>
+                </dt>
+                <dd class="phpdocumentor-tag-list__definition">
+                                                                                
+                                                 <section class="phpdocumentor-description"><pre class="prettyprint"><code class="language-php">FunctionCallTrait::getFunctionName('APPEND([1,2], 3)'); // &quot;APPEND&quot;
+FunctionCallTrait::getFunctionName('foo_bar(1)');       // null
+</code></pre>
+</section>
+
+                                    </dd>
+                                            </dl>
+
+    
+
+            <section>
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+        <span class="phpdocumentor-signature__response_type">string|null</span>
+                    &mdash;
+                <section class="phpdocumentor-description"><p>The function name in uppercase, or null if invalid.</p>
+</section>
+
+            </section>
+
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                    -static                    "
+>
     <h4 class="phpdocumentor-element__name" id="method_includes">
         includes()
         <a href="classes/oihana-reflect-traits-ConstantsTrait.html#method_includes" class="headerlink"><i class="fas fa-link"></i></a>
@@ -897,6 +1129,280 @@ types of the needle in the haystack.</p>
             -public
                                     -static                    "
 >
+    <h4 class="phpdocumentor-element__name" id="method_isFunctionCall">
+        isFunctionCall()
+        <a href="classes/oihana-reflect-traits-FunctionCallTrait.html#method_isFunctionCall" class="headerlink"><i class="fas fa-link"></i></a>
+
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/traits/FunctionCallTrait.php"><a href="files/src-oihana-reflect-traits-functioncalltrait.html"><abbr title="src/oihana/reflect/traits/FunctionCallTrait.php">FunctionCallTrait.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">201</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Check if the given expression matches a known function call.</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+            <span class="phpdocumentor-signature__static">static</span>        <span class="phpdocumentor-signature__name">isFunctionCall</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$expression</span></span><span class="phpdocumentor-signature__argument"><span>[</span><span>, </span><span class="phpdocumentor-signature__argument__return-type">string|null&nbsp;</span><span class="phpdocumentor-signature__argument__name">$case</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">null</span><span> ]</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">bool</span></code>
+
+    <div class="phpdocumentor-label-line">
+        </div>
+    
+    
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$expression</span>
+                : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>The expression to validate.</p>
+</section>
+
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$case</span>
+                : <span class="phpdocumentor-signature__argument__return-type">string|null</span>
+                 = <span class="phpdocumentor-signature__argument__default-value">null</span>            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>Optional: 'upper' or 'lower' to force case comparison.</p>
+</section>
+
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="classes/oihana-reflect-traits-FunctionCallTrait.html#method_isFunctionCall#tags" class="headerlink"><i class="fas fa-link"></i></a>
+
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                    <dt class="phpdocumentor-tag-list__entry">
+                    <span class="phpdocumentor-tag__name">example</span>
+                </dt>
+                <dd class="phpdocumentor-tag-list__definition">
+                                                                                
+                                                 <section class="phpdocumentor-description"><pre class="prettyprint"><code class="language-php">use oihana\reflect\traits\FunctionCallTrait;
+
+FunctionCallTrait::isFunctionCall('APPEND([1,2], 3)'); // true
+FunctionCallTrait::isFunctionCall('foo_bar(1, 2)');    // false (unknown function)
+</code></pre>
+</section>
+
+                                    </dd>
+                                            </dl>
+
+    
+
+            <section>
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+        <span class="phpdocumentor-signature__response_type">bool</span>
+                    &mdash;
+                <section class="phpdocumentor-description"><p>True if the expression is a valid function call, false otherwise.</p>
+</section>
+
+            </section>
+
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                    -static                    "
+>
+    <h4 class="phpdocumentor-element__name" id="method_isValidArguments">
+        isValidArguments()
+        <a href="classes/oihana-reflect-traits-FunctionCallTrait.html#method_isValidArguments" class="headerlink"><i class="fas fa-link"></i></a>
+
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/traits/FunctionCallTrait.php"><a href="files/src-oihana-reflect-traits-functioncalltrait.html"><abbr title="src/oihana/reflect/traits/FunctionCallTrait.php">FunctionCallTrait.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">171</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Check if the number of arguments in a function call is within a valid range.</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+            <span class="phpdocumentor-signature__static">static</span>        <span class="phpdocumentor-signature__name">isValidArguments</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$expression</span></span><span class="phpdocumentor-signature__argument"><span>[</span><span>, </span><span class="phpdocumentor-signature__argument__return-type">int&nbsp;</span><span class="phpdocumentor-signature__argument__name">$min</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">0</span><span> ]</span></span><span class="phpdocumentor-signature__argument"><span>[</span><span>, </span><span class="phpdocumentor-signature__argument__return-type">int|null&nbsp;</span><span class="phpdocumentor-signature__argument__name">$max</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">null</span><span> ]</span></span><span class="phpdocumentor-signature__argument"><span>[</span><span>, </span><span class="phpdocumentor-signature__argument__return-type">string|null&nbsp;</span><span class="phpdocumentor-signature__argument__name">$case</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">null</span><span> ]</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">bool</span></code>
+
+    <div class="phpdocumentor-label-line">
+        </div>
+    
+    
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$expression</span>
+                : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>The expression to check.</p>
+</section>
+
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$min</span>
+                : <span class="phpdocumentor-signature__argument__return-type">int</span>
+                 = <span class="phpdocumentor-signature__argument__default-value">0</span>            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>Minimum number of required arguments.</p>
+</section>
+
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$max</span>
+                : <span class="phpdocumentor-signature__argument__return-type">int|null</span>
+                 = <span class="phpdocumentor-signature__argument__default-value">null</span>            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>Optional maximum number of allowed arguments.</p>
+</section>
+
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$case</span>
+                : <span class="phpdocumentor-signature__argument__return-type">string|null</span>
+                 = <span class="phpdocumentor-signature__argument__default-value">null</span>            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>Optional: 'upper' or 'lower' to force case comparison.</p>
+</section>
+
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="classes/oihana-reflect-traits-FunctionCallTrait.html#method_isValidArguments#tags" class="headerlink"><i class="fas fa-link"></i></a>
+
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                    <dt class="phpdocumentor-tag-list__entry">
+                    <span class="phpdocumentor-tag__name">example</span>
+                </dt>
+                <dd class="phpdocumentor-tag-list__definition">
+                                                                                
+                                                 <section class="phpdocumentor-description"><pre class="prettyprint"><code class="language-php">FunctionCallTrait::isValidArguments( 'APPEND([1,2], 3)', 2 ) ;       // true
+FunctionCallTrait::isValidArguments( 'APPEND([1,2], 3)', 3 ) ;       // false
+FunctionCallTrait::isValidArguments( 'MERGE({a:1}, {b:2})', 1, 2 ) ; // true
+</code></pre>
+</section>
+
+                                    </dd>
+                                            </dl>
+
+    
+
+            <section>
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+        <span class="phpdocumentor-signature__response_type">bool</span>
+                    &mdash;
+                <section class="phpdocumentor-description"><p>True if the argument count is valid, false otherwise.</p>
+</section>
+
+            </section>
+
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                    -static                    "
+>
+    <h4 class="phpdocumentor-element__name" id="method_replaceArguments">
+        replaceArguments()
+        <a href="classes/oihana-reflect-traits-FunctionCallTrait.html#method_replaceArguments" class="headerlink"><i class="fas fa-link"></i></a>
+
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/traits/FunctionCallTrait.php"><a href="files/src-oihana-reflect-traits-functioncalltrait.html"><abbr title="src/oihana/reflect/traits/FunctionCallTrait.php">FunctionCallTrait.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">312</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Replace the arguments of a function call and return the new expression.</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+            <span class="phpdocumentor-signature__static">static</span>        <span class="phpdocumentor-signature__name">replaceArguments</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$expression</span></span><span class="phpdocumentor-signature__argument"><span>, </span><span class="phpdocumentor-signature__argument__return-type">array&lt;string|int, mixed&gt;&nbsp;</span><span class="phpdocumentor-signature__argument__name">$newArgs</span></span><span class="phpdocumentor-signature__argument"><span>[</span><span>, </span><span class="phpdocumentor-signature__argument__return-type">string|null&nbsp;</span><span class="phpdocumentor-signature__argument__name">$case</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">null</span><span> ]</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">string|null</span></code>
+
+    <div class="phpdocumentor-label-line">
+        </div>
+    
+    
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$expression</span>
+                : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>The original function expression.</p>
+</section>
+
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$newArgs</span>
+                : <span class="phpdocumentor-signature__argument__return-type">array&lt;string|int, mixed&gt;</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>The new arguments to insert.</p>
+</section>
+
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$case</span>
+                : <span class="phpdocumentor-signature__argument__return-type">string|null</span>
+                 = <span class="phpdocumentor-signature__argument__default-value">null</span>            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="classes/oihana-reflect-traits-FunctionCallTrait.html#method_replaceArguments#tags" class="headerlink"><i class="fas fa-link"></i></a>
+
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                    <dt class="phpdocumentor-tag-list__entry">
+                    <span class="phpdocumentor-tag__name">example</span>
+                </dt>
+                <dd class="phpdocumentor-tag-list__definition">
+                                                                                
+                                                 <section class="phpdocumentor-description"><pre class="prettyprint"><code class="language-php">FunctionCallTrait::replaceArguments('APPEND([1,2], 3)', ['[4,5]', '6']);
+// &quot;APPEND([4,5], 6)&quot;
+</code></pre>
+</section>
+
+                                    </dd>
+                                            </dl>
+
+    
+
+            <section>
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+        <span class="phpdocumentor-signature__response_type">string|null</span>
+                    &mdash;
+                <section class="phpdocumentor-description"><p>Returns the updated expression or null if invalid.</p>
+</section>
+
+            </section>
+
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                    -static                    "
+>
     <h4 class="phpdocumentor-element__name" id="method_resetCaches">
         resetCaches()
         <a href="classes/oihana-reflect-traits-ConstantsTrait.html#method_resetCaches" class="headerlink"><i class="fas fa-link"></i></a>
@@ -925,6 +1431,187 @@ types of the needle in the haystack.</p>
     
 
     
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                    -static                    "
+>
+    <h4 class="phpdocumentor-element__name" id="method_splitExpression">
+        splitExpression()
+        <a href="classes/oihana-reflect-traits-FunctionCallTrait.html#method_splitExpression" class="headerlink"><i class="fas fa-link"></i></a>
+
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/traits/FunctionCallTrait.php"><a href="files/src-oihana-reflect-traits-functioncalltrait.html"><abbr title="src/oihana/reflect/traits/FunctionCallTrait.php">FunctionCallTrait.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">248</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Split an expression into its function name and arguments.</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+            <span class="phpdocumentor-signature__static">static</span>        <span class="phpdocumentor-signature__name">splitExpression</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$expression</span></span><span class="phpdocumentor-signature__argument"><span>[</span><span>, </span><span class="phpdocumentor-signature__argument__return-type">string|null&nbsp;</span><span class="phpdocumentor-signature__argument__name">$case</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">null</span><span> ]</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">array&lt;string|int, mixed&gt;|null</span></code>
+
+    <div class="phpdocumentor-label-line">
+        </div>
+    
+    
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$expression</span>
+                : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>The expression to analyze.</p>
+</section>
+
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$case</span>
+                : <span class="phpdocumentor-signature__argument__return-type">string|null</span>
+                 = <span class="phpdocumentor-signature__argument__default-value">null</span>            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>Optional: 'upper' or 'lower' for function name.</p>
+</section>
+
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="classes/oihana-reflect-traits-FunctionCallTrait.html#method_splitExpression#tags" class="headerlink"><i class="fas fa-link"></i></a>
+
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                    <dt class="phpdocumentor-tag-list__entry">
+                    <span class="phpdocumentor-tag__name">example</span>
+                </dt>
+                <dd class="phpdocumentor-tag-list__definition">
+                                                                                
+                                                 <section class="phpdocumentor-description"><pre class="prettyprint"><code class="language-php">FunctionCallTrait::splitExpression('APPEND([1,2], 3)');
+// Returns:
+// [
+//   'function'  =&gt; 'APPEND',
+//   'arguments' =&gt; ['[1,2]', '3']
+// ]
+</code></pre>
+</section>
+
+                                    </dd>
+                                                <dt class="phpdocumentor-tag-list__entry">
+                    <span class="phpdocumentor-tag__name">see</span>
+                </dt>
+                <dd class="phpdocumentor-tag-list__definition">
+                                                                                    <span class="phpdocumentor-tag-link"><a href="classes/oihana-reflect-enums-FunctionEnum.html"><abbr title="\oihana\reflect\enums\FunctionEnum">FunctionEnum</abbr></a></span>
+                                        
+                                             
+                                    </dd>
+                                            </dl>
+
+    
+
+            <section>
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+        <span class="phpdocumentor-signature__response_type">array&lt;string|int, mixed&gt;|null</span>
+                    &mdash;
+                <section class="phpdocumentor-description"><p>Returns an associative array or null if invalid.</p>
+</section>
+
+            </section>
+
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                    -static                    "
+>
+    <h4 class="phpdocumentor-element__name" id="method_toCanonicalExpression">
+        toCanonicalExpression()
+        <a href="classes/oihana-reflect-traits-FunctionCallTrait.html#method_toCanonicalExpression" class="headerlink"><i class="fas fa-link"></i></a>
+
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/traits/FunctionCallTrait.php"><a href="files/src-oihana-reflect-traits-functioncalltrait.html"><abbr title="src/oihana/reflect/traits/FunctionCallTrait.php">FunctionCallTrait.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">280</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Convert a function expression into its canonical representation.</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+            <span class="phpdocumentor-signature__static">static</span>        <span class="phpdocumentor-signature__name">toCanonicalExpression</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$expression</span></span><span class="phpdocumentor-signature__argument"><span>[</span><span>, </span><span class="phpdocumentor-signature__argument__return-type">string|null&nbsp;</span><span class="phpdocumentor-signature__argument__name">$case</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">null</span><span> ]</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">string|null</span></code>
+
+    <div class="phpdocumentor-label-line">
+        </div>
+    
+        <section class="phpdocumentor-description"><ul>
+<li>Uppercases the function name.</li>
+<li>Normalizes spacing between arguments.</li>
+</ul>
+</section>
+
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$expression</span>
+                : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>The input expression.</p>
+</section>
+
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$case</span>
+                : <span class="phpdocumentor-signature__argument__return-type">string|null</span>
+                 = <span class="phpdocumentor-signature__argument__default-value">null</span>            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>Optional: 'upper' or 'lower' for function name.</p>
+</section>
+
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="classes/oihana-reflect-traits-FunctionCallTrait.html#method_toCanonicalExpression#tags" class="headerlink"><i class="fas fa-link"></i></a>
+
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                    <dt class="phpdocumentor-tag-list__entry">
+                    <span class="phpdocumentor-tag__name">example</span>
+                </dt>
+                <dd class="phpdocumentor-tag-list__definition">
+                                                                                
+                                                 <section class="phpdocumentor-description"><pre class="prettyprint"><code class="language-php">FunctionCallTrait::toCanonicalExpression('append([1,2],3)');
+// &quot;APPEND([1,2], 3)&quot;
+</code></pre>
+</section>
+
+                                    </dd>
+                                            </dl>
+
+    
+
+            <section>
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+        <span class="phpdocumentor-signature__response_type">string|null</span>
+                    &mdash;
+                <section class="phpdocumentor-description"><p>Canonicalized function expression or null if invalid.</p>
+</section>
+
+            </section>
+
 </article>
                     <article
         class="phpdocumentor-element
@@ -1015,7 +1702,7 @@ types of the needle in the haystack.</p>
     <div class="phpdocumentor-modal-bg" data-exit-button></div>
     <div class="phpdocumentor-modal-container">
         <div class="phpdocumentor-modal-content">
-            <pre style="max-height: 500px; overflow-y: scroll" data-src="files/src/oihana/reflect/traits/ConstantsTrait.php.txt" class="language-php line-numbers linkable-line-numbers"></pre>
+            <pre style="max-height: 500px; overflow-y: scroll" data-src="files/src/oihana/reflect/traits/FunctionCallTrait.php.txt" class="language-php line-numbers linkable-line-numbers"></pre>
         </div>
         <button data-exit-button class="phpdocumentor-modal__close">&times;</button>
     </div>
@@ -1116,8 +1803,8 @@ types of the needle in the haystack.</p>
             <li class="phpdocumentor-on-this-page-section__title">Table Of Contents</li>
             <li>
                 <ul class="phpdocumentor-list -clean">
-                                                            <li><a href="classes/oihana-reflect-traits-ConstantsTrait.html#toc-properties">Properties</a></li>
-                                                            <li><a href="classes/oihana-reflect-traits-ConstantsTrait.html#toc-methods">Methods</a></li>
+                                                            <li><a href="classes/oihana-reflect-traits-FunctionCallTrait.html#toc-properties">Properties</a></li>
+                                                            <li><a href="classes/oihana-reflect-traits-FunctionCallTrait.html#toc-methods">Methods</a></li>
                                     </ul>
             </li>
                                     <li class="phpdocumentor-on-this-page-section__title">Properties</li>
@@ -1133,11 +1820,18 @@ types of the needle in the haystack.</p>
                                             <li class=""><a href="classes/oihana-reflect-traits-ConstantsTrait.html#method_enums">enums()</a></li>
                                             <li class=""><a href="classes/oihana-reflect-traits-ConstantsTrait.html#method_get">get()</a></li>
                                             <li class=""><a href="classes/oihana-reflect-traits-ConstantsTrait.html#method_getAll">getAll()</a></li>
+                                            <li class=""><a href="classes/oihana-reflect-traits-FunctionCallTrait.html#method_getArguments">getArguments()</a></li>
                                             <li class=""><a href="classes/oihana-reflect-traits-ConstantsTrait.html#method_getConstant">getConstant()</a></li>
                                             <li class=""><a href="classes/oihana-reflect-traits-ConstantsTrait.html#method_getConstantKeys">getConstantKeys()</a></li>
                                             <li class=""><a href="classes/oihana-reflect-traits-ConstantsTrait.html#method_getConstantValues">getConstantValues()</a></li>
+                                            <li class=""><a href="classes/oihana-reflect-traits-FunctionCallTrait.html#method_getFunctionName">getFunctionName()</a></li>
                                             <li class=""><a href="classes/oihana-reflect-traits-ConstantsTrait.html#method_includes">includes()</a></li>
+                                            <li class=""><a href="classes/oihana-reflect-traits-FunctionCallTrait.html#method_isFunctionCall">isFunctionCall()</a></li>
+                                            <li class=""><a href="classes/oihana-reflect-traits-FunctionCallTrait.html#method_isValidArguments">isValidArguments()</a></li>
+                                            <li class=""><a href="classes/oihana-reflect-traits-FunctionCallTrait.html#method_replaceArguments">replaceArguments()</a></li>
                                             <li class=""><a href="classes/oihana-reflect-traits-ConstantsTrait.html#method_resetCaches">resetCaches()</a></li>
+                                            <li class=""><a href="classes/oihana-reflect-traits-FunctionCallTrait.html#method_splitExpression">splitExpression()</a></li>
+                                            <li class=""><a href="classes/oihana-reflect-traits-FunctionCallTrait.html#method_toCanonicalExpression">toCanonicalExpression()</a></li>
                                             <li class=""><a href="classes/oihana-reflect-traits-ConstantsTrait.html#method_validate">validate()</a></li>
                                     </ul>
             </li>
@@ -1158,7 +1852,7 @@ types of the needle in the haystack.</p>
     </section>
 </section>
         </div>
-        <a href="classes/oihana-reflect-traits-ConstantsTrait.html#top" class="phpdocumentor-back-to-top"><i class="fas fa-chevron-circle-up"></i></a>
+        <a href="classes/oihana-reflect-traits-FunctionCallTrait.html#top" class="phpdocumentor-back-to-top"><i class="fas fa-chevron-circle-up"></i></a>
 
     </main>
 

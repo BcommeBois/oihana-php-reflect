@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+## [1.0.3] - 2025-08-24
+
+### Added
+
+- oihana\reflect\enums\CaseEnum
+- oihana\reflect\enums\FunctionEnum
+- oihana\reflect\trait\FunctionCallTrait
+
 ## [1.0.2] - 2025-08-13
 
 ### Fixed
