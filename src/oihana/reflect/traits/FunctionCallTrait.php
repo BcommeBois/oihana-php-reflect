@@ -203,7 +203,7 @@ trait FunctionCallTrait
         $expression = trim( $expression ) ;
 
         // Retrieve the list of valid functions from ConstantsTrait
-        $functions = static::getConstantKeys();
+        $functions = static::getConstantValues();
 
         // Apply case transformation if requested
         if ( $case !== null )
@@ -221,7 +221,7 @@ trait FunctionCallTrait
             }
         }
 
-        $pattern   = '/^(' . implode('|', array_map('preg_quote' , $functions ) ) . ')\s*\(/i';
+        $pattern   = '/^(' . implode('|', array_map('preg_quote' , $functions ) ) . ')\s*\(/';
 
         return (bool) preg_match( $pattern , $expression ) ;
     }

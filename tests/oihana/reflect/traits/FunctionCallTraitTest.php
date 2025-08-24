@@ -14,9 +14,9 @@ class FunctionCallTraitTest extends TestCase
 
     public function testGetFunctionName(): void
     {
-        $expr = 'append([1,2], 3)';
+        $expr = 'APPEND([1,2], 3)';
 
-        $this->assertSame('append', static::getFunctionName($expr));
+        $this->assertSame('APPEND', static::getFunctionName($expr));
         $this->assertSame('APPEND', static::getFunctionName($expr, 'upper'));
         $this->assertSame('append', static::getFunctionName($expr, 'lower'));
 
@@ -37,7 +37,7 @@ class FunctionCallTraitTest extends TestCase
 
     public function testIsFunctionCall(): void
     {
-        $expr = 'append([1,2], 3)';
+        $expr = 'APPEND([1,2], 3)';
 
         $this->assertTrue(static::isFunctionCall($expr));
         $this->assertTrue(static::isFunctionCall($expr, 'upper'));
@@ -48,30 +48,30 @@ class FunctionCallTraitTest extends TestCase
 
     public function testSplitExpression(): void
     {
-        $expr = 'append([1,2], 3)';
+        $expr = 'APPEND([1,2], 3)';
 
         $expectedDefault =
-        [
-            'function' => 'append',
-            'arguments' => ['[1,2]', '3']
-        ];
-
-        $expectedUpper =
         [
             'function' => 'APPEND',
             'arguments' => ['[1,2]', '3']
         ];
 
+        $expectedUpper =
+        [
+            'function' => 'append',
+            'arguments' => ['[1,2]', '3']
+        ];
+
         $this->assertSame($expectedDefault, static::splitExpression($expr));
-        $this->assertSame($expectedUpper, static::splitExpression($expr, 'upper'));
+        $this->assertSame($expectedUpper, static::splitExpression($expr, 'lower'));
         $this->assertNull(static::splitExpression('invalid'));
     }
 
     public function testToCanonicalExpression(): void
     {
-        $expr = 'append([1,2],3)';
+        $expr = 'APPEND([1,2],3)';
 
-        $this->assertSame('append([1,2], 3)', static::toCanonicalExpression($expr));
+        $this->assertSame('APPEND([1,2], 3)', static::toCanonicalExpression($expr));
         $this->assertSame('APPEND([1,2], 3)', static::toCanonicalExpression($expr, 'upper'));
         $this->assertSame('append([1,2], 3)', static::toCanonicalExpression($expr, 'lower'));
         $this->assertNull(static::toCanonicalExpression('invalid'));
@@ -95,5 +95,16 @@ class FunctionCallTraitTest extends TestCase
         $this->assertTrue(static::isValidArguments($expr, 2, 3));
         $this->assertFalse(static::isValidArguments($expr, 3));
         $this->assertFalse(static::isValidArguments('invalid', 1));
+    }
+
+    public function testFunctionCallCaseSensitive()
+    {
+        $this->assertTrue( self::isFunctionCall('APPEND([1,2], 3)'));
+
+        $this->assertFalse(self::isFunctionCall('append([1,2], 3)'));
+
+        $this->assertTrue(self::isFunctionCall('APPEND([1,2], 3)', 'upper'));
+
+        $this->assertTrue(self::isFunctionCall('append([1,2], 3)', 'lower'));
     }
 }
