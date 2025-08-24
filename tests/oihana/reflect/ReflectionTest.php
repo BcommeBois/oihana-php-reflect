@@ -1,9 +1,10 @@
 <?php
 
-namespace oihana\reflect;
+namespace tests\oihana\reflect;
 
 use InvalidArgumentException;
 
+use oihana\reflect\Reflection;
 use ReflectionClassConstant;
 use ReflectionException;
 use ReflectionMethod;

@@ -1,6 +1,6 @@
 <?php
 
-namespace tests\oihana\reflections\traits;
+namespace tests\oihana\reflect\traits;
 
 use oihana\reflect\traits\ConstantsTrait;
 use PHPUnit\Framework\TestCase;

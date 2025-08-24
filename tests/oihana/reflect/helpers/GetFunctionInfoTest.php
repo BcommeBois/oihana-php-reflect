@@ -1,6 +1,6 @@
 <?php
 
-namespace tests\oihana\reflections\helpers;
+namespace tests\oihana\reflect\helpers;
 
 use tests\oihana\reflect\helpers\samples\SampleClass;
 
