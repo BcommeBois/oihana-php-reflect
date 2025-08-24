@@ -32,10 +32,10 @@ use oihana\reflect\enums\FunctionEnum;
  *     public const string MERGE  = 'MERGE';
  * }
  *
- * $expr = 'append([1,2], 3)';
+ * $expr = 'APPEND([1,2], 3)';
  *
  * // Basic function name extraction
- * FunctionCallTrait::getFunctionName($expr);            // 'append'
+ * FunctionCallTrait::getFunctionName($expr);            // 'APPEND'
  * FunctionCallTrait::getFunctionName($expr, 'upper');   // 'APPEND'
  * FunctionCallTrait::getFunctionName($expr, 'lower');   // 'append'
  *
@@ -51,13 +51,13 @@ use oihana\reflect\enums\FunctionEnum;
  * // Split expression into function and arguments
  * FunctionCallTrait::splitExpression($expr);
  * // [
- * //     'function'  => 'append',
+ * //     'function'  => 'APPEND',
  * //     'arguments' => ['[1,2]', '3']
  * // ]
  *
- * FunctionCallTrait::splitExpression($expr, 'upper');
+ * FunctionCallTrait::splitExpression($expr, 'lower');
  * // [
- * //     'function'  => 'APPEND',
+ * //     'function'  => 'append',
  * //     'arguments' => ['[1,2]', '3']
  * // ]
  *
@@ -70,9 +70,9 @@ use oihana\reflect\enums\FunctionEnum;
  * // 'APPEND([4,5], 6)'
  *
  * // Check argument counts
- * FunctionCallTrait::isValidArguments($expr, 2);             // true
- * FunctionCallTrait::isValidArguments($expr, 2, 3);          // true
- * FunctionCallTrait::isValidArguments($expr, 3);             // false
+ * FunctionCallTrait::isValidArguments($expr, 2);     // true
+ * FunctionCallTrait::isValidArguments($expr, 2, 3);  // true
+ * FunctionCallTrait::isValidArguments($expr, 3);     // false
  * ```
  *
  * @package oihana\reflect\traits
