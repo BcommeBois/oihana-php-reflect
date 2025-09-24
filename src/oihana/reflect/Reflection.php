@@ -10,6 +10,7 @@ use ReflectionClassConstant;
 use ReflectionException;
 use ReflectionFunction;
 use ReflectionMethod;
+use ReflectionNamedType;
 use ReflectionParameter;
 use ReflectionProperty;
 use ReflectionUnionType;
@@ -164,7 +165,7 @@ class Reflection
                 }
                 $typeName = implode('|', $types);
             }
-            elseif ( $type instanceof \ReflectionNamedType )
+            elseif ( $type instanceof ReflectionNamedType )
             {
                 $typeName = $type->getName();
                 $nullable = $type->allowsNull();
@@ -441,7 +442,7 @@ class Reflection
                         {
                             $value = isAssociative( $value )
                                    ? $this->hydrate( $value , $typeName )
-                                   : array_map( fn( $v ) => $this->hydrate( $v , $typeName ) , $value ) ;
+                                   : array_map( fn($v) => is_array($v) ? $this->hydrate( $v , $typeName ) : $v , $value ) ;
                             $hydrated = true ;
                             break;
                         }
