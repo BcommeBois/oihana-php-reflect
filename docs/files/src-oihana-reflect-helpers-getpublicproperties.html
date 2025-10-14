@@ -95,17 +95,21 @@
             <div class="phpdocumentor-column -nine phpdocumentor-content">
                                 <section>
                                         <ul class="phpdocumentor-breadcrumbs">
-            <li class="phpdocumentor-breadcrumb"><a href="namespaces/oihana.html">oihana</a></li>
-            <li class="phpdocumentor-breadcrumb"><a href="namespaces/oihana-reflect.html">reflect</a></li>
     </ul>
 
-    <article class="phpdocumentor-element -namespace">
-        <h2 class="phpdocumentor-content__title">helpers</h2>
+    <article class="phpdocumentor-element -file">
+        <h2 class="phpdocumentor-content__title">getPublicProperties.php</h2>
+
+        
+        
+        
+        
+
 
         
 <h3 id="toc">
     Table of Contents
-    <a href="namespaces/oihana-reflect-helpers.html#toc" class="headerlink"><i class="fas fa-link"></i></a>
+    <a href="files/src-oihana-reflect-helpers-getpublicproperties.html#toc" class="headerlink"><i class="fas fa-link"></i></a>
 
 </h3>
 
@@ -121,17 +125,10 @@
 
 <h4 id="toc-functions">
     Functions
-    <a href="namespaces/oihana-reflect-helpers.html#toc-functions" class="headerlink"><i class="fas fa-link"></i></a>
+    <a href="files/src-oihana-reflect-helpers-getpublicproperties.html#toc-functions" class="headerlink"><i class="fas fa-link"></i></a>
 
 </h4>
 <dl class="phpdocumentor-table-of-contents">
-            <dt class="phpdocumentor-table-of-contents__entry -function -">
-    <a class="" href="namespaces/oihana-reflect-helpers.html#function_getFunctionInfo">getFunctionInfo()</a>
-    <span>
-                                &nbsp;: array&lt;string|int, mixed&gt;|null    </span>
-</dt>
-<dd>Returns detailed reflection information about a given function or method.</dd>
-
             <dt class="phpdocumentor-table-of-contents__entry -function -">
     <a class="" href="namespaces/oihana-reflect-helpers.html#function_getPublicProperties">getPublicProperties()</a>
     <span>
@@ -142,118 +139,15 @@ with optional external cache.</dd>
 
     </dl>
 
+
         
 
             <section class="phpdocumentor-functions">
         <h3 class="phpdocumentor-elements__header" id="functions">
             Functions
-            <a href="namespaces/oihana-reflect-helpers.html#functions" class="headerlink"><i class="fas fa-link"></i></a>
+            <a href="files/src-oihana-reflect-helpers-getpublicproperties.html#functions" class="headerlink"><i class="fas fa-link"></i></a>
 
         </h3>
-                    <article class="phpdocumentor-element -function - ">
-    <h4 class="phpdocumentor-element__name" id="function_getFunctionInfo">
-        getFunctionInfo()
-        <a href="namespaces/oihana-reflect-helpers.html#function_getFunctionInfo" class="headerlink"><i class="fas fa-link"></i></a>
-
-    </h4>
-    <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/helpers/getFunctionInfo.php"><a href="files/src-oihana-reflect-helpers-getfunctioninfo.html"><abbr title="src/oihana/reflect/helpers/getFunctionInfo.php">getFunctionInfo.php</abbr></a></abbr>
-    :
-    <span class="phpdocumentor-element-found-in__line">48</span>
-
-    </aside>
-
-        <p class="phpdocumentor-summary">Returns detailed reflection information about a given function or method.</p>
-
-    
-    <code class="phpdocumentor-code phpdocumentor-signature ">
-    <span class="phpdocumentor-signature__visibility"></span>
-                    <span class="phpdocumentor-signature__name">getFunctionInfo</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">callable|string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$callable</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">array&lt;string|int, mixed&gt;|null</span></code>
-
-        <section class="phpdocumentor-description"><p>This function uses PHP's Reflection API to retrieve metadata about
-a callable (function, method, or closure), including its namespace,
-file location, line numbers, and docblock comment.</p>
-</section>
-
-        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
-    <dl class="phpdocumentor-argument-list">
-                    <dt class="phpdocumentor-argument-list__entry">
-                <span class="phpdocumentor-signature__argument__name">$callable</span>
-                : <span class="phpdocumentor-signature__argument__return-type">callable|string</span>
-                            </dt>
-            <dd class="phpdocumentor-argument-list__definition">
-                    <section class="phpdocumentor-description"><p>The callable to reflect: function name, closure, or method (as string or array).</p>
-</section>
-
-            </dd>
-            </dl>
-
-    
-    <h5 class="phpdocumentor-tag-list__heading" id="tags">
-        Tags
-        <a href="namespaces/oihana-reflect-helpers.html#function_getFunctionInfo#tags" class="headerlink"><i class="fas fa-link"></i></a>
-
-    </h5>
-    <dl class="phpdocumentor-tag-list">
-                                    <dt class="phpdocumentor-tag-list__entry">
-                    <span class="phpdocumentor-tag__name">example</span>
-                </dt>
-                <dd class="phpdocumentor-tag-list__definition">
-                                                                                
-                                                 <section class="phpdocumentor-description"><pre class="prettyprint"><code class="language-php">$info = getFunctionInfo('strlen');
-print_r($info);
-
-$infoMethod = getFunctionInfo([DateTime::class, 'format']);
-print_r($infoMethod);
-
-$closure = function($x) { return $x * 2; };
-$infoClosure = getFunctionInfo($closure);
-print_r($infoClosure);
-</code></pre>
-</section>
-
-                                    </dd>
-                                                <dt class="phpdocumentor-tag-list__entry">
-                    <span class="phpdocumentor-tag__name">author</span>
-                </dt>
-                <dd class="phpdocumentor-tag-list__definition">
-                                                                                
-                                                 <section class="phpdocumentor-description"><p>Marc Alcaraz (ekameleon)</p>
-</section>
-
-                                    </dd>
-                                                <dt class="phpdocumentor-tag-list__entry">
-                    <span class="phpdocumentor-tag__name">since</span>
-                </dt>
-                <dd class="phpdocumentor-tag-list__definition">
-                                            <span class="phpdocumentor-tag-link">1.0.0</span>
-                                                                                
-                                             
-                                    </dd>
-                                            </dl>
-
-            <section>
-        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
-        <span class="phpdocumentor-signature__response_type">array&lt;string|int, mixed&gt;|null</span>
-                    &mdash;
-                <section class="phpdocumentor-description"><p>Returns an associative array of function details if the function exists, or null otherwise.
-The array contains:</p>
-<ul>
-<li>'name'       : Full function or method name including class if applicable.</li>
-<li>'namespace'  : Namespace the function or method belongs to.</li>
-<li>'alias'      : Short function or method name without namespace.</li>
-<li>'file'       : Path to the file where the function or method is defined.</li>
-<li>'startLine'  : The starting line number of the function or method definition.</li>
-<li>'endLine'    : The ending line number of the function or method definition.</li>
-<li>'isInternal' : Whether the function or method is internal to PHP.</li>
-<li>'isUser'     : Whether the function or method is user-defined.</li>
-<li>'comment'    : The function's or method's docblock comment, or null if none.</li>
-</ul>
-</section>
-
-            </section>
-
-</article>
                     <article class="phpdocumentor-element -function - ">
     <h4 class="phpdocumentor-element__name" id="function_getPublicProperties">
         getPublicProperties()
@@ -432,7 +326,7 @@ echo $prop-&gt;getDeclaringClass()-&gt;getName();
     <div class="phpdocumentor-modal-bg" data-exit-button></div>
     <div class="phpdocumentor-modal-container">
         <div class="phpdocumentor-modal-content">
-            <pre style="max-height: 500px; overflow-y: scroll" data-src="" class="language-php line-numbers linkable-line-numbers"></pre>
+            <pre style="max-height: 500px; overflow-y: scroll" data-src="files/src/oihana/reflect/helpers/getPublicProperties.php.txt" class="language-php line-numbers linkable-line-numbers"></pre>
         </div>
         <button data-exit-button class="phpdocumentor-modal__close">&times;</button>
     </div>
@@ -533,7 +427,7 @@ echo $prop-&gt;getDeclaringClass()-&gt;getName();
             <li class="phpdocumentor-on-this-page-section__title">Table Of Contents</li>
             <li>
                 <ul class="phpdocumentor-list -clean">
-                                                                                                                                                                                    <li><a href="namespaces/oihana-reflect-helpers.html#toc-functions">Functions</a></li>
+                                                                                                                                                                                        <li><a href="files/src-oihana-reflect-helpers-getpublicproperties.html#toc-functions">Functions</a></li>
                                     </ul>
             </li>
 
@@ -541,7 +435,6 @@ echo $prop-&gt;getDeclaringClass()-&gt;getName();
                             <li class="phpdocumentor-on-this-page-section__title">Functions</li>
                 <li>
                     <ul class="phpdocumentor-list -clean">
-                                                    <li class=""><a href="namespaces/oihana-reflect-helpers.html#function_getFunctionInfo">getFunctionInfo()</a></li>
                                                     <li class=""><a href="namespaces/oihana-reflect-helpers.html#function_getPublicProperties">getPublicProperties()</a></li>
                                             </ul>
                 </li>
@@ -562,7 +455,7 @@ echo $prop-&gt;getDeclaringClass()-&gt;getName();
     </section>
 </section>
         </div>
-        <a href="namespaces/oihana-reflect-helpers.html#top" class="phpdocumentor-back-to-top"><i class="fas fa-chevron-circle-up"></i></a>
+        <a href="files/src-oihana-reflect-helpers-getpublicproperties.html#top" class="phpdocumentor-back-to-top"><i class="fas fa-chevron-circle-up"></i></a>
 
     </main>
 

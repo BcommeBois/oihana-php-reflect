@@ -27,7 +27,8 @@
             "oihana\\reflect\\": "src/oihana/reflect"
         },
         "files": [
-            "src/oihana/reflect/helpers/getFunctionInfo.php"
+            "src/oihana/reflect/helpers/getFunctionInfo.php",
+            "src/oihana/reflect/helpers/getPublicProperties.php"
         ]
     },
     "autoload-dev": {

@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### Added
+
+- oihana\reflect\helpers\getPublicProperties
+
 ## [1.0.3] - 2025-08-24
 
 ### Added

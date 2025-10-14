@@ -86,6 +86,11 @@ Search.appendIndex(
             "summary": "Returns\u0020detailed\u0020reflection\u0020information\u0020about\u0020a\u0020given\u0020function\u0020or\u0020method.",
             "url": "namespaces/oihana-reflect-helpers.html#function_getFunctionInfo"
         },                {
+            "fqsen": "\\oihana\\reflect\\helpers\\getPublicProperties\u0028\u0029",
+            "name": "getPublicProperties",
+            "summary": "Get\u0020all\u0020public\u0020non\u002Dstatic\u0020properties\u0020from\u0020a\u0020class,\u0020including\u0020traits\u0020and\u0020parent\u0020classes,\nwith\u0020optional\u0020external\u0020cache.",
+            "url": "namespaces/oihana-reflect-helpers.html#function_getPublicProperties"
+        },                {
             "fqsen": "\\oihana\\reflect\\Reflection",
             "name": "Reflection",
             "summary": "High\u002Dlevel\u0020helper\u0020over\u0020PHP\u0027s\u0020Reflection\u0020API\u0020and\u0020a\u0020robust\u0020array\u002Dto\u002Dobject\u0020hydrator.",
