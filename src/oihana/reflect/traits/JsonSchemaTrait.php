@@ -8,13 +8,18 @@ use ReflectionNamedType;
 use ReflectionProperty;
 use ReflectionUnionType;
 
+use oihana\reflect\enums\JsonSchemaDraft;
+use oihana\reflect\enums\JsonSchemaKeyword as Keyword;
+use oihana\reflect\enums\JsonSchemaType    as Type ;
+use oihana\reflect\enums\PhpType;
+
 use function oihana\core\json\getJsonType;
 use function oihana\reflect\helpers\getPublicProperties;
 
 /**
  * Trait providing JSON Schema generation and validation capabilities for classes.
  *
- * This trait allows any class to generate a JSON Schema (draft-07) based on its
+ * This trait allows any class to generate a JSON Schema (draft-2020-12) based on its
  * public properties and validate data against that schema. It introspects property
  * types, nullability, and doc-comments to build an accurate schema.
  *
@@ -78,7 +83,7 @@ trait JsonSchemaTrait
     /**
      * Generate JSON Schema for the current class.
      *
-     * Returns a JSON Schema (draft-07) representation of the object structure,
+     * Returns a JSON Schema (draft-2020-12) representation of the object structure,
      * including all public properties from the class, traits, and parent classes.
      *
      * @param bool $strict If true, additionalProperties is set to false in the schema
@@ -203,7 +208,12 @@ trait JsonSchemaTrait
      * @return array
      * @throws ReflectionException
      */
-    private static function generateJsonSchema( string|object $classOrInstance , bool $strict ): array
+    private static function generateJsonSchema
+    (
+        string|object $classOrInstance ,
+        bool          $strict = false
+    )
+    : array
     {
         $instance        = is_object( $classOrInstance ) ? $classOrInstance : new static() ;
         $reflection      = $instance->reflection();
@@ -211,22 +221,22 @@ trait JsonSchemaTrait
 
         $schema =
         [
-            'type'       => 'object',
-            'properties' => [] ,
+            Keyword::TYPE       => Type::OBJECT,
+            Keyword::PROPERTIES => [] ,
         ];
 
         if ( $strict )
         {
-            $schema[ '$schema'              ] = 'http://json-schema.org/draft-07/schema#' ;
-            $schema[ 'title'                ] = $reflectionClass->getShortName();
-            $schema[ 'additionalProperties' ] = false;
+            $schema[ Keyword::SCHEMA                ] = JsonSchemaDraft::DRAFT_2020_12 ;
+            $schema[ Keyword::TITLE                 ] = $reflectionClass->getShortName();
+            $schema[ Keyword::ADDITIONAL_PROPERTIES ] = false ;
         }
 
         // Add description from docblock if available
         $docComment = $reflectionClass->getDocComment() ;
-        if ( $docComment && preg_match('/@see\s+(https?:\/\/[^\s]+)/' , $docComment , $matches ) )
+        if ( $docComment && preg_match('/@see\s+(https?:\/\/\S+)/' , $docComment , $matches ) )
         {
-            $schema['$id'] = $matches[1] ;
+            $schema[ Keyword::ID ] = $matches[1] ;
         }
 
         // Get all public properties including from traits and parent classes
@@ -247,7 +257,7 @@ trait JsonSchemaTrait
                 continue;
             }
 
-            $schema[ 'properties' ][ $propertyName ] = self::getPropertyJsonSchema( $property, $instance ) ;
+            $schema[ Keyword::PROPERTIES ][ $propertyName ] = self::getPropertyJsonSchema( $property, $instance ) ;
         }
 
         return $schema ;
@@ -275,7 +285,7 @@ trait JsonSchemaTrait
         $description = self::extractShortDescription( $property );
         if ( $description !== null )
         {
-            $schema['description'] = $description ;
+            $schema[ Keyword::DESCRIPTION ] = $description ;
         }
 
         // Get default value if property is initialized and instance is provided
@@ -284,7 +294,7 @@ trait JsonSchemaTrait
             $defaultValue = $property->getValue( $instance ) ;
             if ( $defaultValue !== null )
             {
-                $schema['default'] = $defaultValue ;
+                $schema[ Keyword::DEFAULT ] = $defaultValue ;
             }
         }
 
@@ -294,49 +304,49 @@ trait JsonSchemaTrait
         if ($type === null)
         {
             // No type hint - allow any type with oneOf
-            $schema[ 'oneOf' ] =
+            $schema[ Keyword::ONE_OF ] =
             [
-                ['type' => 'string' ] ,
-                ['type' => 'number' ] ,
-                ['type' => 'boolean'] ,
-                ['type' => 'object' ] ,
-                ['type' => 'array'  ] ,
-                ['type' => 'null'   ]
+                [ Keyword::TYPE => Type::STRING  ] ,
+                [ Keyword::TYPE => Type::NUMBER  ] ,
+                [ Keyword::TYPE => Type::BOOLEAN ] ,
+                [ Keyword::TYPE => Type::OBJECT  ] ,
+                [ Keyword::TYPE => Type::ARRAY   ] ,
+                [ Keyword::TYPE => Type::NULL    ]
             ];
-            return $schema;
+            return $schema ;
         }
 
         if ( $type instanceof ReflectionNamedType )
         {
             $mapped = array_merge( $schema , self::mapPhpTypeToJsonSchema($type) ) ;
 
-            if ( $type->allowsNull() && $mapped['type'] !== 'null' ) // If nullable, use oneOf
+            if ( $type->allowsNull() && $mapped[ Keyword::TYPE ] !== Type::NULL ) // If nullable, use oneOf
             {
-                $oneOfTypes = [['type' => 'null']];
+                $oneOfTypes = [[ Keyword::TYPE => Type::NULL ]];
 
-                if (isset($mapped['type']))
+                if ( isset($mapped[ Keyword::TYPE ] ) )
                 {
-                    if (is_array($mapped['type']))
+                    if (is_array($mapped[ Keyword::TYPE ]))
                     {
-                        foreach ($mapped['type'] as $t)
+                        foreach ($mapped[ Keyword::TYPE ] as $t)
                         {
-                            if ( $t !== 'null' ) // Avoid duplicate null type
+                            if ( $t !== Type::NULL ) // Avoid duplicate null type
                             {
-                                $oneOfTypes[] = ['type' => $t] ;
+                                $oneOfTypes[] = [ Keyword::TYPE => $t ] ;
                             }
                         }
                     }
                     else
                     {
-                        $oneOfTypes[] = ['type' => $mapped['type']]; // For simple nullable types like ?int
+                        $oneOfTypes[] = [ Keyword::TYPE => $mapped[ Keyword::TYPE ] ] ; // For simple nullable types like ?int
                     }
                 }
 
-                $schema['oneOf'] = $oneOfTypes;
+                $schema[ Keyword::ONE_OF ] = $oneOfTypes;
 
-                if ( isset($mapped['description'] ) )
+                if ( isset( $mapped[ Keyword::DESCRIPTION ] ) )
                 {
-                    $schema['description'] = $mapped['description'];
+                    $schema[ Keyword::DESCRIPTION ] = $mapped[ Keyword::DESCRIPTION ];
                 }
             }
             else
@@ -353,25 +363,25 @@ trait JsonSchemaTrait
             {
                 $typeName = $unionType->getName();
 
-                if ( $typeName === 'null' )
+                if ( $typeName === Type::NULL )
                 {
                     $hasNull = true;
                 }
                 else
                 {
                     $mapped = self::mapPhpTypeToJsonSchema($unionType) ;
-                    if (isset( $mapped['type'] ) )
+                    if (isset( $mapped[ Keyword::TYPE ] ) )
                     {
-                        if ( is_array( $mapped['type'] ) )
+                        if ( is_array( $mapped[ Keyword::TYPE ] ) )
                         {
-                            foreach ( $mapped['type'] as $t )
+                            foreach ( $mapped[ Keyword::TYPE ] as $t )
                             {
-                                $types[] = ['type' => $t ] ;
+                                $types[] = [ Keyword::TYPE => $t ] ;
                             }
                         }
                         else
                         {
-                            $types[] = [ 'type' => $mapped['type'] ] ;
+                            $types[] = [ Keyword::TYPE => $mapped[ Keyword::TYPE ] ] ;
                         }
                     }
                 }
@@ -379,7 +389,7 @@ trait JsonSchemaTrait
 
             if ( $hasNull )
             {
-                array_unshift( $types , ['type' => 'null'] );
+                array_unshift( $types , [ Keyword::TYPE => Type::NULL ] ) ;
             }
 
             // Remove duplicates based on type
@@ -388,21 +398,21 @@ trait JsonSchemaTrait
 
             foreach ( $types as $typeObj )
             {
-                $key = $typeObj['type'] ;
+                $key = $typeObj[ Keyword::TYPE ] ;
                 if ( !isset( $seen[$key] ) )
                 {
-                    $uniqueTypes[] = $typeObj;
-                    $seen[$key]    = true;
+                    $uniqueTypes[] = $typeObj ;
+                    $seen[$key]    = true ;
                 }
             }
 
             if ( count( $uniqueTypes ) > 1 )
             {
-                $schema['oneOf'] = $uniqueTypes;
+                $schema[ Keyword::ONE_OF ] = $uniqueTypes ;
             }
             else if ( count( $uniqueTypes ) === 1 )
             {
-                $schema['type'] = $uniqueTypes[0]['type'];
+                $schema[ Keyword::TYPE ] = $uniqueTypes[0][ Keyword::TYPE ];
             }
         }
 
@@ -420,42 +430,44 @@ trait JsonSchemaTrait
         $schema   = [] ;
         $typeName = $type->getName() ;
 
+        $mixed = [ Type::STRING , Type::NUMBER , Type::BOOLEAN , Type::OBJECT , Type::ARRAY , Type::NULL ] ;
+
         $mapping =
         [
-            'string' => 'string',
-            'int'    => 'integer',
-            'float'  => 'number',
-            'bool'   => 'boolean',
-            'array'  => 'array',
-            'object' => 'object',
-            'null'   => 'null',
-            'mixed'  => [ 'string' , 'number' , 'boolean' , 'object' , 'array' , 'null' ]
+            PhpType::STRING  => Type::STRING  ,
+            PhpType::INTEGER => Type::INTEGER ,
+            PhpType::FLOAT   => Type::NUMBER  ,
+            PhpType::BOOLEAN => Type::BOOLEAN ,
+            PhpType::ARRAY   => Type::ARRAY   ,
+            PhpType::OBJECT  => Type::OBJECT  ,
+            PhpType::NULL    => Type::NULL    ,
+            PhpType::MIXED   => $mixed
         ];
 
         if ( isset( $mapping[ $typeName] ) )
         {
-            $schema['type'] = $mapping[$typeName];
+            $schema[ Keyword::TYPE ] = $mapping[ $typeName ] ;
         }
         else if ( class_exists( $typeName ) )
         {
             $shortName = new ReflectionClass( $typeName )->getShortName();
-            $schema['type'] = 'object';
-            $schema['$ref'] = "#/definitions/$shortName";
-            if ( isset($schema['description']) )
+            $schema[ Keyword::TYPE ] = Type::OBJECT ;
+            $schema[ Keyword::REF  ] = "#/definitions/$shortName";
+            if ( isset($schema[ Keyword::DESCRIPTION ]) )
             {
-                $schema['description'] .= " (Type: $shortName)" ;
+                $schema[ Keyword::DESCRIPTION ] .= " (Type: $shortName)" ;
             }
             else
             {
-                $schema['description'] = "Type: $shortName" ;
+                $schema[ Keyword::DESCRIPTION ] = "Type: $shortName" ;
             }
         }
         else
         {
-            $schema['type'] = [ 'string' , 'number' , 'boolean' , 'object' , 'array' , 'null' ] ;
+            $schema[ Keyword::TYPE ] = $mixed ;
         }
 
-        return $schema;
+        return $schema ;
     }
 
     /**
@@ -469,54 +481,47 @@ trait JsonSchemaTrait
     {
         $errors = [];
 
-        if ( !isset($schema['properties']) )
+        if ( !isset($schema[ Keyword::PROPERTIES ]) )
         {
-            return [ 'valid' => true , 'errors' => [] ] ;
+            return [ Keyword::VALID => true , Keyword::ERRORS => [] ] ;
         }
 
-
-        foreach ( $schema['properties'] as $key => $propertySchema )
+        foreach( $schema[ Keyword::PROPERTIES ] as $key => $propertySchema )
         {
             if ( !array_key_exists( $key , $data ) )
             {
-                $isNullable = false ;
-                if (isset($propertySchema['oneOf']))
+                if ( isset( $propertySchema[ Keyword::ONE_OF ] ) )
                 {
-                    foreach($propertySchema['oneOf'] as $subSchema)
+                    foreach( $propertySchema[ Keyword::ONE_OF ] as $subSchema )
                     {
-                        if (isset($subSchema['type']) && $subSchema['type'] === 'null')
+                        if (isset( $subSchema[ Keyword::TYPE ] ) && $subSchema[ Keyword::TYPE ] === Type::NULL )
                         {
-                            $isNullable = true ;
                             break ;
                         }
                     }
                 }
-                // if (!$isNullable && !isset($propertySchema['default']))
-                // {
-                //     // $errors[] = "Property '$key' is required";
-                // }
             }
         }
 
-        foreach ($data as $key => $value)
+        foreach ( $data as $key => $value )
         {
-            if ( !isset( $schema['properties'][$key] ) ) // Check if property exists in schema
+            if ( !isset( $schema[ Keyword::PROPERTIES ][ $key ] ) ) // Check if property exists in schema
             {
-                if ( isset($schema['additionalProperties']) && $schema['additionalProperties'] === false )
+                if ( isset($schema[ Keyword::ADDITIONAL_PROPERTIES ]) && $schema[ Keyword::ADDITIONAL_PROPERTIES ] === false )
                 {
                     $errors[] = "Property '$key' is not defined in schema" ;
                 }
                 continue ;
             }
 
-            $propertySchema = $schema['properties'][$key];
+            $propertySchema = $schema[ Keyword::PROPERTIES ][$key];
             $errors         = array_merge( $errors , self::validateValue( $value , $propertySchema , $key ) ) ;
         }
 
         return
         [
-            'valid'  => empty( $errors ) ,
-            'errors' => $errors
+            Keyword::VALID  => empty( $errors ) ,
+            Keyword::ERRORS => $errors
         ];
     }
 
@@ -532,16 +537,16 @@ trait JsonSchemaTrait
     {
         $possibleSchemas = [] ;
 
-        if ( isset($schema['oneOf']) && is_array($schema['oneOf']) )
+        if ( isset( $schema[ Keyword::ONE_OF ] ) && is_array( $schema[ Keyword::ONE_OF ] ) )
         {
-            $possibleSchemas = $schema['oneOf'] ;
+            $possibleSchemas = $schema[ Keyword::ONE_OF ] ;
         }
-        elseif ( isset( $schema['type'] ) )
+        elseif ( isset( $schema[ Keyword::TYPE ] ) )
         {
-            $types = is_array($schema['type']) ? $schema['type'] : [$schema['type']] ;
-            foreach ($types as $t)
+            $types = is_array($schema[ Keyword::TYPE ]) ? $schema[ Keyword::TYPE ] : [$schema[ Keyword::TYPE ]] ;
+            foreach ( $types as $t )
             {
-                $possibleSchemas[] = ['type' => $t] ;
+                $possibleSchemas[] = [ Keyword::TYPE => $t ] ;
             }
         }
 
@@ -553,19 +558,19 @@ trait JsonSchemaTrait
         $isValid = false;
         foreach ( $possibleSchemas as $subSchema )
         {
-            if (isset($subSchema['type']))
+            if (isset( $subSchema[ Keyword::TYPE ] ) )
             {
-                $requiredType     = $subSchema['type'] ;
-                $valueMatchesType = match ($requiredType)
+                $requiredType     = $subSchema[ Keyword::TYPE ] ;
+                $valueMatchesType = match ( $requiredType )
                 {
-                    'string'  => is_string($value),
-                    'integer' => is_int($value),
-                    'number'  => is_int($value) || is_float($value), // JSON 'number' can be int or float in PHP
-                    'boolean' => is_bool($value),
-                    'array'   => is_array($value),
-                    'object'  => is_object($value),
-                    'null'    => is_null($value),
-                    default   => false,
+                    Type::STRING  => is_string ( $value ),
+                    Type::INTEGER => is_int    ( $value ),
+                    Type::NUMBER  => is_int    ( $value ) || is_float($value) , // JSON 'number' can be int or float in PHP
+                    Type::BOOLEAN => is_bool   ( $value ) ,
+                    Type::ARRAY   => is_array  ( $value ) ,
+                    Type::OBJECT  => is_object ( $value ) ,
+                    Type::NULL    => is_null   ( $value ) ,
+                    default       => false,
                 };
 
                 if ($valueMatchesType)
@@ -583,7 +588,7 @@ trait JsonSchemaTrait
 
         // If not valid, generate the error.
         $actualJsonType   = getJsonType( $value );
-        $allowedTypeNames = array_map(fn($s) => $s['type'] ?? 'unknown', $possibleSchemas);
+        $allowedTypeNames = array_map( fn( $s ) => $s[ Keyword::TYPE ] ?? Type::UNKNOWN , $possibleSchemas ) ;
 
         return
         [

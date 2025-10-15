@@ -8,8 +8,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### Added
 
-- oihana\reflect\helpers\getPublicProperties
-- oihana\reflect\traits\JsonSchemaTrait
+- Enums
+  - JsonSchemaDraft : the Json Schema draft versions
+  - JsonSchemaKeyword : the Json Schema keywords
+  - JsonSchemaType : the Json Schema types
+  - PhpType : the main PHP types
+- Helpers
+  - getPublicProperties : Get all public non-static properties from a class, including traits and parent classes, with optional external cache.
+- Traits
+  - JsonSchemaTrait : Providing JSON Schema generation and validation capabilities for classes.
 
 ## [1.0.3] - 2025-08-24
 
