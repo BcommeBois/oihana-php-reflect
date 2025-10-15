@@ -49,7 +49,7 @@ use Attribute;
  * ```
  *
  * @example
- * ydrate an array of objects
+ * Hydrate an array of objects
  * ```php
  * class Tag
  * {
@@ -69,7 +69,8 @@ use Attribute;
  *
  * Hydrate a `mixed` property
  * ```php
- * class Meta {
+ * class Meta
+ * {
  *     public string $type;
  * }
  *
@@ -78,7 +79,42 @@ use Attribute;
  *     #[HydrateAs(Meta::class)]
  *     public mixed $meta;
  * }
+ *
+ * $data =
+ * [
+ *     'meta' => [ 'type' => 'image' ]
+ * ];
+ *
+ * $envelope = Reflection::hydrate(Envelope::class, $data);
+ *
+ * echo get_class( $envelope->meta ) . PHP_EOL; // Meta
+ * echo $envelope->meta->type . PHP_EOL; // 'image'
  * ```
+ *
+ * You can also specify multiple possible classes:
+ *
+ * ```php
+ * class ImageMeta extends Meta { public string $url; }
+ * class VideoMeta extends Meta { public int $duration; }
+ *
+ * class Envelope
+ * {
+ *     #[HydrateAs([ImageMeta::class, VideoMeta::class])]
+ *     public mixed $meta;
+ * }
+ *
+ * $data =
+ * [
+ *     'meta' => [ 'type' => 'video', 'duration' => 42 ]
+ * ];
+ *
+ * $envelope = Reflection::hydrate(Envelope::class, $data);
+ *
+ * echo get_class($envelope->meta) . PHP_EOL; // VideoMeta
+ * echo $envelope->meta->duration . PHP_EOL;  // 42
+ * ```
+ * When multiple classes are provided, the hydrator automatically
+ * chooses the most suitable one based on matching properties.
  *
  * @package oihana\reflect\attributes
  * @author Marc Alcaraz (ekameleon)

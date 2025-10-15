@@ -50,12 +50,12 @@ use Attribute;
  * @author Marc Alcaraz (ekameleon)
  * @since 1.0.0
  */
-#[Attribute(Attribute::TARGET_PROPERTY)]
+#[Attribute( Attribute::TARGET_PROPERTY )]
 class HydrateWith
 {
     public function __construct( ...$classes )
     {
-        $this->classes = $classes;
+        $this->classes = $classes ;
     }
 
     public array $classes ;

@@ -36,11 +36,11 @@ use function oihana\core\arrays\isAssociative;
  *   - {@see HydrateKey} to map incoming keys to a different property name
  *   - {@see HydrateWith} to hydrate arrays of objects (supports polymorphic items)
  *   - {@see HydrateAs} to enforce a target class for ambiguous property types
- * - PHPDoc support for array element types via `@var Type[]` and `@var array<Type>`
+ * - PHPDoc support for array element types via `@var `XXX`[]` and `@var array<Type>`
  * - Assigns public properties only (private/protected are ignored by design)
  *
  * Caching:
- * - Internally caches {@see \ReflectionClass} instances per fully-qualified class name for better performance
+ * - Internally caches {@see ReflectionClass} instances per fully-qualified class name for better performance
  *
  * Limitations and notes:
  * - Hydration relies on property names (or aliases via attributes) and only sets public properties
@@ -341,7 +341,7 @@ class Reflection
         $object          = new $class() ;
         $properties      = $reflectionClass->getProperties() ;
 
-        foreach ( $properties as $property)
+        foreach ( $properties as $property )
         {
             // Determines the key to be used in $thing (via #[HydrateKey])
             $propertyKey = $property->getName() ;
@@ -369,39 +369,74 @@ class Reflection
 
                 $hydrated = false ;
 
+                $hydrateAs   = $property->getAttributes(HydrateAs::class   ) ;
+                $hydrateWith = $property->getAttributes(HydrateWith::class ) ;
+
+                if ( !empty( $hydrateWith ) && is_array( $value ) )
+                {
+                    $arrayType  = null;
+                    $otherTypes = [];
+
+                    foreach ( $types as $type )
+                    {
+                        if ( $type->getName() === 'array' )
+                        {
+                            $arrayType = $type;
+                        }
+                        else
+                        {
+                            $otherTypes[] = $type;
+                        }
+                    }
+
+                    if ( $arrayType !== null )
+                    {
+                        $types = array_merge( [$arrayType], $otherTypes );
+                    }
+                }
+
                 foreach ( $types as $type )
                 {
                     $typeName = $type->getName();
 
                     if ( $typeName === 'null' && $value === null )
                     {
-                        break;
+                        break ;
                     }
 
                     // Attribut #[HydrateAs(Foo::class)]
-                    $hydrateAs = $property->getAttributes(HydrateAs::class ) ;
                     if ( !empty( $hydrateAs ) )
                     {
                         $typeName = $hydrateAs[0]->newInstance()->class ;
                     }
 
+                    if ( !empty( $hydrateWith ) && is_array( $value ) && isAssociative( $value ) )
+                    {
+                        $possibleClasses = $hydrateWith[0]->newInstance()->classes ;
+                        $itemClass       = $this->determineArrayItemType( $value , $possibleClasses );
+                        if ( $itemClass && class_exists( $itemClass ) )
+                        {
+                            $value = $this->hydrate( $value, $itemClass );
+                            $hydrated = true ;
+                            break ;
+                        }
+                    }
+
                     if ( $typeName === 'array' && is_array( $value ) )
                     {
                         // 1. #[HydrateWith(MyClass::class, AnotherClass::class)]
-                        $hydrateWith = $property->getAttributes(HydrateWith::class ) ;
                         if ( !empty( $hydrateWith ) )
                         {
                             $possibleClasses = $hydrateWith[0]->newInstance()->classes ;
-                            $hydratedArray   = [];
-
+                            $hydratedArray   = [] ;
                             foreach ( $value as $item )
                             {
                                 if ( is_array( $item ) )
                                 {
-                                    $itemClass = $this->determineArrayItemType($item, $possibleClasses) ;
+                                    $itemClass = $this->determineArrayItemType( $item , $possibleClasses ) ;
                                     if ( $itemClass && class_exists( $itemClass ) )
                                     {
-                                        $hydratedArray[] = $this->hydrate($item, $itemClass);
+                                        $hydratedArray[] = $this->hydrate( $item , $itemClass ) ;
                                     }
                                     else
                                     {
@@ -413,10 +448,9 @@ class Reflection
                                     $hydratedArray[] = $item ;
                                 }
                             }
-
                             $value    = $hydratedArray;
-                            $hydrated = true;
-                            break;
+                            $hydrated = true ;
+                            break ;
                         }
 
                         // 2. DocComment analysis: @var MyClass | @var \oihana\package\MyClass | @var array<MockAddress>
@@ -424,14 +458,14 @@ class Reflection
                         if
                         (
                             $doc &&
-                            preg_match('/@var\s+((\w+(?:\\\\\w+)*)\[\]|array<(\w+(?:\\\\\w+)*)>)/' , $doc , $matches )
+                            preg_match('/@var\s+((\w+(?:\\\w+)*)\[]|array<(\w+(?:\\\w+)*)>)/' , $doc , $matches )
                         )
                         {
-                            $itemClass = $matches[1] ?: $matches[2]; // Support both Type[] and array<Type>
+                            $itemClass = $matches[1] ?: $matches[2] ; // Support both Type[] and array<Type>
                             if ( class_exists( $itemClass ) )
                             {
                                 $value    = array_map( fn( $v ) => is_array( $v ) ? $this->hydrate( $v , $itemClass ) : $v , $value );
-                                $hydrated = true;
+                                $hydrated = true ;
                                 break;
                             }
                         }
@@ -461,7 +495,7 @@ class Reflection
             }
         }
 
-        return $object;
+        return $object ;
     }
 
     /**
@@ -716,12 +750,18 @@ class Reflection
      *     private int $id;
      * }
      * $props = (new Reflection())->properties(Item::class);
-     * foreach ($props as $prop) {
+     * foreach ($props as $prop)
+     * {
      *     echo $prop->getName(); // 'name'
      * }
      * ```
      */
-    public function properties( object|string $class , int $filter = ReflectionProperty::IS_PUBLIC ): array
+    public function properties
+    (
+        object|string $class ,
+        int $filter = ReflectionProperty::IS_PUBLIC
+    )
+    : array
     {
         return $this->reflection( $class )->getProperties( $filter ) ;
     }
@@ -776,46 +816,69 @@ class Reflection
     protected array $reflections = [] ;
 
     /**
-     * Determine the type of an array element
-     * @param $item
-     * @param array $possibleClasses
-     * @return string|null
+     * Determines the most appropriate class type for a given array item.
+     *
+     * This method is typically used when hydrating arrays of objects whose element type
+     * is ambiguous. It attempts to infer the class of the element using two strategies:
+     *
+     *  1. **Discriminator field detection** — if the array contains a field such as
+     *     `@type` or `type`, its value is matched (case-sensitive or case-insensitive)
+     *     against the short name or the fully qualified name of one of the `$possibleClasses`.
+     *
+     *  2. **Property-based guessing** — if no discriminator is found or matched,
+     *     the method calls `guessClassFromProperties()` to infer the most likely class
+     *     based on the array's keys.
+     *
+     * @param  mixed $item
+     *         The array element to analyze. If the value is not an array, `null` is returned.
+     *
+     * @param  array<class-string> $possibleClasses
+     *         A list of fully qualified class names that represent the possible types
+     *         for this array element.
+     *
+     * @return class-string|null
+     *         The fully qualified class name inferred from the given `$item`, or `null`
+     *         if no matching class could be determined.
+     *
      * @throws ReflectionException
+     *         If reflection operations fail when analyzing candidate classes.
+     *
+     * @see self::shortName()                For normalization of class names.
+     * @see self::guessClassFromProperties() For heuristic detection based on keys.
      */
-    private function determineArrayItemType($item, array $possibleClasses): ?string
+    private function determineArrayItemType( mixed $item , array $possibleClasses ) :?string
     {
-        if (!is_array($item))
+        if ( !is_array( $item ) )
         {
             return null ;
         }
 
-        // Strategy 1: Search for a discriminator (field ‘type’, ‘@type’, etc.)
-        if ( isset( $item[ '@type' ] ) )
-        {
-            $type = $item['@type'] ;
-            foreach ( $possibleClasses as $class )
-            {
-                if ( $this->shortName( $class ) === $type || $class === $type )
-                {
-                    return $class ;
-                }
-            }
-        }
+        // Strategy 1: Search for a discriminator (field 'atType', ‘type’ or ‘@type)
 
-        if ( isset($item['type'] ) )
+        $discriminatorKeys = [ 'atType' , '@type' , 'type' ] ;
+
+        foreach ( $discriminatorKeys as $key )
         {
-            $type = $item['type'];
-            foreach ($possibleClasses as $class)
+            if ( isset( $item[ $key ] ) )
             {
-                if ( strcasecmp( $this->shortName( $class ) , $type ) === 0 )
+                $type = $item[ $key ];
+                foreach ( $possibleClasses as $class )
                 {
-                    return $class;
+                    if // Case-insensitive comparison on both the short name AND the full name
+                    (
+                        strcasecmp( $this->shortName( $class ), $type ) === 0 ||
+                        strcasecmp( $class , $type ) === 0
+                    )
+                    {
+                        return $class ;
+                    }
                 }
             }
         }
 
         // Strategy 2: Analyze properties to guess the type
-        return $this->guessClassFromProperties($item, $possibleClasses);
+
+        return $this->guessClassFromProperties( $item , $possibleClasses ) ;
     }
 
     /**
@@ -859,6 +922,11 @@ class Reflection
      */
     private function guessClassFromProperties( array $item , array $possibleClasses ): ?string
     {
+        if ( empty( $possibleClasses ) )
+        {
+            return null;
+        }
+
         $maxScore  = 0;
         $bestMatch = null;
 
@@ -882,7 +950,7 @@ class Reflection
                     $score += 2 ; // Bonus for existing property
                 }
 
-                // Vérifier les attributs HydrateKey
+                // Check HydrateKey attributes
                 $keyAttr = $property->getAttributes(HydrateKey::class ) ;
                 if ( !empty( $keyAttr ) )
                 {
@@ -905,6 +973,6 @@ class Reflection
         }
 
         // Return the best match if the score is sufficient
-        return $maxScore > 0.3 ? $bestMatch : $possibleClasses[0] ?? null;
+        return $maxScore > 0.3 ? $bestMatch : $possibleClasses[0] ?? null ;
     }
 }

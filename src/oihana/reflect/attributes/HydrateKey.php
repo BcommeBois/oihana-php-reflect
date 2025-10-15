@@ -41,7 +41,9 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class HydrateKey
 {
-    public function __construct(
+    public function __construct
+    (
         public string $key
-    ) {}
+    )
+    {}
 }

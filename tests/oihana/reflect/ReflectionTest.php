@@ -4,14 +4,19 @@ namespace tests\oihana\reflect;
 
 use InvalidArgumentException;
 
-use oihana\reflect\Reflection;
 use ReflectionClassConstant;
 use ReflectionException;
 use ReflectionMethod;
 
+use oihana\reflect\Reflection;
+
+
 use tests\oihana\reflect\mocks\MockAddress;
+use tests\oihana\reflect\mocks\MockCreativeWork;
 use tests\oihana\reflect\mocks\MockEnum;
 use tests\oihana\reflect\mocks\MockGeo;
+use tests\oihana\reflect\mocks\MockOrganization;
+use tests\oihana\reflect\mocks\MockPerson;
 use tests\oihana\reflect\mocks\MockPolymorphicContainer;
 use tests\oihana\reflect\mocks\MockUser;
 use tests\oihana\reflect\mocks\MockWithRenameKey;
@@ -177,6 +182,61 @@ class ReflectionTest extends TestCase
     /**
      * @throws ReflectionException
      */
+    public function testHydrateWithArrayOfObjects()
+    {
+        // Case 1: Array of objects - should hydrate to [MockPerson, MockOrganization]
+        $data1 =
+        [
+            'sponsor' =>
+            [
+                [ 'atType' => 'MockPerson'       , 'name' => 'Alice'],
+                [ '@type'  => 'MockOrganization' , 'name' => 'Acme Corp']
+            ]
+        ];
+        $work1 = $this->reflection->hydrate($data1, MockCreativeWork::class);
+
+        $this->assertIsArray($work1->sponsor);
+        $this->assertCount(2 , $work1->sponsor ) ;
+
+        $this->assertInstanceOf(MockPerson::class       , $work1->sponsor[0] ) ;
+        $this->assertInstanceOf(MockOrganization::class , $work1->sponsor[1] ) ;
+
+        $this->assertEquals('Alice'     , $work1->sponsor[0]->name ) ;
+        $this->assertEquals('Acme Corp' , $work1->sponsor[1]->name ) ;
+
+        // Case 2: Unique object - should hydrate to MockPerson
+        $data2 =
+        [
+            'sponsor' => ['type' => 'Person', 'name' => 'Bob']
+        ];
+        $work2 = $this->reflection->hydrate($data2, MockCreativeWork::class);
+
+        $this->assertInstanceOf(MockPerson::class, $work2->sponsor);
+        $this->assertEquals('Bob', $work2->sponsor->name);
+
+        // Case 3: String (no hydration) - should preserve the string value
+        $data3 =
+        [
+            'sponsor' => 'https://example.com/sponsor'
+        ];
+        $work3 = $this->reflection->hydrate($data3, MockCreativeWork::class);
+
+        $this->assertIsString($work3->sponsor);
+        $this->assertEquals('https://example.com/sponsor', $work3->sponsor);
+
+        // Case 4: Null - should preserve null value
+        $data4 =
+        [
+            'sponsor' => null
+        ];
+        $work4 = $this->reflection->hydrate($data4, MockCreativeWork::class);
+
+        $this->assertNull($work4->sponsor);
+    }
+
+    /**
+     * @throws ReflectionException
+     */
     public function testClassNameAnonymousClass()
     {
         $anon = new class {};
@@ -282,6 +342,9 @@ class ReflectionTest extends TestCase
         $this->assertTrue($optional);
     }
 
+    /**
+     * @throws ReflectionException
+     */
     public function testIsParameterVariadic()
     {
         $variadic = $this->reflection->isParameterVariadic(MockUser::class, 'addTags', 'tags');

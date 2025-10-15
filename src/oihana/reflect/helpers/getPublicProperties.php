@@ -107,7 +107,7 @@ function getPublicProperties
     $traitPropertyNames = [] ;
     foreach ($reflectionClass->getTraits() as $trait)
     {
-        foreach ($trait->getProperties(ReflectionProperty::IS_PUBLIC) as $prop)
+        foreach ( $trait->getProperties(ReflectionProperty::IS_PUBLIC ) as $prop)
         {
             if (!$prop->isStatic())
             {
@@ -116,7 +116,7 @@ function getPublicProperties
         }
     }
 
-    foreach ($reflectionClass->getProperties(ReflectionProperty::IS_PUBLIC) as $property)
+    foreach ( $reflectionClass->getProperties(ReflectionProperty::IS_PUBLIC ) as $property )
     {
         if (!$property->isStatic())
         {
