@@ -111,14 +111,14 @@
         <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/traits/JsonSchemaTrait.php"><a href="files/src-oihana-reflect-traits-jsonschematrait.html"><abbr title="src/oihana/reflect/traits/JsonSchemaTrait.php">JsonSchemaTrait.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">61</span>
+    <span class="phpdocumentor-element-found-in__line">66</span>
 
     </aside>
 
             <p class="phpdocumentor-summary">Trait providing JSON Schema generation and validation capabilities for classes.</p>
 
 
-    <section class="phpdocumentor-description"><p>This trait allows any class to generate a JSON Schema (draft-07) based on its
+    <section class="phpdocumentor-description"><p>This trait allows any class to generate a JSON Schema (draft-2020-12) based on its
 public properties and validate data against that schema. It introspects property
 types, nullability, and doc-comments to build an accurate schema.</p>
 </section>
@@ -1542,7 +1542,7 @@ $trait-&gt;isParameterVariadic(Foo::class, 'bar', 'x'); // true
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/traits/JsonSchemaTrait.php"><a href="files/src-oihana-reflect-traits-jsonschematrait.html"><abbr title="src/oihana/reflect/traits/JsonSchemaTrait.php">JsonSchemaTrait.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">73</span>
+    <span class="phpdocumentor-element-found-in__line">78</span>
 
     </aside>
 
@@ -1768,7 +1768,7 @@ $helper-&gt;jsonSerializeFromPublicProperties(Product::class, fn($k,$v) =&gt; is
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/traits/JsonSchemaTrait.php"><a href="files/src-oihana-reflect-traits-jsonschematrait.html"><abbr title="src/oihana/reflect/traits/JsonSchemaTrait.php">JsonSchemaTrait.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">107</span>
+    <span class="phpdocumentor-element-found-in__line">112</span>
 
     </aside>
 
@@ -1781,7 +1781,7 @@ $helper-&gt;jsonSerializeFromPublicProperties(Product::class, fn($k,$v) =&gt; is
     <div class="phpdocumentor-label-line">
         </div>
     
-        <section class="phpdocumentor-description"><p>Returns a JSON Schema (draft-07) representation of the object structure,
+        <section class="phpdocumentor-description"><p>Returns a JSON Schema (draft-2020-12) representation of the object structure,
 including all public properties from the class, traits, and parent classes.</p>
 </section>
 
@@ -1870,7 +1870,7 @@ $schema = Place::toJsonSchema();
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/traits/JsonSchemaTrait.php"><a href="files/src-oihana-reflect-traits-jsonschematrait.html"><abbr title="src/oihana/reflect/traits/JsonSchemaTrait.php">JsonSchemaTrait.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">157</span>
+    <span class="phpdocumentor-element-found-in__line">162</span>
 
     </aside>
 
@@ -1977,7 +1977,7 @@ if (!$result['valid'])
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/traits/JsonSchemaTrait.php"><a href="files/src-oihana-reflect-traits-jsonschematrait.html"><abbr title="src/oihana/reflect/traits/JsonSchemaTrait.php">JsonSchemaTrait.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">121</span>
+    <span class="phpdocumentor-element-found-in__line">126</span>
 
     </aside>
 
@@ -2058,7 +2058,7 @@ if (!$result['valid'])
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/traits/JsonSchemaTrait.php"><a href="files/src-oihana-reflect-traits-jsonschematrait.html"><abbr title="src/oihana/reflect/traits/JsonSchemaTrait.php">JsonSchemaTrait.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">170</span>
+    <span class="phpdocumentor-element-found-in__line">175</span>
 
     </aside>
 
@@ -2107,7 +2107,7 @@ if (!$result['valid'])
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/traits/JsonSchemaTrait.php"><a href="files/src-oihana-reflect-traits-jsonschematrait.html"><abbr title="src/oihana/reflect/traits/JsonSchemaTrait.php">JsonSchemaTrait.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">206</span>
+    <span class="phpdocumentor-element-found-in__line">211</span>
 
     </aside>
 
@@ -2115,7 +2115,7 @@ if (!$result['valid'])
 
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">private</span>
-            <span class="phpdocumentor-signature__static">static</span>        <span class="phpdocumentor-signature__name">generateJsonSchema</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">string|object&nbsp;</span><span class="phpdocumentor-signature__argument__name">$classOrInstance</span></span><span class="phpdocumentor-signature__argument"><span>, </span><span class="phpdocumentor-signature__argument__return-type">bool&nbsp;</span><span class="phpdocumentor-signature__argument__name">$strict</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">array&lt;string|int, mixed&gt;</span></code>
+            <span class="phpdocumentor-signature__static">static</span>        <span class="phpdocumentor-signature__name">generateJsonSchema</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">string|object&nbsp;</span><span class="phpdocumentor-signature__argument__name">$classOrInstance</span></span><span class="phpdocumentor-signature__argument"><span>[</span><span>, </span><span class="phpdocumentor-signature__argument__return-type">bool&nbsp;</span><span class="phpdocumentor-signature__argument__name">$strict</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">false</span><span> ]</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">array&lt;string|int, mixed&gt;</span></code>
 
     <div class="phpdocumentor-label-line">
         </div>
@@ -2133,7 +2133,7 @@ if (!$result['valid'])
                     <dt class="phpdocumentor-argument-list__entry">
                 <span class="phpdocumentor-signature__argument__name">$strict</span>
                 : <span class="phpdocumentor-signature__argument__return-type">bool</span>
-                            </dt>
+                 = <span class="phpdocumentor-signature__argument__default-value">false</span>            </dt>
             <dd class="phpdocumentor-argument-list__definition">
                 
             </dd>
@@ -2178,7 +2178,7 @@ if (!$result['valid'])
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/traits/JsonSchemaTrait.php"><a href="files/src-oihana-reflect-traits-jsonschematrait.html"><abbr title="src/oihana/reflect/traits/JsonSchemaTrait.php">JsonSchemaTrait.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">266</span>
+    <span class="phpdocumentor-element-found-in__line">276</span>
 
     </aside>
 
@@ -2236,7 +2236,7 @@ if (!$result['valid'])
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/traits/JsonSchemaTrait.php"><a href="files/src-oihana-reflect-traits-jsonschematrait.html"><abbr title="src/oihana/reflect/traits/JsonSchemaTrait.php">JsonSchemaTrait.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">418</span>
+    <span class="phpdocumentor-element-found-in__line">428</span>
 
     </aside>
 
@@ -2285,7 +2285,7 @@ if (!$result['valid'])
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/traits/JsonSchemaTrait.php"><a href="files/src-oihana-reflect-traits-jsonschematrait.html"><abbr title="src/oihana/reflect/traits/JsonSchemaTrait.php">JsonSchemaTrait.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">468</span>
+    <span class="phpdocumentor-element-found-in__line">480</span>
 
     </aside>
 
@@ -2345,7 +2345,7 @@ if (!$result['valid'])
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/traits/JsonSchemaTrait.php"><a href="files/src-oihana-reflect-traits-jsonschematrait.html"><abbr title="src/oihana/reflect/traits/JsonSchemaTrait.php">JsonSchemaTrait.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">531</span>
+    <span class="phpdocumentor-element-found-in__line">536</span>
 
     </aside>
 
