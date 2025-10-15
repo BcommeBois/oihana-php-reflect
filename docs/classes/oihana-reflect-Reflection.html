@@ -140,7 +140,7 @@
 <li><a href="classes/oihana-reflect-attributes-HydrateAs.html"><abbr title="\oihana\reflect\attributes\HydrateAs">HydrateAs</abbr></a> to enforce a target class for ambiguous property types</li>
 </ul>
 </li>
-<li>PHPDoc support for array element types via <code class="prettyprint">@var Type[]</code> and <code class="prettyprint">@var array&lt;Type&gt;</code></li>
+<li>PHPDoc support for array element types via <code class="prettyprint">@var </code>XXX<code class="prettyprint">[]</code> and <code class="prettyprint">@var array&lt;Type&gt;</code></li>
 <li>Assigns public properties only (private/protected are ignored by design)</li>
 </ul>
 <p>Caching:</p>
@@ -365,9 +365,9 @@ an explicit discriminator (<code class="prettyprint">@type</code> or <code class
             <dt class="phpdocumentor-table-of-contents__entry -method -private">
     <a class="" href="classes/oihana-reflect-Reflection.html#method_determineArrayItemType">determineArrayItemType()</a>
     <span>
-                                &nbsp;: string|null    </span>
+                                &nbsp;: class-string|null    </span>
 </dt>
-<dd>Determine the type of an array element</dd>
+<dd>Determines the most appropriate class type for a given array item.</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -private">
     <a class="" href="classes/oihana-reflect-Reflection.html#method_guessClassFromProperties">guessClassFromProperties()</a>
@@ -407,7 +407,7 @@ based on the presence of matching properties in the provided input array.</dd>
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/Reflection.php"><a href="files/src-oihana-reflect-reflection.html"><abbr title="src/oihana/reflect/Reflection.php">Reflection.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">776</span>
+    <span class="phpdocumentor-element-found-in__line">816</span>
 
     </aside>
 
@@ -1001,7 +1001,7 @@ var_dump($profile-&gt;bio); // null
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/Reflection.php"><a href="files/src-oihana-reflect-reflection.html"><abbr title="src/oihana/reflect/Reflection.php">Reflection.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">489</span>
+    <span class="phpdocumentor-element-found-in__line">523</span>
 
     </aside>
 
@@ -1108,7 +1108,7 @@ var_dump($ref-&gt;isParameterNullable(Example::class, 'demo', 'age'));  // bool(
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/Reflection.php"><a href="files/src-oihana-reflect-reflection.html"><abbr title="src/oihana/reflect/Reflection.php">Reflection.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">525</span>
+    <span class="phpdocumentor-element-found-in__line">559</span>
 
     </aside>
 
@@ -1216,7 +1216,7 @@ var_dump($ref-&gt;isParameterOptional(Example::class, 'demo', 'nickname')); // b
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/Reflection.php"><a href="files/src-oihana-reflect-reflection.html"><abbr title="src/oihana/reflect/Reflection.php">Reflection.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">560</span>
+    <span class="phpdocumentor-element-found-in__line">594</span>
 
     </aside>
 
@@ -1323,7 +1323,7 @@ var_dump($ref-&gt;isParameterVariadic(Example::class, 'demo', 'tags')); // bool(
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/Reflection.php"><a href="files/src-oihana-reflect-reflection.html"><abbr title="src/oihana/reflect/Reflection.php">Reflection.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">596</span>
+    <span class="phpdocumentor-element-found-in__line">630</span>
 
     </aside>
 
@@ -1424,7 +1424,7 @@ foreach ($methods as $method)
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/Reflection.php"><a href="files/src-oihana-reflect-reflection.html"><abbr title="src/oihana/reflect/Reflection.php">Reflection.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">624</span>
+    <span class="phpdocumentor-element-found-in__line">658</span>
 
     </aside>
 
@@ -1532,7 +1532,7 @@ var_dump($ref-&gt;parameterDefaultValue(Example::class, 'testMethod', 'misc')); 
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/Reflection.php"><a href="files/src-oihana-reflect-reflection.html"><abbr title="src/oihana/reflect/Reflection.php">Reflection.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">655</span>
+    <span class="phpdocumentor-element-found-in__line">689</span>
 
     </aside>
 
@@ -1627,7 +1627,7 @@ foreach ($params as $param)
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/Reflection.php"><a href="files/src-oihana-reflect-reflection.html"><abbr title="src/oihana/reflect/Reflection.php">Reflection.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">691</span>
+    <span class="phpdocumentor-element-found-in__line">725</span>
 
     </aside>
 
@@ -1736,7 +1736,7 @@ var_dump($ref-&gt;parameterType(Example::class, 'testMethod', 'misc')); // outpu
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/Reflection.php"><a href="files/src-oihana-reflect-reflection.html"><abbr title="src/oihana/reflect/Reflection.php">Reflection.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">724</span>
+    <span class="phpdocumentor-element-found-in__line">759</span>
 
     </aside>
 
@@ -1799,7 +1799,8 @@ var_dump($ref-&gt;parameterType(Example::class, 'testMethod', 'misc')); // outpu
     private int $id;
 }
 $props = (new Reflection())-&gt;properties(Item::class);
-foreach ($props as $prop) {
+foreach ($props as $prop)
+{
     echo $prop-&gt;getName(); // 'name'
 }
 </code></pre>
@@ -1834,7 +1835,7 @@ foreach ($props as $prop) {
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/Reflection.php"><a href="files/src-oihana-reflect-reflection.html"><abbr title="src/oihana/reflect/Reflection.php">Reflection.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">742</span>
+    <span class="phpdocumentor-element-found-in__line">782</span>
 
     </aside>
 
@@ -1917,7 +1918,7 @@ echo $reflectionClass-&gt;getName(); // 'App\Entity\User'
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/Reflection.php"><a href="files/src-oihana-reflect-reflection.html"><abbr title="src/oihana/reflect/Reflection.php">Reflection.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">767</span>
+    <span class="phpdocumentor-element-found-in__line">807</span>
 
     </aside>
 
@@ -2000,20 +2001,35 @@ echo $reflectionClass-&gt;getName(); // 'App\Entity\User'
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/Reflection.php"><a href="files/src-oihana-reflect-reflection.html"><abbr title="src/oihana/reflect/Reflection.php">Reflection.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">785</span>
+    <span class="phpdocumentor-element-found-in__line">849</span>
 
     </aside>
 
-        <p class="phpdocumentor-summary">Determine the type of an array element</p>
+        <p class="phpdocumentor-summary">Determines the most appropriate class type for a given array item.</p>
 
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">private</span>
-                    <span class="phpdocumentor-signature__name">determineArrayItemType</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">mixed&nbsp;</span><span class="phpdocumentor-signature__argument__name">$item</span></span><span class="phpdocumentor-signature__argument"><span>, </span><span class="phpdocumentor-signature__argument__return-type">array&lt;string|int, mixed&gt;&nbsp;</span><span class="phpdocumentor-signature__argument__name">$possibleClasses</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">string|null</span></code>
+                    <span class="phpdocumentor-signature__name">determineArrayItemType</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">mixed&nbsp;</span><span class="phpdocumentor-signature__argument__name">$item</span></span><span class="phpdocumentor-signature__argument"><span>, </span><span class="phpdocumentor-signature__argument__return-type">array&lt;string|int, class-string&gt;&nbsp;</span><span class="phpdocumentor-signature__argument__name">$possibleClasses</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">class-string|null</span></code>
 
     <div class="phpdocumentor-label-line">
         </div>
     
-    
+        <section class="phpdocumentor-description"><p>This method is typically used when hydrating arrays of objects whose element type
+is ambiguous. It attempts to infer the class of the element using two strategies:</p>
+<ol>
+<li>
+<p><strong>Discriminator field detection</strong> — if the array contains a field such as
+<code class="prettyprint">@type</code> or <code class="prettyprint">type</code>, its value is matched (case-sensitive or case-insensitive)
+against the short name or the fully qualified name of one of the <code class="prettyprint">$possibleClasses</code>.</p>
+</li>
+<li>
+<p><strong>Property-based guessing</strong> — if no discriminator is found or matched,
+the method calls <code class="prettyprint">guessClassFromProperties()</code> to infer the most likely class
+based on the array's keys.</p>
+</li>
+</ol>
+</section>
+
         <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
     <dl class="phpdocumentor-argument-list">
                     <dt class="phpdocumentor-argument-list__entry">
@@ -2021,14 +2037,19 @@ echo $reflectionClass-&gt;getName(); // 'App\Entity\User'
                 : <span class="phpdocumentor-signature__argument__return-type">mixed</span>
                             </dt>
             <dd class="phpdocumentor-argument-list__definition">
-                
+                    <section class="phpdocumentor-description"><p>The array element to analyze. If the value is not an array, <code class="prettyprint">null</code> is returned.</p>
+</section>
+
             </dd>
                     <dt class="phpdocumentor-argument-list__entry">
                 <span class="phpdocumentor-signature__argument__name">$possibleClasses</span>
-                : <span class="phpdocumentor-signature__argument__return-type">array&lt;string|int, mixed&gt;</span>
+                : <span class="phpdocumentor-signature__argument__return-type">array&lt;string|int, class-string&gt;</span>
                             </dt>
             <dd class="phpdocumentor-argument-list__definition">
-                
+                    <section class="phpdocumentor-description"><p>A list of fully qualified class names that represent the possible types
+for this array element.</p>
+</section>
+
             </dd>
             </dl>
 
@@ -2045,7 +2066,29 @@ echo $reflectionClass-&gt;getName(); // 'App\Entity\User'
                 <dd class="phpdocumentor-tag-list__definition">
                                                                 <span class="phpdocumentor-tag-link"><abbr title="\ReflectionException">ReflectionException</abbr></span>
                                                             
-                                             
+                                                 <section class="phpdocumentor-description"><p>If reflection operations fail when analyzing candidate classes.</p>
+</section>
+
+                                    </dd>
+                                                <dt class="phpdocumentor-tag-list__entry">
+                    <span class="phpdocumentor-tag__name">see</span>
+                </dt>
+                <dd class="phpdocumentor-tag-list__definition">
+                                                                                    <span class="phpdocumentor-tag-link"><abbr title="\oihana\reflect\self::shortName()">self::shortName()</abbr></span>
+                                        
+                                                 <section class="phpdocumentor-description"><p>For normalization of class names.</p>
+</section>
+
+                                    </dd>
+                            <dt class="phpdocumentor-tag-list__entry">
+                    <span class="phpdocumentor-tag__name">see</span>
+                </dt>
+                <dd class="phpdocumentor-tag-list__definition">
+                                                                                    <span class="phpdocumentor-tag-link"><abbr title="\oihana\reflect\self::guessClassFromProperties()">self::guessClassFromProperties()</abbr></span>
+                                        
+                                                 <section class="phpdocumentor-description"><p>For heuristic detection based on keys.</p>
+</section>
+
                                     </dd>
                                             </dl>
 
@@ -2053,7 +2096,12 @@ echo $reflectionClass-&gt;getName(); // 'App\Entity\User'
 
             <section>
         <h5 class="phpdocumentor-return-value__heading">Return values</h5>
-        <span class="phpdocumentor-signature__response_type">string|null</span>
+        <span class="phpdocumentor-signature__response_type">class-string|null</span>
+                    &mdash;
+                <section class="phpdocumentor-description"><p>The fully qualified class name inferred from the given <code class="prettyprint">$item</code>, or <code class="prettyprint">null</code>
+if no matching class could be determined.</p>
+</section>
+
             </section>
 
 </article>
@@ -2071,7 +2119,7 @@ echo $reflectionClass-&gt;getName(); // 'App\Entity\User'
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/Reflection.php"><a href="files/src-oihana-reflect-reflection.html"><abbr title="src/oihana/reflect/Reflection.php">Reflection.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">860</span>
+    <span class="phpdocumentor-element-found-in__line">923</span>
 
     </aside>
 

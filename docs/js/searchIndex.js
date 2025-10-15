@@ -168,7 +168,7 @@ Search.appendIndex(
         },                {
             "fqsen": "\\oihana\\reflect\\Reflection\u003A\u003AdetermineArrayItemType\u0028\u0029",
             "name": "determineArrayItemType",
-            "summary": "Determine\u0020the\u0020type\u0020of\u0020an\u0020array\u0020element",
+            "summary": "Determines\u0020the\u0020most\u0020appropriate\u0020class\u0020type\u0020for\u0020a\u0020given\u0020array\u0020item.",
             "url": "classes/oihana-reflect-Reflection.html#method_determineArrayItemType"
         },                {
             "fqsen": "\\oihana\\reflect\\Reflection\u003A\u003AguessClassFromProperties\u0028\u0029",
@@ -280,6 +280,61 @@ Search.appendIndex(
             "name": "replaceArguments",
             "summary": "Replace\u0020the\u0020arguments\u0020of\u0020a\u0020function\u0020call\u0020and\u0020return\u0020the\u0020new\u0020expression.",
             "url": "classes/oihana-reflect-traits-FunctionCallTrait.html#method_replaceArguments"
+        },                {
+            "fqsen": "\\oihana\\reflect\\traits\\JsonSchemaTrait",
+            "name": "JsonSchemaTrait",
+            "summary": "Trait\u0020providing\u0020JSON\u0020Schema\u0020generation\u0020and\u0020validation\u0020capabilities\u0020for\u0020classes.",
+            "url": "classes/oihana-reflect-traits-JsonSchemaTrait.html"
+        },                {
+            "fqsen": "\\oihana\\reflect\\traits\\JsonSchemaTrait\u003A\u003AjsonSchema\u0028\u0029",
+            "name": "jsonSchema",
+            "summary": "Generate\u0020JSON\u0020Schema\u0020for\u0020a\u0020class\u0020statically.",
+            "url": "classes/oihana-reflect-traits-JsonSchemaTrait.html#method_jsonSchema"
+        },                {
+            "fqsen": "\\oihana\\reflect\\traits\\JsonSchemaTrait\u003A\u003AtoJsonSchema\u0028\u0029",
+            "name": "toJsonSchema",
+            "summary": "Generate\u0020JSON\u0020Schema\u0020for\u0020the\u0020current\u0020class.",
+            "url": "classes/oihana-reflect-traits-JsonSchemaTrait.html#method_toJsonSchema"
+        },                {
+            "fqsen": "\\oihana\\reflect\\traits\\JsonSchemaTrait\u003A\u003AvalidateWithJsonSchema\u0028\u0029",
+            "name": "validateWithJsonSchema",
+            "summary": "Validate\u0020data\u0020against\u0020a\u0020class\u0020schema\u0020statically.",
+            "url": "classes/oihana-reflect-traits-JsonSchemaTrait.html#method_validateWithJsonSchema"
+        },                {
+            "fqsen": "\\oihana\\reflect\\traits\\JsonSchemaTrait\u003A\u003AvalidateDataWithJsonSchema\u0028\u0029",
+            "name": "validateDataWithJsonSchema",
+            "summary": "Validate\u0020data\u0020against\u0020the\u0020current\u0020class\u0020schema.",
+            "url": "classes/oihana-reflect-traits-JsonSchemaTrait.html#method_validateDataWithJsonSchema"
+        },                {
+            "fqsen": "\\oihana\\reflect\\traits\\JsonSchemaTrait\u003A\u003AextractShortDescription\u0028\u0029",
+            "name": "extractShortDescription",
+            "summary": "Extract\u0020the\u0020description\u0020of\u0020the\u0020specific\u0020property.",
+            "url": "classes/oihana-reflect-traits-JsonSchemaTrait.html#method_extractShortDescription"
+        },                {
+            "fqsen": "\\oihana\\reflect\\traits\\JsonSchemaTrait\u003A\u003AgenerateJsonSchema\u0028\u0029",
+            "name": "generateJsonSchema",
+            "summary": "Internal\u0020method\u0020to\u0020generate\u0020JSON\u0020Schema\u0020from\u0020a\u0020class\u0020or\u0020object.",
+            "url": "classes/oihana-reflect-traits-JsonSchemaTrait.html#method_generateJsonSchema"
+        },                {
+            "fqsen": "\\oihana\\reflect\\traits\\JsonSchemaTrait\u003A\u003AgetPropertyJsonSchema\u0028\u0029",
+            "name": "getPropertyJsonSchema",
+            "summary": "Generate\u0020JSON\u0020Schema\u0020for\u0020a\u0020single\u0020property.",
+            "url": "classes/oihana-reflect-traits-JsonSchemaTrait.html#method_getPropertyJsonSchema"
+        },                {
+            "fqsen": "\\oihana\\reflect\\traits\\JsonSchemaTrait\u003A\u003AmapPhpTypeToJsonSchema\u0028\u0029",
+            "name": "mapPhpTypeToJsonSchema",
+            "summary": "Map\u0020PHP\u0020type\u0020to\u0020JSON\u0020Schema\u0020type.",
+            "url": "classes/oihana-reflect-traits-JsonSchemaTrait.html#method_mapPhpTypeToJsonSchema"
+        },                {
+            "fqsen": "\\oihana\\reflect\\traits\\JsonSchemaTrait\u003A\u003AvalidateAgainstSchema\u0028\u0029",
+            "name": "validateAgainstSchema",
+            "summary": "Validate\u0020data\u0020against\u0020a\u0020JSON\u0020Schema.",
+            "url": "classes/oihana-reflect-traits-JsonSchemaTrait.html#method_validateAgainstSchema"
+        },                {
+            "fqsen": "\\oihana\\reflect\\traits\\JsonSchemaTrait\u003A\u003AvalidateValue\u0028\u0029",
+            "name": "validateValue",
+            "summary": "Validate\u0020a\u0020single\u0020value\u0020against\u0020its\u0020schema.",
+            "url": "classes/oihana-reflect-traits-JsonSchemaTrait.html#method_validateValue"
         },                {
             "fqsen": "\\oihana\\reflect\\traits\\ReflectionTrait",
             "name": "ReflectionTrait",

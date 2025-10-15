@@ -117,7 +117,7 @@
         <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/attributes/HydrateAs.php"><a href="files/src-oihana-reflect-attributes-hydrateas.html"><abbr title="src/oihana/reflect/attributes/HydrateAs.php">HydrateAs.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">87</span>
+    <span class="phpdocumentor-element-found-in__line">123</span>
 
     </aside>
 
@@ -189,7 +189,7 @@ echo $user-&gt;address-&gt;city; // &quot;Paris&quot;
                 </dt>
                 <dd class="phpdocumentor-tag-list__definition">
                                                                                 
-                                                 <section class="phpdocumentor-description"><p>ydrate an array of objects</p>
+                                                 <section class="phpdocumentor-description"><p>Hydrate an array of objects</p>
 <pre class="prettyprint"><code class="language-php">class Tag
 {
     public string $label;
@@ -206,7 +206,8 @@ $post = (new Reflection())-&gt;hydrate($data, Post::class);
 echo $post-&gt;tags[1]-&gt;label; // &quot;Reflections&quot;
 </code></pre>
 <p>Hydrate a <code class="prettyprint">mixed</code> property</p>
-<pre class="prettyprint"><code class="language-php">class Meta {
+<pre class="prettyprint"><code class="language-php">class Meta
+{
     public string $type;
 }
 
@@ -215,7 +216,39 @@ class Envelope
     #[HydrateAs(Meta::class)]
     public mixed $meta;
 }
+
+$data =
+[
+    'meta' =&gt; [ 'type' =&gt; 'image' ]
+];
+
+$envelope = Reflection::hydrate(Envelope::class, $data);
+
+echo get_class( $envelope-&gt;meta ) . PHP_EOL; // Meta
+echo $envelope-&gt;meta-&gt;type . PHP_EOL; // 'image'
 </code></pre>
+<p>You can also specify multiple possible classes:</p>
+<pre class="prettyprint"><code class="language-php">class ImageMeta extends Meta { public string $url; }
+class VideoMeta extends Meta { public int $duration; }
+
+class Envelope
+{
+    #[HydrateAs([ImageMeta::class, VideoMeta::class])]
+    public mixed $meta;
+}
+
+$data =
+[
+    'meta' =&gt; [ 'type' =&gt; 'video', 'duration' =&gt; 42 ]
+];
+
+$envelope = Reflection::hydrate(Envelope::class, $data);
+
+echo get_class($envelope-&gt;meta) . PHP_EOL; // VideoMeta
+echo $envelope-&gt;meta-&gt;duration . PHP_EOL;  // 42
+</code></pre>
+<p>When multiple classes are provided, the hydrator automatically
+chooses the most suitable one based on matching properties.</p>
 </section>
 
                                     </dd>
@@ -326,7 +359,7 @@ class Envelope
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/attributes/HydrateAs.php"><a href="files/src-oihana-reflect-attributes-hydrateas.html"><abbr title="src/oihana/reflect/attributes/HydrateAs.php">HydrateAs.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">90</span>
+    <span class="phpdocumentor-element-found-in__line">126</span>
 
     </aside>
 
@@ -369,7 +402,7 @@ class Envelope
     <aside class="phpdocumentor-element-found-in">
     <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/attributes/HydrateAs.php"><a href="files/src-oihana-reflect-attributes-hydrateas.html"><abbr title="src/oihana/reflect/attributes/HydrateAs.php">HydrateAs.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">90</span>
+    <span class="phpdocumentor-element-found-in__line">126</span>
 
     </aside>
 

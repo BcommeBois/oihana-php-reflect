@@ -12,10 +12,51 @@ use function oihana\core\json\getJsonType;
 use function oihana\reflect\helpers\getPublicProperties;
 
 /**
+ * Trait providing JSON Schema generation and validation capabilities for classes.
+ *
+ * This trait allows any class to generate a JSON Schema (draft-07) based on its
+ * public properties and validate data against that schema. It introspects property
+ * types, nullability, and doc-comments to build an accurate schema.
  *
  * @package oihana\reflect\traits
  * @author Marc Alcaraz (ekameleon)
  * @since 1.0.4
+ *
+ * @example
+ * ```php
+ * class User
+ * {
+ *     use \oihana\reflect\traits\JsonSchemaTrait;
+ *
+ *     // This is the user's full name.
+ *     public string $name;
+ *
+ *     // The age must be an integer or null.
+ *     public ?int $age;
+ * }
+ *
+ * // 1. Generate the schema
+ * $schema = User::jsonSchema();
+ * // echo json_encode($schema, JSON_PRETTY_PRINT);
+ *
+ * // 2. Validate valid data
+ * $validData = ['name' => 'John Doe', 'age' => 30];
+ * $result = User::validateWithJsonSchema( $validData );
+ * var_dump($result['valid']); // bool(true)
+ *
+ * // 3. Validate invalid data
+ * $invalidData = ['name' => 123, 'age' => 'thirty', 'extra' => 'field'];
+ * $result = User::validateWithJsonSchema( $invalidData ) ;
+ *
+ * var_dump($result['valid']); // bool(false)
+ * print_r($result['errors']);
+ * // Array
+ * // (
+ * //     [0] => Property 'name' should be of type [string], got integer
+ * //     [1] => Property 'age' should be of type [integer,null], got string
+ * //     [2] => Property 'extra' is not defined in schema
+ * // )
+ * ```
  */
 trait JsonSchemaTrait
 {
@@ -104,8 +145,10 @@ trait JsonSchemaTrait
      * ];
      *
      * $result = $place->validateData($data);
-     * if (!$result['valid']) {
-     *     foreach ($result['errors'] as $error) {
+     * if (!$result['valid'])
+     * {
+     *     foreach ($result['errors'] as $error)
+     *     {
      *         echo $error . "\n";
      *     }
      * }
@@ -386,7 +429,7 @@ trait JsonSchemaTrait
             'array'  => 'array',
             'object' => 'object',
             'null'   => 'null',
-            'mixed'  => ['string' , 'number' , 'boolean' , 'object' , 'array' , 'null' ]
+            'mixed'  => [ 'string' , 'number' , 'boolean' , 'object' , 'array' , 'null' ]
         ];
 
         if ( isset( $mapping[ $typeName] ) )
@@ -400,11 +443,11 @@ trait JsonSchemaTrait
             $schema['$ref'] = "#/definitions/$shortName";
             if ( isset($schema['description']) )
             {
-                $schema['description'] .= " (Type: $shortName)";
+                $schema['description'] .= " (Type: $shortName)" ;
             }
             else
             {
-                $schema['description'] = "Type: $shortName";
+                $schema['description'] = "Type: $shortName" ;
             }
         }
         else
@@ -429,6 +472,30 @@ trait JsonSchemaTrait
         if ( !isset($schema['properties']) )
         {
             return [ 'valid' => true , 'errors' => [] ] ;
+        }
+
+
+        foreach ( $schema['properties'] as $key => $propertySchema )
+        {
+            if ( !array_key_exists( $key , $data ) )
+            {
+                $isNullable = false ;
+                if (isset($propertySchema['oneOf']))
+                {
+                    foreach($propertySchema['oneOf'] as $subSchema)
+                    {
+                        if (isset($subSchema['type']) && $subSchema['type'] === 'null')
+                        {
+                            $isNullable = true ;
+                            break ;
+                        }
+                    }
+                }
+                // if (!$isNullable && !isset($propertySchema['default']))
+                // {
+                //     // $errors[] = "Property '$key' is required";
+                // }
+            }
         }
 
         foreach ($data as $key => $value)
@@ -461,45 +528,72 @@ trait JsonSchemaTrait
      * @param string $path
      * @return array
      */
-    private static function validateValue( mixed $value, array $schema, string $path ) :array
+    private static function validateValue( mixed $value, array $schema , string $path ) :array
     {
-        $errors = [];
-        $types  = [];
+        $possibleSchemas = [] ;
 
-        if ( isset($schema['type']) )
+        if ( isset($schema['oneOf']) && is_array($schema['oneOf']) )
         {
-            $types = is_array($schema['type']) ? $schema['type'] : [$schema['type']];
+            $possibleSchemas = $schema['oneOf'] ;
+        }
+        elseif ( isset( $schema['type'] ) )
+        {
+            $types = is_array($schema['type']) ? $schema['type'] : [$schema['type']] ;
+            foreach ($types as $t)
+            {
+                $possibleSchemas[] = ['type' => $t] ;
+            }
         }
 
-        if (isset($schema['oneOf']) && is_array($schema['oneOf']))
+        if (empty( $possibleSchemas ) )
         {
-            foreach ($schema['oneOf'] as $subSchema)
+            return [] ; // No type constraint, so it's valid.
+        }
+
+        $isValid = false;
+        foreach ( $possibleSchemas as $subSchema )
+        {
+            if (isset($subSchema['type']))
             {
-                if (isset( $subSchema['type'] ) )
+                $requiredType     = $subSchema['type'] ;
+                $valueMatchesType = match ($requiredType)
                 {
-                    $types[] = $subSchema['type'];
+                    'string'  => is_string($value),
+                    'integer' => is_int($value),
+                    'number'  => is_int($value) || is_float($value), // JSON 'number' can be int or float in PHP
+                    'boolean' => is_bool($value),
+                    'array'   => is_array($value),
+                    'object'  => is_object($value),
+                    'null'    => is_null($value),
+                    default   => false,
+                };
+
+                if ($valueMatchesType)
+                {
+                    $isValid = true ;
+                    break ; // Found a matching type
                 }
             }
         }
 
-        if ( empty( $types ) )
+        if ( $isValid )
         {
-            return $errors;
+            return [] ;
         }
 
-        $actual = getJsonType($value);
+        // If not valid, generate the error.
+        $actualJsonType   = getJsonType( $value );
+        $allowedTypeNames = array_map(fn($s) => $s['type'] ?? 'unknown', $possibleSchemas);
 
-        if (!in_array( $actual , array_unique($types), true))
-        {
-            $errors[] = sprintf
+        return
+        [
+            sprintf
             (
-                "Property '%s' should be of type [%s], got %s",
-                $path,
-                implode(',', array_unique($types)),
-                $actual
-            );
-        }
-
-        return $errors;
+                "Property '%s' should be of type [%s], got %s" ,
+                $path ,
+                implode(',' , array_unique( $allowedTypeNames ) ) ,
+                $actualJsonType
+            )
+        ];
     }
 }

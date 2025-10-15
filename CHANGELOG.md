@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### Added
 
 - oihana\reflect\helpers\getPublicProperties
+- oihana\reflect\traits\JsonSchemaTrait
 
 ## [1.0.3] - 2025-08-24
 
