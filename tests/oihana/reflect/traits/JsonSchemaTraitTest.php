@@ -3,19 +3,21 @@
 namespace tests\oihana\reflect\traits;
 
 use Closure;
-use oihana\reflect\traits\JsonSchemaTrait;
-use PHPUnit\Framework\TestCase;
 
 use ReflectionException;
 use ReflectionMethod;
 use ReflectionProperty;
-use function oihana\core\strings\toPhpString;
+
+use PHPUnit\Framework\TestCase;
+
+use oihana\reflect\traits\JsonSchemaTrait;
 
 final class JsonSchemaTraitTest extends TestCase
 {
     public function createTestClass(): object
     {
-        return new class {
+        return new class
+        {
             use JsonSchemaTrait;
 
             /**
@@ -40,7 +42,7 @@ final class JsonSchemaTraitTest extends TestCase
 
     public function testJsonSchemaStatic(): void
     {
-        $obj = $this->createTestClass();
+        $obj    = $this->createTestClass();
         $schema = $obj::jsonSchema();
 
         $this->assertArrayHasKey('type', $schema);
@@ -114,9 +116,9 @@ final class JsonSchemaTraitTest extends TestCase
         $obj = $this->createTestClass();
         $reflectionProp = new ReflectionProperty($obj, 'name');
 
-        $desc = $this->getObjectMethod($obj, 'extractShortDescription')($reflectionProp);
+        $desc = $this->getObjectMethod( $obj , 'extractShortDescription' )( $reflectionProp ) ;
 
-        $this->assertEquals('The name', $desc);
+        $this->assertEquals('The name' , $desc ) ;
     }
 
     /**

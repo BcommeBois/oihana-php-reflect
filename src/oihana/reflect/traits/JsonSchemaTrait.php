@@ -109,7 +109,7 @@ trait JsonSchemaTrait
      * $schema = Place::toJsonSchema();
      * ```
      */
-    public function toJsonSchema( bool $strict = true ): array
+    public function toJsonSchema( bool $strict = true ) :array
     {
         return self::generateJsonSchema( $this , $strict ) ;
     }
@@ -125,7 +125,7 @@ trait JsonSchemaTrait
      */
     public static function validateWithJsonSchema( array $data, bool $strict = true ): array
     {
-        $schema = static::jsonSchema( $strict );
+        $schema = static::jsonSchema( $strict ) ;
         return self::validateAgainstSchema( $data , $schema ) ;
     }
 
@@ -159,10 +159,10 @@ trait JsonSchemaTrait
      * }
      * ```
      */
-    public function validateDataWithJsonSchema(array $data, bool $strict = true): array
+    public function validateDataWithJsonSchema( array $data, bool $strict = true ): array
     {
         $schema = $this->toJsonSchema( $strict );
-        return self::validateAgainstSchema($data, $schema);
+        return self::validateAgainstSchema( $data , $schema ) ;
     }
 
     /**
@@ -262,8 +262,6 @@ trait JsonSchemaTrait
 
         return $schema ;
     }
-
-
 
     /**
      * Generate JSON Schema for a single property.
