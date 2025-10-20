@@ -289,10 +289,17 @@ trait JsonSchemaTrait
         // Get default value if property is initialized and instance is provided
         if ( $instance !== null && $property->isInitialized( $instance ) )
         {
-            $defaultValue = $property->getValue( $instance ) ;
-            if ( $defaultValue !== null )
+            try
             {
-                $schema[ Keyword::DEFAULT ] = $defaultValue ;
+                $defaultValue = $property->getValue( $instance ) ;
+                if ( $defaultValue !== null )
+                {
+                    $schema[ Keyword::DEFAULT ] = $defaultValue ;
+                }
+            }
+            catch( ReflectionException )
+            {
+
             }
         }
 
