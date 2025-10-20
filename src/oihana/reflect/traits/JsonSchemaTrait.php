@@ -2,6 +2,7 @@
 
 namespace oihana\reflect\traits ;
 
+use oihana\reflect\Reflection;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionNamedType;
@@ -13,6 +14,7 @@ use oihana\reflect\enums\JsonSchemaKeyword as Keyword;
 use oihana\reflect\enums\JsonSchemaType    as Type ;
 use oihana\reflect\enums\PhpType;
 
+use tests\oihana\reflect\traits\ReflectionTraitTest;
 use function oihana\core\json\getJsonType;
 use function oihana\reflect\helpers\getPublicProperties;
 
@@ -215,8 +217,13 @@ trait JsonSchemaTrait
     )
     : array
     {
-        $instance        = is_object( $classOrInstance ) ? $classOrInstance : new static() ;
-        $reflection      = $instance->reflection();
+        $instance = is_object( $classOrInstance ) ? $classOrInstance : null ;
+
+        $usesReflectionTrait = $instance !== null &&
+            in_array(ReflectionTrait::class, class_uses($instance, true));
+
+        $reflection = $usesReflectionTrait ? $instance->reflection() : new Reflection() ;
+
         $reflectionClass = $reflection->reflection( $classOrInstance ) ;
 
         $schema =
@@ -257,7 +264,7 @@ trait JsonSchemaTrait
                 continue;
             }
 
-            $schema[ Keyword::PROPERTIES ][ $propertyName ] = self::getPropertyJsonSchema( $property, $instance ) ;
+            $schema[ Keyword::PROPERTIES ][ $propertyName ] = self::getPropertyJsonSchema( $property , $instance ) ;
         }
 
         return $schema ;
