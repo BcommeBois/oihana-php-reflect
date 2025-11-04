@@ -15,6 +15,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - PhpType : the main PHP types
 - Helpers
   - getPublicProperties : Get all public non-static properties from a class, including traits and parent classes, with optional external cache.
+  - hasTrait : Check if a class uses a specific trait, including traits from parent classes and nested traits, with optional external cache.
+  - useConstantsTrait : Checks if a given class uses the `ConstantsTrait`, either directly or via parent classes.
 - Traits
   - JsonSchemaTrait : Providing JSON Schema generation and validation capabilities for classes.
 

@@ -471,6 +471,16 @@ Search.appendIndex(
             "summary": "Get\u0020all\u0020public\u0020non\u002Dstatic\u0020properties\u0020from\u0020a\u0020class,\u0020including\u0020traits\u0020and\u0020parent\u0020classes,\nwith\u0020optional\u0020external\u0020cache.",
             "url": "namespaces/oihana-reflect-helpers.html#function_getPublicProperties"
         },                {
+            "fqsen": "\\oihana\\reflect\\helpers\\hasTrait\u0028\u0029",
+            "name": "hasTrait",
+            "summary": "Check\u0020if\u0020a\u0020class\u0020uses\u0020a\u0020specific\u0020trait,\u0020including\u0020traits\u0020from\u0020parent\u0020classes\nand\u0020nested\u0020traits,\u0020with\u0020optional\u0020external\u0020cache.",
+            "url": "namespaces/oihana-reflect-helpers.html#function_hasTrait"
+        },                {
+            "fqsen": "\\oihana\\reflect\\helpers\\useConstantsTrait\u0028\u0029",
+            "name": "useConstantsTrait",
+            "summary": "Checks\u0020if\u0020a\u0020given\u0020class\u0020uses\u0020the\u0020\u0060ConstantsTrait\u0060,\u0020either\u0020directly\u0020or\u0020via\u0020parent\u0020classes.",
+            "url": "namespaces/oihana-reflect-helpers.html#function_useConstantsTrait"
+        },                {
             "fqsen": "\\oihana\\reflect\\Reflection",
             "name": "Reflection",
             "summary": "High\u002Dlevel\u0020helper\u0020over\u0020PHP\u0027s\u0020Reflection\u0020API\u0020and\u0020a\u0020robust\u0020array\u002Dto\u002Dobject\u0020hydrator.",

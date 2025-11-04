@@ -140,6 +140,21 @@
 <dd>Get all public non-static properties from a class, including traits and parent classes,
 with optional external cache.</dd>
 
+            <dt class="phpdocumentor-table-of-contents__entry -function -">
+    <a class="" href="namespaces/oihana-reflect-helpers.html#function_hasTrait">hasTrait()</a>
+    <span>
+                                &nbsp;: bool    </span>
+</dt>
+<dd>Check if a class uses a specific trait, including traits from parent classes
+and nested traits, with optional external cache.</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -function -">
+    <a class="" href="namespaces/oihana-reflect-helpers.html#function_useConstantsTrait">useConstantsTrait()</a>
+    <span>
+                                &nbsp;: bool    </span>
+</dt>
+<dd>Checks if a given class uses the `ConstantsTrait`, either directly or via parent classes.</dd>
+
     </dl>
 
         
@@ -426,6 +441,331 @@ echo $prop-&gt;getDeclaringClass()-&gt;getName();
             </section>
 
 </article>
+                    <article class="phpdocumentor-element -function - ">
+    <h4 class="phpdocumentor-element__name" id="function_hasTrait">
+        hasTrait()
+        <a href="namespaces/oihana-reflect-helpers.html#function_hasTrait" class="headerlink"><i class="fas fa-link"></i></a>
+
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/helpers/hasTrait.php"><a href="files/src-oihana-reflect-helpers-hastrait.html"><abbr title="src/oihana/reflect/helpers/hasTrait.php">hasTrait.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">112</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Check if a class uses a specific trait, including traits from parent classes
+and nested traits, with optional external cache.</p>
+
+    
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility"></span>
+                    <span class="phpdocumentor-signature__name">hasTrait</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type"><abbr title="\ReflectionClass">ReflectionClass</abbr>&nbsp;</span><span class="phpdocumentor-signature__argument__name">$reflectionClass</span></span><span class="phpdocumentor-signature__argument"><span>, </span><span class="phpdocumentor-signature__argument__return-type">string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$traitName</span></span><span class="phpdocumentor-signature__argument"><span>[</span><span>, </span><span class="phpdocumentor-signature__argument__return-type">bool&nbsp;</span><span class="phpdocumentor-signature__argument__name">$recursive</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">true</span><span> ]</span></span><span class="phpdocumentor-signature__argument"><span>[</span><span>, </span><span class="phpdocumentor-signature__argument__return-type">array&lt;string, bool&gt;&nbsp;</span><span class="phpdocumentor-signature__argument__reference-operator">&amp;</span><span class="phpdocumentor-signature__argument__name">$cache</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">[]</span><span> ]</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">bool</span></code>
+
+        <section class="phpdocumentor-description"><p>When recursive mode is enabled (default), the function searches through:</p>
+<ul>
+<li>Direct traits of the class</li>
+<li>Traits used by other traits (nested traits)</li>
+<li>Traits from parent classes</li>
+</ul>
+</section>
+
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$reflectionClass</span>
+                : <span class="phpdocumentor-signature__argument__return-type"><abbr title="\ReflectionClass">ReflectionClass</abbr></span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>The reflection of the class to inspect</p>
+</section>
+
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$traitName</span>
+                : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>The fully qualified trait name to search for</p>
+</section>
+
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$recursive</span>
+                : <span class="phpdocumentor-signature__argument__return-type">bool</span>
+                 = <span class="phpdocumentor-signature__argument__default-value">true</span>            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>Whether to recursively search in traits and parent classes</p>
+</section>
+
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$cache</span>
+                : <span class="phpdocumentor-signature__argument__return-type">array&lt;string, bool&gt;</span>
+                 = <span class="phpdocumentor-signature__argument__default-value">[]</span>            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>Optional external cache (passed by reference)</p>
+</section>
+
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="namespaces/oihana-reflect-helpers.html#function_hasTrait#tags" class="headerlink"><i class="fas fa-link"></i></a>
+
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                    <dt class="phpdocumentor-tag-list__entry">
+                    <span class="phpdocumentor-tag__name">example</span>
+                </dt>
+                <dd class="phpdocumentor-tag-list__definition">
+                                                                                
+                                                 <section class="phpdocumentor-description"><h3>Basic recursive usage</h3>
+<pre class="prettyprint"><code class="language-php">trait MyTrait
+{
+    public $value;
+}
+
+class MyParent
+{
+    use MyTrait;
+}
+
+class MyClass extends MyParent
+{
+    public $name;
+}
+
+$reflection = new ReflectionClass(MyClass::class);
+
+// Will find MyTrait in parent class
+var_dump(hasTrait($reflection, MyTrait::class));
+// bool(true)
+</code></pre>
+</section>
+
+                                    </dd>
+                            <dt class="phpdocumentor-tag-list__entry">
+                    <span class="phpdocumentor-tag__name">example</span>
+                </dt>
+                <dd class="phpdocumentor-tag-list__definition">
+                                                                                
+                                                 <section class="phpdocumentor-description"><h3>Non-recursive usage</h3>
+<pre class="prettyprint"><code class="language-php">// Using the same classes as above...
+$reflection = new ReflectionClass(MyClass::class);
+
+// Will NOT find MyTrait because it's only in the parent
+var_dump(hasTrait($reflection, MyTrait::class, false));
+// bool(false)
+
+$parentReflection = new ReflectionClass(MyParent::class);
+
+// Will find MyTrait directly in MyParent
+var_dump(hasTrait($parentReflection, MyTrait::class, false));
+// bool(true)
+</code></pre>
+</section>
+
+                                    </dd>
+                            <dt class="phpdocumentor-tag-list__entry">
+                    <span class="phpdocumentor-tag__name">example</span>
+                </dt>
+                <dd class="phpdocumentor-tag-list__definition">
+                                                                                
+                                                 <section class="phpdocumentor-description"><h3>Nested traits detection</h3>
+<pre class="prettyprint"><code class="language-php">trait BaseTrait
+{
+    public $id;
+}
+
+trait ComposedTrait
+{
+    use BaseTrait;
+    public $name;
+}
+
+class MyClass
+{
+    use ComposedTrait;
+}
+
+$reflection = new ReflectionClass(MyClass::class);
+
+// Will find BaseTrait even though it's nested in ComposedTrait
+var_dump(hasTrait($reflection, BaseTrait::class));
+// bool(true)
+
+var_dump(hasTrait($reflection, ComposedTrait::class));
+// bool(true)
+</code></pre>
+</section>
+
+                                    </dd>
+                            <dt class="phpdocumentor-tag-list__entry">
+                    <span class="phpdocumentor-tag__name">example</span>
+                </dt>
+                <dd class="phpdocumentor-tag-list__definition">
+                                                                                
+                                                 <section class="phpdocumentor-description"><h3>Using external cache for performance</h3>
+<pre class="prettyprint"><code class="language-php">$cache = [];
+$reflection1 = new ReflectionClass(MyClass1::class);
+$reflection2 = new ReflectionClass(MyClass2::class);
+
+// First call populates cache
+hasTrait($reflection1, MyTrait::class, true, $cache);
+
+// Second call uses cache if classes overlap in hierarchy
+hasTrait($reflection2, MyTrait::class, true, $cache);
+</code></pre>
+</section>
+
+                                    </dd>
+                                                <dt class="phpdocumentor-tag-list__entry">
+                    <span class="phpdocumentor-tag__name">author</span>
+                </dt>
+                <dd class="phpdocumentor-tag-list__definition">
+                                                                                
+                                                 <section class="phpdocumentor-description"><p>Marc Alcaraz (ekameleon)</p>
+</section>
+
+                                    </dd>
+                                                <dt class="phpdocumentor-tag-list__entry">
+                    <span class="phpdocumentor-tag__name">since</span>
+                </dt>
+                <dd class="phpdocumentor-tag-list__definition">
+                                            <span class="phpdocumentor-tag-link">1.0.4</span>
+                                                                                
+                                             
+                                    </dd>
+                                            </dl>
+
+            <section>
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+        <span class="phpdocumentor-signature__response_type">bool</span>
+                    &mdash;
+                <section class="phpdocumentor-description"><p>True if the class uses the trait, false otherwise</p>
+</section>
+
+            </section>
+
+</article>
+                    <article class="phpdocumentor-element -function - ">
+    <h4 class="phpdocumentor-element__name" id="function_useConstantsTrait">
+        useConstantsTrait()
+        <a href="namespaces/oihana-reflect-helpers.html#function_useConstantsTrait" class="headerlink"><i class="fas fa-link"></i></a>
+
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/helpers/useConstantsTrait.php"><a href="files/src-oihana-reflect-helpers-useconstantstrait.html"><abbr title="src/oihana/reflect/helpers/useConstantsTrait.php">useConstantsTrait.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">49</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Checks if a given class uses the `ConstantsTrait`, either directly or via parent classes.</p>
+
+    
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility"></span>
+                    <span class="phpdocumentor-signature__name">useConstantsTrait</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__return-type">string&nbsp;</span><span class="phpdocumentor-signature__argument__name">$className</span></span><span class="phpdocumentor-signature__argument"><span>[</span><span>, </span><span class="phpdocumentor-signature__argument__return-type">array&lt;string|int, mixed&gt;&nbsp;</span><span class="phpdocumentor-signature__argument__reference-operator">&amp;</span><span class="phpdocumentor-signature__argument__name">$cache</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">[]</span><span> ]</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">bool</span></code>
+
+        <section class="phpdocumentor-description"><p>This function leverages <a href="namespaces/oihana-reflect-helpers.html#function_hasTrait"><abbr title="\oihana\reflect\helpers\hasTrait()">hasTrait()</abbr></a> to perform a recursive search:</p>
+<ul>
+<li>Checks if the class itself uses <code class="prettyprint">ConstantsTrait</code></li>
+<li>Checks traits used by traits (nested traits)</li>
+<li>Checks parent classes recursively</li>
+</ul>
+</section>
+
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$className</span>
+                : <span class="phpdocumentor-signature__argument__return-type">string</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>The fully-qualified class name to inspect.</p>
+</section>
+
+            </dd>
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-signature__argument__name">$cache</span>
+                : <span class="phpdocumentor-signature__argument__return-type">array&lt;string|int, mixed&gt;</span>
+                 = <span class="phpdocumentor-signature__argument__default-value">[]</span>            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>Optional external cache passed by reference to speed up repeated checks.</p>
+</section>
+
+            </dd>
+            </dl>
+
+    
+    <h5 class="phpdocumentor-tag-list__heading" id="tags">
+        Tags
+        <a href="namespaces/oihana-reflect-helpers.html#function_useConstantsTrait#tags" class="headerlink"><i class="fas fa-link"></i></a>
+
+    </h5>
+    <dl class="phpdocumentor-tag-list">
+                                    <dt class="phpdocumentor-tag-list__entry">
+                    <span class="phpdocumentor-tag__name">example</span>
+                </dt>
+                <dd class="phpdocumentor-tag-list__definition">
+                                                                                
+                                                 <section class="phpdocumentor-description"><pre class="prettyprint"><code class="language-php">use oihana\reflect\helpers\useConstantsTrait;
+use oihana\reflect\traits\ConstantsTrait;
+
+trait MyEnumTrait { use ConstantsTrait; }
+
+class ParentClass { use MyEnumTrait; }
+class ChildClass extends ParentClass }
+class NoTraitClass }
+
+// Direct usage
+var_dump(useConstantsTrait(ParentClass::class)); // true
+
+// Inherited via parent
+var_dump(useConstantsTrait(ChildClass::class)); // true
+
+// Class without the trait
+var_dump(useConstantsTrait(NoTraitClass::class)); // false
+
+// Non-existent class
+var_dump(useConstantsTrait('NonExistentClass')); // false
+</code></pre>
+</section>
+
+                                    </dd>
+                                                <dt class="phpdocumentor-tag-list__entry">
+                    <span class="phpdocumentor-tag__name">author</span>
+                </dt>
+                <dd class="phpdocumentor-tag-list__definition">
+                                                                                
+                                                 <section class="phpdocumentor-description"><p>Marc Alcaraz (ekameleon)</p>
+</section>
+
+                                    </dd>
+                                                <dt class="phpdocumentor-tag-list__entry">
+                    <span class="phpdocumentor-tag__name">since</span>
+                </dt>
+                <dd class="phpdocumentor-tag-list__definition">
+                                            <span class="phpdocumentor-tag-link">1.0.4</span>
+                                                                                
+                                             
+                                    </dd>
+                                            </dl>
+
+            <section>
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+        <span class="phpdocumentor-signature__response_type">bool</span>
+                    &mdash;
+                <section class="phpdocumentor-description"><p>Returns <code class="prettyprint">true</code> if the class or any parent class uses <code class="prettyprint">ConstantsTrait</code>, <code class="prettyprint">false</code> otherwise.</p>
+</section>
+
+            </section>
+
+</article>
             </section>
 
         <div class="phpdocumentor-modal" id="source-view">
@@ -543,6 +883,8 @@ echo $prop-&gt;getDeclaringClass()-&gt;getName();
                     <ul class="phpdocumentor-list -clean">
                                                     <li class=""><a href="namespaces/oihana-reflect-helpers.html#function_getFunctionInfo">getFunctionInfo()</a></li>
                                                     <li class=""><a href="namespaces/oihana-reflect-helpers.html#function_getPublicProperties">getPublicProperties()</a></li>
+                                                    <li class=""><a href="namespaces/oihana-reflect-helpers.html#function_hasTrait">hasTrait()</a></li>
+                                                    <li class=""><a href="namespaces/oihana-reflect-helpers.html#function_useConstantsTrait">useConstantsTrait()</a></li>
                                             </ul>
                 </li>
                     </ul>

@@ -28,7 +28,9 @@
         },
         "files": [
             "src/oihana/reflect/helpers/getFunctionInfo.php",
-            "src/oihana/reflect/helpers/getPublicProperties.php"
+            "src/oihana/reflect/helpers/getPublicProperties.php",
+            "src/oihana/reflect/helpers/hasTrait.php",
+            "src/oihana/reflect/helpers/useConstantsTrait.php"
         ]
     },
     "autoload-dev": {
