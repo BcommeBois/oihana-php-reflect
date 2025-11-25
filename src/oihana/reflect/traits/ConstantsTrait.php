@@ -5,6 +5,7 @@ namespace oihana\reflect\traits;
 use ReflectionClass;
 
 use oihana\reflect\exceptions\ConstantException;
+use function oihana\core\arrays\toArray;
 
 /**
  * Enum-like utilities for classes that expose a set of public constants.
@@ -118,6 +119,8 @@ trait ConstantsTrait
      * If the constant values are strings containing multiple parts separated
      * by one or more separators, it splits them accordingly before matching.
      *
+     * It also supports case-insensitive lookup if the `$caseInsensitive` flag is set.
+     *
      * The method returns:
      * - a string with the constant name if exactly one constant matches,
      * - an array of constant names if multiple constants share the same value,
@@ -125,11 +128,12 @@ trait ConstantsTrait
      *
      * The internal cache is used to optimize repeated lookups.
      *
-     * @param string $value The value to search for among the constants.
-     * @param string|string[]|null $separator Optional separator(s) to split constant values before matching.
-     *     - If null, no splitting is performed.
-     *     - If a string, it is used as the delimiter.
-     *     - If an array of strings, each separator is applied iteratively.
+     * @param string               $value           The value to search for among the constants.
+     * @param string|string[]|null $separator       Optional separator(s) to split constant values before matching.
+     *                                                - If null, no splitting is performed.
+     *                                                - If a string, it is used as the delimiter.
+     *                                                - If an array of strings, each separator is applied iteratively.
+     * @param bool                 $caseInsensitive If true, performs a case-insensitive search.
      *
      * @return string|string[]|null The constant name(s) matching the value, or null if none found.
      *
@@ -174,99 +178,99 @@ trait ConstantsTrait
      * }
      * echo Multi::getConstant('b', [',', '|']);
      * // 'ALPHA'
+     *
+     * // Case-insensitive search
+     * echo Status::getConstant('OPEN', null, true); // 'OPEN'
+     * echo Status::getConstant('OpEn', null, true); // 'OPEN'
      * ```
      */
-    public static function getConstant( string $value , array|string|null $separator = null ): string|array|null
+    public static function getConstant
+    (
+        string            $value ,
+        array|string|null $separator       = null ,
+        bool              $caseInsensitive = false
+    )
+    : string|array|null
     {
         if( static::$CONSTANTS === null )
         {
             static::$CONSTANTS = [] ;
         }
 
-        if( is_array( $separator ) )
+        if ( is_array( $separator ) )
         {
-            sort($separator ) ;
-            $key = implode('|' , $separator ) ;
+            sort( $separator ) ;
+            $sepKey = implode( '|' , $separator ) ;
         }
         else
         {
-            $key = $separator ?? '__null__';
+            $sepKey = $separator ?? '__null__' ;
         }
 
-        if( !isset( static::$CONSTANTS[ $key ] ) )
+        $cacheKey = ( $caseInsensitive ? 'ci|' : '' ) . $sepKey ;
+
+        if( !isset( static::$CONSTANTS[ $cacheKey ] ) )
         {
-            static::$CONSTANTS[ $key ] = [] ;
+            static::$CONSTANTS[ $cacheKey ] = [] ;
 
             $all = static::getAll() ;
+
             foreach ( $all as $name => $constantValue )
             {
-                // Explode value by each separator if applicable
-                if( $separator !== null )
+                $values = toArray( $constantValue ) ;
+
+                if ( $separator !== null && is_string( $constantValue ) )
                 {
-                    $values = [ $constantValue ] ;
-                    if( is_string( $constantValue ) )
+                    if ( is_array( $separator ) )
                     {
-                        if( is_array($separator) )
+                        foreach ( $separator as $sep )
                         {
-                            foreach ($separator as $sep)
+                            $tmp = [] ;
+                            foreach ($values as $val)
                             {
-                                $tmp = [];
-                                foreach ($values as $val)
+                                if ( str_contains( $val , $sep ) )
                                 {
-                                    if( str_contains($val, $sep) )
-                                    {
-                                        $tmp = array_merge($tmp, explode($sep, $val));
-                                    }
-                                    else
-                                    {
-                                        $tmp[] = $val;
-                                    }
+                                    $tmp = array_merge( $tmp , explode( $sep , $val ) ) ;
                                 }
-                                $values = $tmp;
+                                else
+                                {
+                                    $tmp[] = $val ;
+                                }
                             }
-                        }
-                        else
-                        {
-                            if( str_contains($constantValue, $separator) )
-                            {
-                                $values = explode($separator, $constantValue);
-                            }
+                            $values = $tmp ;
                         }
                     }
-                    elseif( is_array($constantValue) )
+                    else
                     {
-                        $values = $constantValue;
+                        if ( str_contains( $constantValue , $separator ) )
+                        {
+                            $values = explode( $separator , $constantValue ) ;
+                        }
                     }
-                }
-                else
-                {
-                    $values = is_array( $constantValue ) ? $constantValue : [ $constantValue ] ;
                 }
 
                 foreach ( $values as $v )
                 {
-                    if ( !isset(static::$CONSTANTS[$key][$v] ) )
+                    $vKey = $caseInsensitive ? strtolower( $v ) : $v ;
+                    if ( !isset( static::$CONSTANTS[ $cacheKey ][ $vKey ] ) )
                     {
-                        static::$CONSTANTS[$key][$v] = [] ;
+                        static::$CONSTANTS[ $cacheKey ][ $vKey ] = [] ;
                     }
-                    static::$CONSTANTS[$key][$v][] = $name;
+                    static::$CONSTANTS[ $cacheKey ][ $vKey ][] = $name ;
                 }
             }
         }
 
-        if (!isset(static::$CONSTANTS[$key][$value]))
+        $searchValue = $caseInsensitive ? strtolower( $value ) : $value ;
+
+        if ( !isset( static::$CONSTANTS[ $cacheKey ][ $searchValue ] ) )
         {
-            return null;
+            return null ;
         }
 
-        $result = static::$CONSTANTS[$key][$value] ;
+        $result = static::$CONSTANTS[ $cacheKey ][ $searchValue ] ;
 
-        if (count($result) === 1)
-        {
-            return $result[0] ;
-        }
-
-        return $result ;
+        return count($result) === 1 ? $result[0] : $result ;
     }
 
     /**

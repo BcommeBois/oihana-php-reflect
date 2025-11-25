@@ -31,15 +31,10 @@ class ConstantsTraitTest extends TestCase
     public function testGetAllReturnsConstants()
     {
         $all = ConstantsTraitTestClass::getAll();
-
         $this->assertIsArray( $all );
-
         $this->assertArrayHasKey('FOO' , $all ) ;
         $this->assertArrayHasKey('BAZ' , $all ) ;
-
-
         $this->assertIsArray( $all['BAZ'] );
-
         $this->assertEquals(['baz1', 'baz2', 'baz3'], $all['BAZ']);
     }
 
@@ -90,6 +85,37 @@ class ConstantsTraitTest extends TestCase
         $this->assertNull(ConstantsTraitTestClass::getConstant('four', ['|', ',']));
     }
 
+    public function testGetConstantCaseInsensitive()
+    {
+        $reflection = new ReflectionClass(ConstantsTraitTestClass::class);
+        $prop = $reflection->getProperty('ALL' ) ;
+        $prop->setValue(null ,
+        [
+            'FOO' => 'foo',
+            'MULTI' => 'one|Two,three',
+            'BAZ' => ['baz1','baz2','baz3']
+        ]);
+        ConstantsTraitTestClass::resetCaches();
+
+        // Simple case-insensitive
+        $this->assertSame('FOO', ConstantsTraitTestClass::getConstant('FOO', caseInsensitive: true));
+        $this->assertSame('FOO', ConstantsTraitTestClass::getConstant('foo', caseInsensitive: true));
+        $this->assertSame('FOO', ConstantsTraitTestClass::getConstant('FoO', caseInsensitive: true));
+
+        // Array constant
+        $this->assertSame('BAZ', ConstantsTraitTestClass::getConstant('BAZ1', caseInsensitive: true));
+        $this->assertSame('BAZ', ConstantsTraitTestClass::getConstant('baz2', caseInsensitive: true));
+        $this->assertSame('BAZ', ConstantsTraitTestClass::getConstant('BaZ3', caseInsensitive: true));
+
+        // String with separator, multi-separator
+        $this->assertSame('MULTI', ConstantsTraitTestClass::getConstant('ONE'   , ['|',','] , true));
+        $this->assertSame('MULTI', ConstantsTraitTestClass::getConstant('two'   , ['|',','] , true));
+        $this->assertSame('MULTI', ConstantsTraitTestClass::getConstant('THREE' , ['|',','] , true));
+
+        // Not found
+        $this->assertNull(ConstantsTraitTestClass::getConstant('FOOBAR', null, true));
+    }
+
     public function testIncludesFindsValueInSimpleConstant()
     {
         $this->assertTrue(ConstantsTraitTestClass::includes('foo'));
@@ -131,4 +157,5 @@ class ConstantsTraitTest extends TestCase
         $this->expectException(ConstantException::class);
         ConstantsTraitTestClass::validate('invalid');
     }
+
 }
