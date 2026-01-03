@@ -322,7 +322,13 @@ trait ReflectionTrait
      * $helper->jsonSerializeFromPublicProperties(Product::class, fn($k,$v) => is_string($v) && $v !== ''); // ['name' => 'Book']
      * ```
      */
-    public function jsonSerializeFromPublicProperties( object|string $class , bool|callable $reduce = false , ?array $options = [] ):array
+    public function jsonSerializeFromPublicProperties
+    (
+        object|string $class   ,
+        bool|callable $reduce  = false ,
+        ?array        $options = []
+    )
+    :array
     {
         $object     = [] ;
         $properties = $this->getPublicProperties( $class ) ;
