@@ -2,6 +2,7 @@
 
 namespace tests\oihana\reflect\traits;
 
+use oihana\reflect\options\JsonSerializeOption;
 use oihana\reflect\traits\ReflectionTrait;
 
 use PHPUnit\Framework\TestCase;
@@ -62,26 +63,7 @@ final class ReflectionTraitTest extends TestCase
         $this->assertSame('Alice', $hydrated->name);
     }
 
-    public function testJsonSerializeFromPublicProperties(): void
-    {
-        $obj = new class
-        {
-            use ReflectionTrait;
 
-            public string $name = 'Book';
-            public ?string $desc = null;
-        };
-
-        $data = $obj->jsonSerializeFromPublicProperties($obj::class);
-        $this->assertSame(['name' => 'Book', 'desc' => null], $data);
-
-        $dataReduced = $obj->jsonSerializeFromPublicProperties($obj::class, true);
-        $this->assertSame(['name' => 'Book'], $dataReduced);
-
-        $reduceByName = static fn(string $prop, mixed $value) => str_starts_with($prop, 'n');
-        $dataByName = $obj->jsonSerializeFromPublicProperties($obj::class, $reduceByName);
-        $this->assertSame(['name' => 'Book'], $dataByName);
-    }
 
     public function testGetMethodParameters(): void
     {
@@ -157,5 +139,27 @@ final class ReflectionTraitTest extends TestCase
         };
 
         $this->assertTrue($obj->isParameterVariadic($obj::class, 'demo', 'args'));
+    }
+
+    public function testJsonSerializeFromPublicProperties(): void
+    {
+        $obj = new class
+        {
+            use ReflectionTrait;
+
+            public ?int    $age ;
+            public string  $name = 'Book' ;
+            public ?string $desc = null ;
+        };
+
+        $data = $obj->jsonSerializeFromPublicProperties($obj::class);
+        $this->assertSame([ 'age' => null , 'desc' => null , 'name' => 'Book' ], $data); // order the keys by default
+
+        $dataReduced = $obj->jsonSerializeFromPublicProperties($obj::class, [ JsonSerializeOption::REDUCE => true ]);
+        $this->assertSame(['name' => 'Book'], $dataReduced);
+
+        $reduceByName = static fn(string $prop, mixed $value) => str_starts_with($prop, 'n');
+        $dataByName = $obj->jsonSerializeFromPublicProperties($obj::class, [ JsonSerializeOption::REDUCE => $reduceByName ] );
+        $this->assertSame(['name' => 'Book'], $dataByName);
     }
 }
