@@ -2,6 +2,7 @@
 
 namespace oihana\reflect\traits ;
 
+use oihana\reflect\options\JsonSerializeOption;
 use ReflectionException;
 use ReflectionProperty;
 
@@ -294,61 +295,143 @@ trait ReflectionTrait
     /**
      * Generates an associative array from the public properties of a given class or object.
      *
-     * Optionally compresses the array by removing properties with null values.
+     * This method supports fine-grained control over the serialization:
+     * - filtering properties via `INCLUDE` / `EXCLUDE`,
+     * - reducing values (removing nulls or applying a custom callable),
+     * - injecting keys before or after the serialized properties (`BEFORE` / `AFTER`),
+     * - reordering keys via `FIRST_KEYS`,
+     * - sorting remaining keys alphabetically (`SORT`).
      *
-     * @param object|string $class    The object instance or fully-qualified class name.
-     * @param bool|callable $reduce   If true, null properties are omitted. If a callable,
-     *                                it receives ($propertyName, $propertyValue) and should return true to keep the property.
-     * @param array|null    $options  Optional default reducer configuration:
-     *                                  - **clone** (bool)         If `true`, works on a cloned copy of the array. Original remains unchanged. *(default: false)*
-     *                                  - **conditions** (callable|array<callable>) One or more callbacks: `(mixed $value): bool`. If any condition returns `true`, the value is removed. ( default: `fn($v) => is_null($v)` )*
-     *                                  - **excludes** (string[])  List of keys to exclude from filtering, even if matched by a condition.
-     *                                  - **recursive** (bool)     Whether to recursively compress nested arrays or objects. *(default: true)*
-     *                                  - **depth** (int|null)     Maximum depth for recursion. `null` means no limit.
-     *                                  - **throwable** (bool)     If `true`, throws `InvalidArgumentException` for invalid conditions. *(default: true)*
+     * @param object|string $class   The object instance or fully-qualified class name.
+     * @param array|null    $options Optional configuration array (see {@see JsonSerializeOption}):
+     *                               - **REDUCE**      (bool|array|callable)
+     *                                                 If `true`, null values are removed.
+     *                                                 If array, forwarded to `compress()` with options.
+     *                                                 If callable: `fn($propertyName, $propertyValue): bool`,
+     *                                                 return `true` to keep the property.
+     *                               - **INCLUDE**     (string[]|null) Whitelist of property names to include.
+     *                               - **EXCLUDE**     (string[]|null) Blacklist of property names to exclude.
+     *                               - **BEFORE**      (array<string,mixed>) Keys/values prepended before serialized properties.
+     *                               - **AFTER**       (array<string,mixed>) Keys/values appended after serialized properties.
+     *                               - **FIRST_KEYS**  (string[]) Keys that must appear first in the resulting array (in order).
+     *                               - **SORT**        (bool) Whether remaining keys are sorted alphabetically (default: true).
      *
-     * @return array The associative array of property values.
+     * @return array The associative array representing the public properties of the object.
      *
      * @throws ReflectionException
      *
-     * @example
+     * @example Basic usage
      * ```php
-     * class Product { public string $name = 'Book'; public ?string $desc = null; public int $stock = 0; }
+     * class Product
+     * {
+     *     public string $name = 'Book';
+     *     public ?string $desc = null;
+     *     public int $stock = 0;
+     * }
      *
-     * // remove only null values
-     * $helper->jsonSerializeFromPublicProperties(Product::class, true); // ['name' => 'Book', 'stock' => 0]
+     * // Remove null properties
+     * $helper->jsonSerializeFromPublicProperties( Product::class,
+     * [
+     *     JsonSerializeOption::REDUCE => true
+     * ]);
+     * // Result: ['name' => 'Book', 'stock' => 0]
      *
-     * // custom filter: keep only non-empty strings
-     * $helper->jsonSerializeFromPublicProperties(Product::class, fn($k,$v) => is_string($v) && $v !== ''); // ['name' => 'Book']
+     * // Custom filter: keep only non-empty strings
+     * $helper->jsonSerializeFromPublicProperties( Product::class,
+     * [
+     *     JsonSerializeOption::REDUCE => fn($k, $v) => is_string($v) && $v !== ''
+     * ]);
+     * // Result: ['name' => 'Book']
+     *
+     * // Inject metadata and reorder keys
+     * $helper->jsonSerializeFromPublicProperties( Product::class,
+     * [
+     *     JsonSerializeOption::BEFORE      => ['_type' => 'Product'],
+     *     JsonSerializeOption::FIRST_KEYS  => ['_type', 'name'],
+     *     JsonSerializeOption::REDUCE      => true
+     * ]);
      * ```
      */
     public function jsonSerializeFromPublicProperties
     (
         object|string $class   ,
-        bool|callable $reduce  = false ,
         ?array        $options = []
     )
     :array
     {
-        $object     = [] ;
+        $data       = [] ;
+        $options    = JsonSerializeOption::normalize( $options ) ;
         $properties = $this->getPublicProperties( $class ) ;
 
-        foreach( $properties as $property )
+        foreach ( $properties as $property)
         {
-            $name = $property->getName();
+            $name = $property->getName() ;
 
-            $object[ $name ] = $this->{ $name } ?? null ;
+            if
+            (
+                    is_array( $options[ JsonSerializeOption::INCLUDE ] )
+                && !in_array( $name , $options[ JsonSerializeOption::INCLUDE ] , true )
+            )
+            {
+                continue ;
+            }
+
+            if
+            (
+                   is_array( $options[ JsonSerializeOption::EXCLUDE ] )
+                && in_array( $name , $options[ JsonSerializeOption::EXCLUDE ] , true )
+            )
+            {
+                continue ;
+            }
+
+            $data[ $name ] = $this->{ $name } ?? null ;
         }
 
-        if ( $reduce === true )
+        $reduce = $options[ JsonSerializeOption::REDUCE ] ;
+        $data = match( true )
         {
-            $object = compress( $object , $options ) ;
-        }
-        else if ( is_callable( $reduce ) )
+            $reduce     === true    => compress( $data ) ,
+            is_array    ( $reduce ) => compress( $data , $reduce ) ,
+            is_callable ( $reduce ) => array_filter( $data , fn($v, $k) => $reduce($k, $v) , ARRAY_FILTER_USE_BOTH ) ,
+            default                 => $data ,
+        };
+
+        if ( $options[ JsonSerializeOption::BEFORE ] )
         {
-            $object = array_filter($object, fn($v, $k) => $reduce( $k , $v ) , ARRAY_FILTER_USE_BOTH ) ;
+            $data = $options[ JsonSerializeOption::BEFORE ] + $data ;
         }
 
-        return $object ;
+        if ($options[ JsonSerializeOption::AFTER ] )
+        {
+            $data += $options[ JsonSerializeOption::AFTER ] ;
+        }
+
+        if ( $options[ JsonSerializeOption::FIRST_KEYS ] )
+        {
+            $ordered = [] ;
+            foreach ( $options[ JsonSerializeOption::FIRST_KEYS ] as $key )
+            {
+                if ( array_key_exists( $key , $data ) )
+                {
+                    $ordered[ $key ] = $data[ $key ] ;
+                    unset( $data[ $key ] ) ;
+                }
+            }
+
+            if ( $options[ JsonSerializeOption::SORT ] )
+            {
+                ksort($data , SORT_STRING ) ;
+            }
+
+            return $ordered + $data ;
+        }
+
+        if ( $options[ JsonSerializeOption::SORT ] )
+        {
+            ksort($data, SORT_STRING ) ;
+        }
+
+        return $data ;
     }
 }
