@@ -362,9 +362,9 @@ trait ReflectionTrait
         $properties = $this->getPublicProperties( $class ?? $this ) ;
         $options    = PrepareOption::normalize( $options ) ;
 
-        $defaults   = $options[ PrepareOption::DEFAULTS ] ;
-        $include    = $options[ PrepareOption::INCLUDE  ] ;
-        $exclude    = $options[ PrepareOption::EXCLUDE  ] ;
+        $defaults = $options[ PrepareOption::DEFAULTS ] ?? [] ;
+        $include  = $options[ PrepareOption::INCLUDE  ] ?? [] ;
+        $exclude  = $options[ PrepareOption::EXCLUDE  ] ?? [] ;
 
         $data = [] ;
 
@@ -372,12 +372,12 @@ trait ReflectionTrait
         {
             $name = $property->getName() ;
 
-            if ( is_array( $include ) && !in_array( $name , $include , true ) )
+            if ( !empty( $include ) && !in_array( $name , $include , true ) )
             {
                 continue ;
             }
 
-            if ( is_array( $exclude ) && in_array( $name , $exclude , true ) )
+            if ( !empty( $exclude ) && in_array( $name , $exclude , true ) )
             {
                 continue ;
             }
