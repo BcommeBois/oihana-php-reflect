@@ -159,22 +159,35 @@ final class ReflectionTraitTest extends TestCase
 
         $this->assertSame
         (
-            ['name' => 'Book'] ,
-            $obj->toArray( options: [ PrepareOption::REDUCE => true ])
+            [ 'name' => 'Book' , 'desc' => null ] ,
+            $obj->toArray( [ PrepareOption::FIRST_KEYS => [ 'name' ] ] )
+        );
+
+        $this->assertSame
+        (
+            [ 'name' => 'Book' ] ,
+            $obj->toArray( [ PrepareOption::REDUCE => true ] )
         );
 
         $reduceByName = static fn( string $prop , mixed $value ) => str_starts_with($prop, 'n');
         $this->assertSame
         (
             ['name' => 'Book'] ,
-            $obj->toArray( options: [ PrepareOption::REDUCE => $reduceByName ] )
+            $obj->toArray( [ PrepareOption::REDUCE => $reduceByName ] )
         );
 
+        $obj->age = 48 ;
         unset( $obj->desc );
         $this->assertSame
         (
-            [ 'name' => 'Book' ] ,
+            [ 'age' => 48 , 'name' => 'Book' ] ,
             $obj->toArray()
+        );
+
+        $this->assertSame
+        (
+            [ 'name' => 'Book' , 'age' => 48 ] ,
+            $obj->toArray( [ PrepareOption::FIRST_KEYS => [ 'name' ] ] )
         );
     }
 }
