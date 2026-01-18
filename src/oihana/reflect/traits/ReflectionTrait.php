@@ -2,13 +2,13 @@
 
 namespace oihana\reflect\traits ;
 
-use oihana\reflect\options\JsonSerializeOption;
 use ReflectionException;
 use ReflectionProperty;
 
+use oihana\core\options\PrepareOption;
 use oihana\reflect\Reflection;
 
-use function oihana\core\arrays\compress;
+use function oihana\core\arrays\prepare;
 
 /**
  * Provides helper methods for working with PHP reflection.
@@ -295,28 +295,28 @@ trait ReflectionTrait
     /**
      * Generates an associative array from the public properties of a given class or object.
      *
-     * This method supports fine-grained control over the serialization:
-     * - filtering properties via `INCLUDE` / `EXCLUDE`,
-     * - reducing values (removing nulls or applying a custom callable),
-     * - injecting keys before or after the serialized properties (`BEFORE` / `AFTER`),
-     * - reordering keys via `FIRST_KEYS`,
-     * - sorting remaining keys alphabetically (`SORT`).
+     * This method allows fine-grained control over the resulting array:
+     * - **INCLUDE / EXCLUDE**: Filter which properties are included.
+     * - **REDUCE**: Remove nulls or apply a custom filter.
+     * - **BEFORE / AFTER**: Inject keys/values before or after the serialized properties.
+     * - **FIRST_KEYS**: Force certain keys to appear first.
+     * - **SORT**: Sort remaining keys alphabetically.
      *
      * @param object|string $class   The object instance or fully-qualified class name.
-     * @param array|null    $options Optional configuration array (see {@see JsonSerializeOption}):
-     *                               - **REDUCE**      (bool|array|callable)
-     *                                                 If `true`, null values are removed.
-     *                                                 If array, forwarded to `compress()` with options.
-     *                                                 If callable: `fn($propertyName, $propertyValue): bool`,
-     *                                                 return `true` to keep the property.
-     *                               - **INCLUDE**     (string[]|null) Whitelist of property names to include.
-     *                               - **EXCLUDE**     (string[]|null) Blacklist of property names to exclude.
-     *                               - **BEFORE**      (array<string,mixed>) Keys/values prepended before serialized properties.
-     *                               - **AFTER**       (array<string,mixed>) Keys/values appended after serialized properties.
-     *                               - **FIRST_KEYS**  (string[]) Keys that must appear first in the resulting array (in order).
-     *                               - **SORT**        (bool) Whether remaining keys are sorted alphabetically (default: true).
+     * @param array|null    $options Optional configuration (see {@see PrepareOption}):
+     *                              - **REDUCE**     (bool|array|callable)
+     *                                 - `true` removes null values,
+     *                                 - `array` is forwarded to `compress()`,
+     *                                 - `callable(string $name, mixed $value): bool` : returns `true` to keep a property.
+     *                              - **INCLUDE**    (string[]|null) Whitelist of properties to include.
+     *                              - **EXCLUDE**    (string[]|null) Blacklist of properties to exclude.
+     *                              - **BEFORE**     (array<string,mixed>) Keys/values prepended.
+     *                              - **AFTER**      (array<string,mixed>) Keys/values appended.
+     *                              - **FIRST_KEYS** (string[]) Keys to appear first (in order).
+     *                              - **SORT**       (bool) Sort remaining keys alphabetically (default: true).
+     *                              - **DEFAULTS**   (array<string,mixed>) Default values for missing or null properties.
      *
-     * @return array The associative array representing the public properties of the object.
+     * @return array The resulting associative array of properties.
      *
      * @throws ReflectionException
      *
@@ -330,108 +330,61 @@ trait ReflectionTrait
      * }
      *
      * // Remove null properties
-     * $helper->jsonSerializeFromPublicProperties( Product::class,
+     * $helper->toArray( Product::class,
      * [
-     *     JsonSerializeOption::REDUCE => true
+     *     PrepareOption::REDUCE => true
      * ]);
      * // Result: ['name' => 'Book', 'stock' => 0]
      *
      * // Custom filter: keep only non-empty strings
-     * $helper->jsonSerializeFromPublicProperties( Product::class,
+     * $helper->toArray( Product::class,
      * [
-     *     JsonSerializeOption::REDUCE => fn($k, $v) => is_string($v) && $v !== ''
+     *     PrepareOption::REDUCE => fn($k, $v) => is_string($v) && $v !== ''
      * ]);
      * // Result: ['name' => 'Book']
      *
      * // Inject metadata and reorder keys
-     * $helper->jsonSerializeFromPublicProperties( Product::class,
+     * $helper->toArray( Product::class,
      * [
-     *     JsonSerializeOption::BEFORE      => ['_type' => 'Product'],
-     *     JsonSerializeOption::FIRST_KEYS  => ['_type', 'name'],
-     *     JsonSerializeOption::REDUCE      => true
+     *     PrepareOption::BEFORE      => ['_type' => 'Product'],
+     *     PrepareOption::FIRST_KEYS  => ['_type', 'name'],
+     *     PrepareOption::REDUCE      => true
      * ]);
      * ```
      */
-    public function jsonSerializeFromPublicProperties
+    public function toArray
     (
         object|string $class   ,
         ?array        $options = []
     )
     :array
     {
-        $data       = [] ;
-        $options    = JsonSerializeOption::normalize( $options ) ;
         $properties = $this->getPublicProperties( $class ) ;
+        $options    = PrepareOption::normalize( $options ) ;
+
+        $defaults   = $options[ PrepareOption::DEFAULTS ] ;
+        $include    = $options[ PrepareOption::INCLUDE  ] ;
+        $exclude    = $options[ PrepareOption::EXCLUDE  ] ;
+
+        $data = [] ;
 
         foreach ( $properties as $property)
         {
             $name = $property->getName() ;
 
-            if
-            (
-                    is_array( $options[ JsonSerializeOption::INCLUDE ] )
-                && !in_array( $name , $options[ JsonSerializeOption::INCLUDE ] , true )
-            )
+            if ( is_array( $include ) && !in_array( $name , $include , true ) )
             {
                 continue ;
             }
 
-            if
-            (
-                   is_array( $options[ JsonSerializeOption::EXCLUDE ] )
-                && in_array( $name , $options[ JsonSerializeOption::EXCLUDE ] , true )
-            )
+            if ( is_array( $exclude ) && in_array( $name , $exclude , true ) )
             {
                 continue ;
             }
 
-            $data[ $name ] = $this->{ $name } ?? null ;
+            $data[ $name ] = $this->{ $name } ?? $defaults[ $name ] ?? null ;
         }
 
-        $reduce = $options[ JsonSerializeOption::REDUCE ] ;
-        $data = match( true )
-        {
-            $reduce     === true    => compress( $data ) ,
-            is_array    ( $reduce ) => compress( $data , $reduce ) ,
-            is_callable ( $reduce ) => array_filter( $data , fn($v, $k) => $reduce($k, $v) , ARRAY_FILTER_USE_BOTH ) ,
-            default                 => $data ,
-        };
-
-        if ( $options[ JsonSerializeOption::BEFORE ] )
-        {
-            $data = $options[ JsonSerializeOption::BEFORE ] + $data ;
-        }
-
-        if ($options[ JsonSerializeOption::AFTER ] )
-        {
-            $data += $options[ JsonSerializeOption::AFTER ] ;
-        }
-
-        if ( $options[ JsonSerializeOption::FIRST_KEYS ] )
-        {
-            $ordered = [] ;
-            foreach ( $options[ JsonSerializeOption::FIRST_KEYS ] as $key )
-            {
-                if ( array_key_exists( $key , $data ) )
-                {
-                    $ordered[ $key ] = $data[ $key ] ;
-                    unset( $data[ $key ] ) ;
-                }
-            }
-
-            if ( $options[ JsonSerializeOption::SORT ] )
-            {
-                ksort($data , SORT_STRING ) ;
-            }
-
-            return $ordered + $data ;
-        }
-
-        if ( $options[ JsonSerializeOption::SORT ] )
-        {
-            ksort($data, SORT_STRING ) ;
-        }
-
-        return $data ;
+        return prepare( $data , $options ) ;
     }
 }

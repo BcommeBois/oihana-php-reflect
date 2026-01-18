@@ -47,11 +47,11 @@ use function oihana\core\arrays\compress;
  *
  * @example Basic usage
  * ```php
- * use oihana\reflect\options\JsonSerializeOption;
+ * use oihana\reflect\options\NormalizeOption;
  *
  * $options =
  * [
- *     JsonSerializeOption::BEFORE =>
+ *     NormalizeOption::BEFORE =>
  *     [
  *        '@type'    => 'Thing',
  *        '@context' => 'https://schema.org',
@@ -60,14 +60,14 @@ use function oihana\core\arrays\compress;
  *     JsonSerializeOption::REDUCE        => true,
  * ];
  *
- * $data = JsonSerializeOption::normalize($options);
+ * $data = NormalizeOption::normalize($options);
  * ```
  *
  * @package oihana\core\options
  * @author  Marc Alcaraz
  * @since   1.0.4
  */
-class JsonSerializeOption
+class NormalizeOption
 {
     /**
      * Keys/values to append **after** serialized properties.
@@ -75,21 +75,45 @@ class JsonSerializeOption
      *
      * Type: array<string,mixed>
      */
-    public const string AFTER = 'after';
+    public const string AFTER = 'after' ;
 
     /**
      * Keys/values to inject **before** serialized properties.
      * Typically used for metadatas.
      * Type: array<string,mixed>
      */
-    public const string BEFORE = 'before';
+    public const string BEFORE = 'before' ;
+
+    /**
+     * Default values to apply for keys that are missing or null in the serialized output.
+     *
+     * Type: array<string,mixed>
+     *
+     * Usage:
+     * - Each key represents a property name.
+     * - If the property is missing or its value is `null`, the corresponding default value will be used.
+     *
+     * Example:
+     * ```php
+     * $options = [
+     *     JsonSerializeOption::DEFAULTS => [
+     *         'stock' => 0,
+     *         'desc'  => 'No description'
+     *     ]
+     * ];
+     *
+     * $data = $helper->jsonSerializeFromPublicProperties(Product::class, $options);
+     * // 'stock' and 'desc' will get default values if they are null or missing
+     * ```
+     */
+    public const string DEFAULTS = 'defaults' ;
 
     /**
      * Blacklist of property names to exclude from serialization.
      *
      * Type: string[]|null
      */
-    public const string EXCLUDE = 'exclude';
+    public const string EXCLUDE = 'exclude' ;
 
     /**
      * List of keys that must appear first in the resulting JSON object,
@@ -97,7 +121,7 @@ class JsonSerializeOption
      *
      * Type: string[]
      */
-    public const string FIRST_KEYS = 'firstKeys';
+    public const string FIRST_KEYS = 'firstKeys' ;
 
     /**
      * Whitelist of property names to include in serialization.
@@ -105,7 +129,7 @@ class JsonSerializeOption
      *
      * Type: string[]|null
      */
-    public const string INCLUDE = 'include';
+    public const string INCLUDE = 'include' ;
 
     /**
      * Controls value reduction using `compress()` semantics.
@@ -116,14 +140,14 @@ class JsonSerializeOption
      *
      * Type: bool|array
      */
-    public const string REDUCE = 'reduce';
+    public const string REDUCE = 'reduce' ;
 
     /**
      * Whether remaining keys should be sorted alphabetically (ksort).
      *
      * Type: bool
      */
-    public const string SORT = 'sort';
+    public const string SORT = 'sort' ;
 
     /**
      * Normalize the options for the reflection jsonSerializeOptions functions.
@@ -162,13 +186,14 @@ class JsonSerializeOption
         $options = $options ?? [];
         return
         [
-            self::AFTER         => $options[ self::AFTER         ] ?? []    ,
-            self::BEFORE        => $options[ self::BEFORE        ] ?? []    ,
-            self::EXCLUDE       => $options[ self::EXCLUDE       ] ?? null  ,
-            self::SORT          => $options[ self::SORT          ] ?? true  ,
+            self::AFTER      => $options[ self::AFTER      ] ?? []    ,
+            self::BEFORE     => $options[ self::BEFORE     ] ?? []    ,
+            self::DEFAULTS   => $options[ self::DEFAULTS   ] ?? []    ,
+            self::EXCLUDE    => $options[ self::EXCLUDE    ] ?? null  ,
             self::FIRST_KEYS => $options[ self::FIRST_KEYS ] ?? []    ,
-            self::REDUCE        => $options[ self::REDUCE        ] ?? false ,
-            self::INCLUDE       => $options[ self::INCLUDE       ] ?? null  ,
+            self::SORT       => $options[ self::SORT       ] ?? true  ,
+            self::REDUCE     => $options[ self::REDUCE     ] ?? false ,
+            self::INCLUDE    => $options[ self::INCLUDE    ] ?? null  ,
         ];
     }
 }

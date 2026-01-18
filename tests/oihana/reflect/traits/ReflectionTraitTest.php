@@ -2,7 +2,7 @@
 
 namespace tests\oihana\reflect\traits;
 
-use oihana\reflect\options\JsonSerializeOption;
+use oihana\core\options\PrepareOption;
 use oihana\reflect\traits\ReflectionTrait;
 
 use PHPUnit\Framework\TestCase;
@@ -62,8 +62,6 @@ final class ReflectionTraitTest extends TestCase
         $hydrated = $object->hydrate(['name' => 'Alice'], $className::class);
         $this->assertSame('Alice', $hydrated->name);
     }
-
-
 
     public function testGetMethodParameters(): void
     {
@@ -141,7 +139,7 @@ final class ReflectionTraitTest extends TestCase
         $this->assertTrue($obj->isParameterVariadic($obj::class, 'demo', 'args'));
     }
 
-    public function testJsonSerializeFromPublicProperties(): void
+    public function testToArray(): void
     {
         $obj = new class
         {
@@ -152,14 +150,14 @@ final class ReflectionTraitTest extends TestCase
             public ?string $desc = null ;
         };
 
-        $data = $obj->jsonSerializeFromPublicProperties($obj::class);
+        $data = $obj->toArray($obj::class);
         $this->assertSame([ 'age' => null , 'desc' => null , 'name' => 'Book' ], $data); // order the keys by default
 
-        $dataReduced = $obj->jsonSerializeFromPublicProperties($obj::class, [ JsonSerializeOption::REDUCE => true ]);
+        $dataReduced = $obj->toArray($obj::class, [ PrepareOption::REDUCE => true ]);
         $this->assertSame(['name' => 'Book'], $dataReduced);
 
-        $reduceByName = static fn(string $prop, mixed $value) => str_starts_with($prop, 'n');
-        $dataByName = $obj->jsonSerializeFromPublicProperties($obj::class, [ JsonSerializeOption::REDUCE => $reduceByName ] );
+        $reduceByName = static fn( string $prop , mixed $value ) => str_starts_with($prop, 'n');
+        $dataByName = $obj->toArray($obj::class, [ PrepareOption::REDUCE => $reduceByName ] );
         $this->assertSame(['name' => 'Book'], $dataByName);
     }
 }
