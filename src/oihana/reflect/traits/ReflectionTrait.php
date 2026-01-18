@@ -354,7 +354,7 @@ trait ReflectionTrait
      */
     public function toArray
     (
-        null|object|string $class   ,
+        null|object|string $class   = null ,
         ?array             $options = []
     )
     :array
