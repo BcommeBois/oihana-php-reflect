@@ -302,8 +302,8 @@ trait ReflectionTrait
      * - **FIRST_KEYS**: Force certain keys to appear first.
      * - **SORT**: Sort remaining keys alphabetically.
      *
-     * @param object|string $class   The object instance or fully-qualified class name.
-     * @param array|null    $options Optional configuration (see {@see PrepareOption}):
+     * @param null|object|string $class   The object instance or fully-qualified class name.
+     * @param array|null        $options Optional configuration (see {@see PrepareOption}):
      *                              - **REDUCE**     (bool|array|callable)
      *                                 - `true` removes null values,
      *                                 - `array` is forwarded to `compress()`,
@@ -354,12 +354,12 @@ trait ReflectionTrait
      */
     public function toArray
     (
-        object|string $class   ,
-        ?array        $options = []
+        null|object|string $class   ,
+        ?array             $options = []
     )
     :array
     {
-        $properties = $this->getPublicProperties( $class ) ;
+        $properties = $this->getPublicProperties( $class ?? $this ) ;
         $options    = PrepareOption::normalize( $options ) ;
 
         $defaults   = $options[ PrepareOption::DEFAULTS ] ;
