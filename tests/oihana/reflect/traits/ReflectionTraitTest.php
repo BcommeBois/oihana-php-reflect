@@ -150,20 +150,31 @@ final class ReflectionTraitTest extends TestCase
             public ?string $desc = null ;
         };
 
-        $data = $obj->toArray($obj);
-
         // order the keys by default
         $this->assertSame
         (
-            [ 'age' => null , 'desc' => null , 'name' => 'Book' ] ,
-            $data
+            [ 'desc' => null , 'name' => 'Book' ] ,
+            $obj->toArray()
         );
 
-        $dataReduced = $obj->toArray( options: [ PrepareOption::REDUCE => true ]);
-        $this->assertSame(['name' => 'Book'], $dataReduced);
+        $this->assertSame
+        (
+            ['name' => 'Book'] ,
+            $obj->toArray( options: [ PrepareOption::REDUCE => true ])
+        );
 
         $reduceByName = static fn( string $prop , mixed $value ) => str_starts_with($prop, 'n');
-        $dataByName = $obj->toArray( options: [ PrepareOption::REDUCE => $reduceByName ] );
-        $this->assertSame(['name' => 'Book'], $dataByName);
+        $this->assertSame
+        (
+            ['name' => 'Book'] ,
+            $obj->toArray( options: [ PrepareOption::REDUCE => $reduceByName ] )
+        );
+
+        unset( $obj->desc );
+        $this->assertSame
+        (
+            [ 'name' => 'Book' ] ,
+            $obj->toArray()
+        );
     }
 }

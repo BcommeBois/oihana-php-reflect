@@ -302,19 +302,18 @@ trait ReflectionTrait
      * - **FIRST_KEYS**: Force certain keys to appear first.
      * - **SORT**: Sort remaining keys alphabetically.
      *
-     * @param null|object|string $class   The object instance or fully-qualified class name.
-     * @param array|null        $options Optional configuration (see {@see PrepareOption}):
-     *                              - **REDUCE**     (bool|array|callable)
-     *                                 - `true` removes null values,
-     *                                 - `array` is forwarded to `compress()`,
-     *                                 - `callable(string $name, mixed $value): bool` : returns `true` to keep a property.
-     *                              - **INCLUDE**    (string[]|null) Whitelist of properties to include.
-     *                              - **EXCLUDE**    (string[]|null) Blacklist of properties to exclude.
-     *                              - **BEFORE**     (array<string,mixed>) Keys/values prepended.
-     *                              - **AFTER**      (array<string,mixed>) Keys/values appended.
-     *                              - **FIRST_KEYS** (string[]) Keys to appear first (in order).
-     *                              - **SORT**       (bool) Sort remaining keys alphabetically (default: true).
-     *                              - **DEFAULTS**   (array<string,mixed>) Default values for missing or null properties.
+     * @param array|null $options Optional configuration (see {@see PrepareOption}):
+     *  - **REDUCE**     (bool|array|callable)
+     *     - `true` removes null values,
+     *     - `array` is forwarded to `compress()`,
+     *     - `callable(string $name, mixed $value): bool` : returns `true` to keep a property.
+     *  - **INCLUDE**    (string[]|null) Whitelist of properties to include.
+     *  - **EXCLUDE**    (string[]|null) Blacklist of properties to exclude.
+     *  - **BEFORE**     (array<string,mixed>) Keys/values prepended.
+     *  - **AFTER**      (array<string,mixed>) Keys/values appended.
+     *  - **FIRST_KEYS** (string[]) Keys to appear first (in order).
+     *  - **SORT**       (bool) Sort remaining keys alphabetically (default: true).
+     *  - **DEFAULTS**   (array<string,mixed>) Default values for missing or null properties.
      *
      * @return array The resulting associative array of properties.
      *
@@ -330,10 +329,7 @@ trait ReflectionTrait
      * }
      *
      * // Remove null properties
-     * $helper->toArray( Product::class,
-     * [
-     *     PrepareOption::REDUCE => true
-     * ]);
+     * $helper->toArray([ PrepareOption::REDUCE => true ]);
      * // Result: ['name' => 'Book', 'stock' => 0]
      *
      * // Custom filter: keep only non-empty strings
@@ -352,15 +348,10 @@ trait ReflectionTrait
      * ]);
      * ```
      */
-    public function toArray
-    (
-        null|object|string $class   = null ,
-        ?array             $options = []
-    )
-    :array
+    public function toArray( ?array $options = [] ) :array
     {
-        $properties = $this->getPublicProperties( $class ?? $this ) ;
         $options    = PrepareOption::normalize( $options ) ;
+        $properties = $this->reflection()->properties( $this ) ;
 
         $defaults = $options[ PrepareOption::DEFAULTS ] ?? [] ;
         $include  = $options[ PrepareOption::INCLUDE  ] ?? [] ;
@@ -368,9 +359,14 @@ trait ReflectionTrait
 
         $data = [] ;
 
-        foreach ( $properties as $property)
+        foreach ( $properties as $property )
         {
             $name = $property->getName() ;
+
+            if( !$property->isInitialized( $this ) )
+            {
+                continue ;
+            }
 
             if ( !empty( $include ) && !in_array( $name , $include , true ) )
             {
