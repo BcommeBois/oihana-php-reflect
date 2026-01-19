@@ -19,6 +19,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - useConstantsTrait : Checks if a given class uses the `ConstantsTrait`, either directly or via parent classes.
 - Traits
   - JsonSchemaTrait : Providing JSON Schema generation and validation capabilities for classes.
+- Utils
+  - JsonSerializer tool : an helper class to serialize objects with temporary options.
 
 ### Changed
   - ReflectionTrait : Rename the jsonSerializePublicProperties method in toArray( array $options = [] ) 

@@ -806,6 +806,26 @@ Search.appendIndex(
             "summary": "Cached\u0020short\u0020class\u0020name\u0020for\u0020performance.",
             "url": "classes/oihana-reflect-traits-ReflectionTrait.html#property___shortName"
         },                {
+            "fqsen": "\\oihana\\reflect\\utils\\JsonSerializer",
+            "name": "JsonSerializer",
+            "summary": "JsonSerializer\u0020is\u0020an\u0020helper\u0020class\u0020to\u0020serialize\u0020objects\u0020into\u0020JSON\u0020while\u0020allowing\u0020temporary,\nglobal\u0020serialization\u0020options.",
+            "url": "classes/oihana-reflect-utils-JsonSerializer.html"
+        },                {
+            "fqsen": "\\oihana\\reflect\\utils\\JsonSerializer\u003A\u003Aencode\u0028\u0029",
+            "name": "encode",
+            "summary": "Encode\u0020data\u0020to\u0020JSON\u0020with\u0020temporary\u0020options\u0020applied",
+            "url": "classes/oihana-reflect-utils-JsonSerializer.html#method_encode"
+        },                {
+            "fqsen": "\\oihana\\reflect\\utils\\JsonSerializer\u003A\u003AgetOptions\u0028\u0029",
+            "name": "getOptions",
+            "summary": "Get\u0020current\u0020temporary\u0020options",
+            "url": "classes/oihana-reflect-utils-JsonSerializer.html#method_getOptions"
+        },                {
+            "fqsen": "\\oihana\\reflect\\utils\\JsonSerializer\u003A\u003A\u0024temporaryOptions",
+            "name": "temporaryOptions",
+            "summary": "Temporary\u0020options\u0020applied\u0020to\u0020all\u0020Thing\u0020objects\u0020during\u0020serialization",
+            "url": "classes/oihana-reflect-utils-JsonSerializer.html#property_temporaryOptions"
+        },                {
             "fqsen": "\\oihana\\reflect\\Version",
             "name": "Version",
             "summary": "Represents\u0020a\u0020software\u0020version\u0020using\u0020four\u0020components\u003A\u0020major,\u0020minor,\u0020build,\u0020and\u0020revision.",
@@ -915,5 +935,10 @@ Search.appendIndex(
             "name": "traits",
             "summary": "",
             "url": "namespaces/oihana-reflect-traits.html"
+        },                {
+            "fqsen": "\\oihana\\reflect\\utils",
+            "name": "utils",
+            "summary": "",
+            "url": "namespaces/oihana-reflect-utils.html"
         }            ]
 );
