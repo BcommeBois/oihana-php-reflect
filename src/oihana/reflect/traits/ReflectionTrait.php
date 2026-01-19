@@ -5,7 +5,7 @@ namespace oihana\reflect\traits ;
 use ReflectionException;
 use ReflectionProperty;
 
-use oihana\core\options\PrepareOption;
+use oihana\core\options\ArrayOption;
 use oihana\reflect\Reflection;
 
 use function oihana\core\arrays\prepare;
@@ -302,7 +302,7 @@ trait ReflectionTrait
      * - **FIRST_KEYS**: Force certain keys to appear first.
      * - **SORT**: Sort remaining keys alphabetically.
      *
-     * @param array $options Optional configuration (see {@see PrepareOption}):
+     * @param array $options Optional configuration (see {@see ArrayOption}):
      *  - **REDUCE**     (bool|array|callable)
      *     - `true` removes null values,
      *     - `array` is forwarded to `compress()`,
@@ -329,33 +329,33 @@ trait ReflectionTrait
      * }
      *
      * // Remove null properties
-     * $helper->toArray([ PrepareOption::REDUCE => true ]);
+     * $helper->toArray([ ArrayOption::REDUCE => true ]);
      * // Result: ['name' => 'Book', 'stock' => 0]
      *
      * // Custom filter: keep only non-empty strings
      * $helper->toArray( Product::class,
      * [
-     *     PrepareOption::REDUCE => fn($k, $v) => is_string($v) && $v !== ''
+     *     ArrayOption::REDUCE => fn($k, $v) => is_string($v) && $v !== ''
      * ]);
      * // Result: ['name' => 'Book']
      *
      * // Inject metadata and reorder keys
      * $helper->toArray( Product::class,
      * [
-     *     PrepareOption::BEFORE      => ['_type' => 'Product'],
-     *     PrepareOption::FIRST_KEYS  => ['_type', 'name'],
-     *     PrepareOption::REDUCE      => true
+     *     ArrayOption::BEFORE      => ['_type' => 'Product'],
+     *     ArrayOption::FIRST_KEYS  => ['_type', 'name'],
+     *     ArrayOption::REDUCE      => true
      * ]);
      * ```
      */
     public function toArray( array $options = [] ) :array
     {
-        $options    = PrepareOption::normalize( $options ) ;
+        $options    = ArrayOption::normalize( $options ) ;
         $properties = $this->reflection()->properties( $this ) ;
 
-        $defaults = $options[ PrepareOption::DEFAULTS ] ?? [] ;
-        $include  = $options[ PrepareOption::INCLUDE  ] ?? [] ;
-        $exclude  = $options[ PrepareOption::EXCLUDE  ] ?? [] ;
+        $defaults = $options[ ArrayOption::DEFAULTS ] ?? [] ;
+        $include  = $options[ ArrayOption::INCLUDE  ] ?? [] ;
+        $exclude  = $options[ ArrayOption::EXCLUDE  ] ?? [] ;
 
         $data = [] ;
 

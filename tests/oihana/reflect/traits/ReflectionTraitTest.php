@@ -2,7 +2,7 @@
 
 namespace tests\oihana\reflect\traits;
 
-use oihana\core\options\PrepareOption;
+use oihana\core\options\ArrayOption;
 use oihana\reflect\traits\ReflectionTrait;
 
 use PHPUnit\Framework\TestCase;
@@ -160,20 +160,20 @@ final class ReflectionTraitTest extends TestCase
         $this->assertSame
         (
             [ 'name' => 'Book' , 'desc' => null ] ,
-            $obj->toArray( [ PrepareOption::FIRST_KEYS => [ 'name' ] ] )
+            $obj->toArray( [ ArrayOption::FIRST_KEYS => [ 'name' ] ] )
         );
 
         $this->assertSame
         (
             [ 'name' => 'Book' ] ,
-            $obj->toArray( [ PrepareOption::REDUCE => true ] )
+            $obj->toArray( [ ArrayOption::REDUCE => true ] )
         );
 
         $reduceByName = static fn( string $prop , mixed $value ) => str_starts_with($prop, 'n');
         $this->assertSame
         (
             ['name' => 'Book'] ,
-            $obj->toArray( [ PrepareOption::REDUCE => $reduceByName ] )
+            $obj->toArray( [ ArrayOption::REDUCE => $reduceByName ] )
         );
 
         $obj->age = 48 ;
@@ -187,7 +187,7 @@ final class ReflectionTraitTest extends TestCase
         $this->assertSame
         (
             [ 'name' => 'Book' , 'age' => 48 ] ,
-            $obj->toArray( [ PrepareOption::FIRST_KEYS => [ 'name' ] ] )
+            $obj->toArray( [ ArrayOption::FIRST_KEYS => [ 'name' ] ] )
         );
     }
 }

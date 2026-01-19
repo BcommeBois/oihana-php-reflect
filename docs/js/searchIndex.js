@@ -791,10 +791,10 @@ Search.appendIndex(
             "summary": "Creates\u0020and\u0020hydrates\u0020an\u0020object\u0020of\u0020the\u0020given\u0020class\u0020from\u0020an\u0020associative\u0020array.",
             "url": "classes/oihana-reflect-traits-ReflectionTrait.html#method_hydrate"
         },                {
-            "fqsen": "\\oihana\\reflect\\traits\\ReflectionTrait\u003A\u003AjsonSerializeFromPublicProperties\u0028\u0029",
-            "name": "jsonSerializeFromPublicProperties",
+            "fqsen": "\\oihana\\reflect\\traits\\ReflectionTrait\u003A\u003AtoArray\u0028\u0029",
+            "name": "toArray",
             "summary": "Generates\u0020an\u0020associative\u0020array\u0020from\u0020the\u0020public\u0020properties\u0020of\u0020a\u0020given\u0020class\u0020or\u0020object.",
-            "url": "classes/oihana-reflect-traits-ReflectionTrait.html#method_jsonSerializeFromPublicProperties"
+            "url": "classes/oihana-reflect-traits-ReflectionTrait.html#method_toArray"
         },                {
             "fqsen": "\\oihana\\reflect\\traits\\ReflectionTrait\u003A\u003A\u0024__reflection",
             "name": "__reflection",
