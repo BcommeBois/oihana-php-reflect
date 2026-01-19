@@ -302,7 +302,7 @@ trait ReflectionTrait
      * - **FIRST_KEYS**: Force certain keys to appear first.
      * - **SORT**: Sort remaining keys alphabetically.
      *
-     * @param array|null $options Optional configuration (see {@see PrepareOption}):
+     * @param array $options Optional configuration (see {@see PrepareOption}):
      *  - **REDUCE**     (bool|array|callable)
      *     - `true` removes null values,
      *     - `array` is forwarded to `compress()`,
@@ -348,7 +348,7 @@ trait ReflectionTrait
      * ]);
      * ```
      */
-    public function toArray( ?array $options = [] ) :array
+    public function toArray( array $options = [] ) :array
     {
         $options    = PrepareOption::normalize( $options ) ;
         $properties = $this->reflection()->properties( $this ) ;
