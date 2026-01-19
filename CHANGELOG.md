@@ -20,6 +20,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Traits
   - JsonSchemaTrait : Providing JSON Schema generation and validation capabilities for classes.
 
+### Changed
+  - ReflectionTrait : Rename the jsonSerializePublicProperties method in toArray( array $options = [] ) 
+
 ## [1.0.3] - 2025-08-24
 
 ### Added
