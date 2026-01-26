@@ -2,11 +2,13 @@
 
 namespace oihana\reflect\utils;
 
+use function oihana\core\cbor\cbor_encode;
+
 /**
- * JsonSerializer is an helper class to serialize objects into JSON while allowing temporary,
- * global serialization options.
+ * CborSerializer is an helper class to serialize objects
+ * into cbor while allowing temporary, global serialization options.
  *
- * This class acts as a wrapper around `json_encode()` and provides:
+ * This class acts as a wrapper around {@see cbor_encode()} and provides:
  * - Temporary global options applied to all Thing objects during serialization.
  * - Safe scoping of options using `try/finally` to ensure they are reset.
  * - Compatibility with arrays or single objects.
@@ -17,14 +19,14 @@ namespace oihana\reflect\utils;
  * Example usage:
  * ```php
  * use oihana\core\options\ArrayOption;
- * use oihana\reflect\utils\JsonSerializer;
+ * use oihana\reflect\utils\CborSerializer;
  * use org\schema\Thing;
  *
  * $person1 = new Person(['name' => 'Alice', 'age' => 30]);
  * $person2 = new Person(['name' => 'Bob', 'age' => null]);
  *
  * // Temporarily remove null values during JSON serialization
- * echo JsonSerializer::encode([$person1, $person2], [ArrayOption::REDUCE => true]);
+ * echo CborSerializer::encode([$person1, $person2], [ArrayOption::REDUCE => true]);
  * ```
  *
  * Notes:
@@ -37,38 +39,33 @@ namespace oihana\reflect\utils;
  * @package oihana\reflect\utils
  * @since   1.0.4
  */
-final class JsonSerializer
+final class CborSerializer
 {
     /**
-     * Encode data to JSON with temporary options applied
+     * Encode data to cbor with temporary options applied
      *
-     * @param array|object $data      Object or array of Thing instances.
-     * @param int          $jsonFlags JSON encode flags.
-     * @param array        $options   Temporary options for extends the serialization behavior.
+     * @param array|object $data    Object or array of Thing instances.
+     * @param array        $options Temporary options for extends the serialization behavior.
      *
      * @return string JSON string
      */
-    public static function encode( mixed $data , int $jsonFlags = 0  , array $options = [] ) :string
+    public static function encode( mixed $data , array $options = [] ) :string
     {
         $previous = SerializationContext::getOptions() ;
 
-        SerializationContext::setOptions( $options );
+        SerializationContext::setOptions( $options ) ;
 
         try
         {
-            return json_encode( $data , $jsonFlags ) ;
+            return cbor_encode
+            (
+                $data ,
+                fn( mixed $v ): string => JsonSerializer::encode( $v )
+            );
         }
         finally
         {
             SerializationContext::reset( $previous ) ;
         }
-    }
-
-    /**
-     * Get current temporary options
-     */
-    public static function getOptions(): array
-    {
-        return SerializationContext::getOptions() ;
     }
 }
