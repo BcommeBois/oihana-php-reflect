@@ -57,11 +57,7 @@ final class CborSerializer
 
         try
         {
-            return cbor_encode
-            (
-                $data ,
-                fn( mixed $v ): string => JsonSerializer::encode( $v )
-            );
+            return cbor_encode( $data ) ;
         }
         finally
         {
