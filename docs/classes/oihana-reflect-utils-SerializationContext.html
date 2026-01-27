@@ -102,7 +102,7 @@
 
     <article class="phpdocumentor-element -class">
         <h2 class="phpdocumentor-content__title">
-    JsonSerializer
+    SerializationContext
 
     
     
@@ -117,48 +117,39 @@
 </div>
 
         <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/utils/JsonSerializer.php"><a href="files/src-oihana-reflect-utils-jsonserializer.html"><abbr title="src/oihana/reflect/utils/JsonSerializer.php">JsonSerializer.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/utils/SerializationContext.php"><a href="files/src-oihana-reflect-utils-serializationcontext.html"><abbr title="src/oihana/reflect/utils/SerializationContext.php">SerializationContext.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">40</span>
+    <span class="phpdocumentor-element-found-in__line">29</span>
 
     </aside>
 
-            <p class="phpdocumentor-summary">JsonSerializer is an helper class to serialize objects into JSON while allowing temporary,
-global serialization options.</p>
+            <p class="phpdocumentor-summary">SerializationContext is a global helper that stores temporary serialization options
+during an encoding scope.</p>
 
 
-    <section class="phpdocumentor-description"><p>This class acts as a wrapper around <code class="prettyprint">json_encode()</code> and provides:</p>
+    <section class="phpdocumentor-description"><p>This class centralizes all transient serialization configuration shared between
+different serializers (JSON, CBOR, etc.) and the domain objects themselves.</p>
+<p>Typical usage:</p>
 <ul>
-<li>Temporary global options applied to all Thing objects during serialization.</li>
-<li>Safe scoping of options using <code class="prettyprint">try/finally</code> to ensure they are reset.</li>
-<li>Compatibility with arrays or single objects.</li>
+<li>A serializer (JsonSerializer, CborSerializer, …) sets options at the beginning
+of an encode() call.</li>
+<li>Domain objects (via ThingTrait::getJsonSerializeOptions()) read these options
+while being serialized.</li>
+<li>The previous context is restored using a try/finally block to guarantee
+proper cleanup even in case of error.</li>
 </ul>
-<p>The main purpose is to separate serialization logic and option management
-from the Thing classes themselves, keeping traits minimal and focused on data.</p>
-<p>Example usage:</p>
-<pre class="prettyprint"><code class="language-php">use oihana\core\options\ArrayOption;
-use oihana\reflect\utils\JsonSerializer;
-use org\schema\Thing;
-
-$person1 = new Person(['name' =&gt; 'Alice', 'age' =&gt; 30]);
-$person2 = new Person(['name' =&gt; 'Bob', 'age' =&gt; null]);
-
-// Temporarily remove null values during JSON serialization
-echo JsonSerializer::encode([$person1, $person2], [ArrayOption::REDUCE =&gt; true]);
-</code></pre>
-<p>Notes:</p>
+<p>This design ensures:</p>
 <ul>
-<li>Options are <strong>global for the duration of the encode() call</strong> and automatically
-reset afterward.</li>
-<li>This is especially useful for JSON-LD serialization where all Thing objects
-need consistent formatting rules.</li>
+<li>A single source of truth for serialization options.</li>
+<li>Safe scoping of global state.</li>
+<li>Consistent behavior across all serialization formats.</li>
 </ul>
 </section>
 
 
     <h5 class="phpdocumentor-tag-list__heading" id="tags">
         Tags
-        <a href="classes/oihana-reflect-utils-JsonSerializer.html#tags" class="headerlink"><i class="fas fa-link"></i></a>
+        <a href="classes/oihana-reflect-utils-SerializationContext.html#tags" class="headerlink"><i class="fas fa-link"></i></a>
 
     </h5>
     <dl class="phpdocumentor-tag-list">
@@ -185,7 +176,7 @@ need consistent formatting rules.</li>
     
 <h3 id="toc">
     Table of Contents
-    <a href="classes/oihana-reflect-utils-JsonSerializer.html#toc" class="headerlink"><i class="fas fa-link"></i></a>
+    <a href="classes/oihana-reflect-utils-SerializationContext.html#toc" class="headerlink"><i class="fas fa-link"></i></a>
 
 </h3>
 
@@ -197,26 +188,47 @@ need consistent formatting rules.</li>
 
 
 
+<h4 id="toc-properties">
+    Properties
+    <a href="classes/oihana-reflect-utils-SerializationContext.html#toc-properties" class="headerlink"><i class="fas fa-link"></i></a>
+
+</h4>
+<dl class="phpdocumentor-table-of-contents">
+            <dt class="phpdocumentor-table-of-contents__entry -property -private">
+    <a class="" href="classes/oihana-reflect-utils-SerializationContext.html#property_temporaryOptions">$temporaryOptions</a>
+    <span>
+                        &nbsp;: array&lt;string, mixed&gt;            </span>
+</dt>
+<dd>Temporary options applied during the current serialization scope.</dd>
+
+    </dl>
 
 <h4 id="toc-methods">
     Methods
-    <a href="classes/oihana-reflect-utils-JsonSerializer.html#toc-methods" class="headerlink"><i class="fas fa-link"></i></a>
+    <a href="classes/oihana-reflect-utils-SerializationContext.html#toc-methods" class="headerlink"><i class="fas fa-link"></i></a>
 
 </h4>
 <dl class="phpdocumentor-table-of-contents">
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
-    <a class="" href="classes/oihana-reflect-utils-JsonSerializer.html#method_encode">encode()</a>
+    <a class="" href="classes/oihana-reflect-utils-SerializationContext.html#method_getOptions">getOptions()</a>
     <span>
-                                &nbsp;: string    </span>
+                                &nbsp;: array&lt;string, mixed&gt;    </span>
 </dt>
-<dd>Encode data to JSON with temporary options applied</dd>
+<dd>Returns the current global serialization context options.</dd>
 
             <dt class="phpdocumentor-table-of-contents__entry -method -public">
-    <a class="" href="classes/oihana-reflect-utils-JsonSerializer.html#method_getOptions">getOptions()</a>
+    <a class="" href="classes/oihana-reflect-utils-SerializationContext.html#method_reset">reset()</a>
     <span>
-                                &nbsp;: array&lt;string|int, mixed&gt;    </span>
+                                &nbsp;: void    </span>
 </dt>
-<dd>Get current temporary options</dd>
+<dd>Resets the global serialization context options.</dd>
+
+            <dt class="phpdocumentor-table-of-contents__entry -method -public">
+    <a class="" href="classes/oihana-reflect-utils-SerializationContext.html#method_setOptions">setOptions()</a>
+    <span>
+                                &nbsp;: void    </span>
+</dt>
+<dd>Sets the global serialization context options.</dd>
 
     </dl>
 
@@ -225,11 +237,59 @@ need consistent formatting rules.</li>
         
 
         
+    <section class="phpdocumentor-properties">
+        <h3 class="phpdocumentor-elements__header" id="properties">
+            Properties
+            <a href="classes/oihana-reflect-utils-SerializationContext.html#properties" class="headerlink"><i class="fas fa-link"></i></a>
+
+        </h3>
+                    <article
+        class="
+            phpdocumentor-element
+            -property
+            -private
+            -static                                                        "
+>
+    <h4 class="phpdocumentor-element__name" id="property_temporaryOptions">
+        $temporaryOptions
+        <a href="classes/oihana-reflect-utils-SerializationContext.html#property_temporaryOptions" class="headerlink"><i class="fas fa-link"></i></a>
+
+        <span class="phpdocumentor-element__modifiers">
+                                            </span>
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/utils/SerializationContext.php"><a href="files/src-oihana-reflect-utils-serializationcontext.html"><abbr title="src/oihana/reflect/utils/SerializationContext.php">SerializationContext.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">39</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Temporary options applied during the current serialization scope.</p>
+
+    
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+        <span class="phpdocumentor-signature__visibility">private</span>
+        <span class="phpdocumentor-signature__static">static</span>    <span class="phpdocumentor-signature__type">array&lt;string, mixed&gt;</span>
+    <span class="phpdocumentor-signature__name">$temporaryOptions</span>
+     = <span class="phpdocumentor-signature__default-value">[]</span></code>
+
+        <section class="phpdocumentor-description"><p>These options are intended to be short-lived and must be set and restored
+by serializers using a try/finally pattern.</p>
+</section>
+
+    
+    
+
+        
+        
+
+</article>
+            </section>
 
             <section class="phpdocumentor-methods">
         <h3 class="phpdocumentor-elements__header" id="methods">
             Methods
-            <a href="classes/oihana-reflect-utils-JsonSerializer.html#methods" class="headerlink"><i class="fas fa-link"></i></a>
+            <a href="classes/oihana-reflect-utils-SerializationContext.html#methods" class="headerlink"><i class="fas fa-link"></i></a>
 
         </h3>
                     <article
@@ -238,54 +298,85 @@ need consistent formatting rules.</li>
             -public
                                     -static                    "
 >
-    <h4 class="phpdocumentor-element__name" id="method_encode">
-        encode()
-        <a href="classes/oihana-reflect-utils-JsonSerializer.html#method_encode" class="headerlink"><i class="fas fa-link"></i></a>
+    <h4 class="phpdocumentor-element__name" id="method_getOptions">
+        getOptions()
+        <a href="classes/oihana-reflect-utils-SerializationContext.html#method_getOptions" class="headerlink"><i class="fas fa-link"></i></a>
 
     </h4>
     <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/utils/JsonSerializer.php"><a href="files/src-oihana-reflect-utils-jsonserializer.html"><abbr title="src/oihana/reflect/utils/JsonSerializer.php">JsonSerializer.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/utils/SerializationContext.php"><a href="files/src-oihana-reflect-utils-serializationcontext.html"><abbr title="src/oihana/reflect/utils/SerializationContext.php">SerializationContext.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">51</span>
+    <span class="phpdocumentor-element-found-in__line">49</span>
 
     </aside>
 
-        <p class="phpdocumentor-summary">Encode data to JSON with temporary options applied</p>
+        <p class="phpdocumentor-summary">Returns the current global serialization context options.</p>
 
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
-            <span class="phpdocumentor-signature__static">static</span>        <span class="phpdocumentor-signature__name">encode</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__type">array&lt;string|int, mixed&gt;|object&nbsp;</span><span class="phpdocumentor-signature__argument__name">$data</span></span><span class="phpdocumentor-signature__argument"><span>[</span><span>, </span><span class="phpdocumentor-signature__argument__type">int&nbsp;</span><span class="phpdocumentor-signature__argument__name">$jsonFlags</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">0</span><span> ]</span></span><span class="phpdocumentor-signature__argument"><span>[</span><span>, </span><span class="phpdocumentor-signature__argument__type">array&lt;string|int, mixed&gt;&nbsp;</span><span class="phpdocumentor-signature__argument__name">$options</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">[]</span><span> ]</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">string</span></code>
+            <span class="phpdocumentor-signature__static">static</span>        <span class="phpdocumentor-signature__name">getOptions</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">array&lt;string, mixed&gt;</span></code>
 
     <div class="phpdocumentor-label-line">
         </div>
     
+        <section class="phpdocumentor-description"><p>This method is typically called from domain objects (e.g. in jsonSerialize())
+to retrieve the active temporary configuration.</p>
+</section>
+
     
+    
+
+        
+    
+            <section>
+        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
+        <span class="phpdocumentor-signature__response_type">array&lt;string, mixed&gt;</span>
+                    &mdash;
+                <section class="phpdocumentor-description"><p>The current serialization options.</p>
+</section>
+
+            </section>
+
+</article>
+                    <article
+        class="phpdocumentor-element
+            -method
+            -public
+                                    -static                    "
+>
+    <h4 class="phpdocumentor-element__name" id="method_reset">
+        reset()
+        <a href="classes/oihana-reflect-utils-SerializationContext.html#method_reset" class="headerlink"><i class="fas fa-link"></i></a>
+
+    </h4>
+    <aside class="phpdocumentor-element-found-in">
+    <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/utils/SerializationContext.php"><a href="files/src-oihana-reflect-utils-serializationcontext.html"><abbr title="src/oihana/reflect/utils/SerializationContext.php">SerializationContext.php</abbr></a></abbr>
+    :
+    <span class="phpdocumentor-element-found-in__line">64</span>
+
+    </aside>
+
+        <p class="phpdocumentor-summary">Resets the global serialization context options.</p>
+
+    <code class="phpdocumentor-code phpdocumentor-signature ">
+    <span class="phpdocumentor-signature__visibility">public</span>
+            <span class="phpdocumentor-signature__static">static</span>        <span class="phpdocumentor-signature__name">reset</span><span>(</span><span class="phpdocumentor-signature__argument"><span>[</span><span class="phpdocumentor-signature__argument__type">array&lt;string, mixed&gt;&nbsp;</span><span class="phpdocumentor-signature__argument__name">$previous</span><span> = </span><span class="phpdocumentor-signature__argument__default-value">[]</span><span> ]</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">void</span></code>
+
+    <div class="phpdocumentor-label-line">
+        </div>
+    
+        <section class="phpdocumentor-description"><p>This method is intended to be used in a finally block to restore the
+previous serialization context after an encode() call.</p>
+</section>
+
         <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
     <dl class="phpdocumentor-argument-list">
                     <dt class="phpdocumentor-argument-list__entry">
-                <span class="phpdocumentor-argument-list__argument__name">$data</span>
-                : <span class="phpdocumentor-argument-list__argument__type">array&lt;string|int, mixed&gt;|object</span>
-                            </dt>
-            <dd class="phpdocumentor-argument-list__definition">
-                    <section class="phpdocumentor-description"><p>Object or array of Thing instances.</p>
-</section>
-
-            </dd>
-                    <dt class="phpdocumentor-argument-list__entry">
-                <span class="phpdocumentor-argument-list__argument__name">$jsonFlags</span>
-                : <span class="phpdocumentor-argument-list__argument__type">int</span>
-                 = <span class="phpdocumentor-argument-list__argument__default-value">0</span>            </dt>
-            <dd class="phpdocumentor-argument-list__definition">
-                    <section class="phpdocumentor-description"><p>JSON encode flags.</p>
-</section>
-
-            </dd>
-                    <dt class="phpdocumentor-argument-list__entry">
-                <span class="phpdocumentor-argument-list__argument__name">$options</span>
-                : <span class="phpdocumentor-argument-list__argument__type">array&lt;string|int, mixed&gt;</span>
+                <span class="phpdocumentor-argument-list__argument__name">$previous</span>
+                : <span class="phpdocumentor-argument-list__argument__type">array&lt;string, mixed&gt;</span>
                  = <span class="phpdocumentor-argument-list__argument__default-value">[]</span>            </dt>
             <dd class="phpdocumentor-argument-list__definition">
-                    <section class="phpdocumentor-description"><p>Temporary options for extends the serialization behavior.</p>
+                    <section class="phpdocumentor-description"><p>The previous options to restore.</p>
 </section>
 
             </dd>
@@ -295,15 +386,7 @@ need consistent formatting rules.</li>
 
         
     
-            <section>
-        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
-        <span class="phpdocumentor-signature__response_type">string</span>
-                    &mdash;
-                <section class="phpdocumentor-description"><p>JSON string</p>
-</section>
-
-            </section>
-
+    
 </article>
                     <article
         class="phpdocumentor-element
@@ -311,38 +394,49 @@ need consistent formatting rules.</li>
             -public
                                     -static                    "
 >
-    <h4 class="phpdocumentor-element__name" id="method_getOptions">
-        getOptions()
-        <a href="classes/oihana-reflect-utils-JsonSerializer.html#method_getOptions" class="headerlink"><i class="fas fa-link"></i></a>
+    <h4 class="phpdocumentor-element__name" id="method_setOptions">
+        setOptions()
+        <a href="classes/oihana-reflect-utils-SerializationContext.html#method_setOptions" class="headerlink"><i class="fas fa-link"></i></a>
 
     </h4>
     <aside class="phpdocumentor-element-found-in">
-    <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/utils/JsonSerializer.php"><a href="files/src-oihana-reflect-utils-jsonserializer.html"><abbr title="src/oihana/reflect/utils/JsonSerializer.php">JsonSerializer.php</abbr></a></abbr>
+    <abbr class="phpdocumentor-element-found-in__file" title="src/oihana/reflect/utils/SerializationContext.php"><a href="files/src-oihana-reflect-utils-serializationcontext.html"><abbr title="src/oihana/reflect/utils/SerializationContext.php">SerializationContext.php</abbr></a></abbr>
     :
-    <span class="phpdocumentor-element-found-in__line">70</span>
+    <span class="phpdocumentor-element-found-in__line">79</span>
 
     </aside>
 
-        <p class="phpdocumentor-summary">Get current temporary options</p>
+        <p class="phpdocumentor-summary">Sets the global serialization context options.</p>
 
     <code class="phpdocumentor-code phpdocumentor-signature ">
     <span class="phpdocumentor-signature__visibility">public</span>
-            <span class="phpdocumentor-signature__static">static</span>        <span class="phpdocumentor-signature__name">getOptions</span><span>(</span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">array&lt;string|int, mixed&gt;</span></code>
+            <span class="phpdocumentor-signature__static">static</span>        <span class="phpdocumentor-signature__name">setOptions</span><span>(</span><span class="phpdocumentor-signature__argument"><span class="phpdocumentor-signature__argument__type">array&lt;string, mixed&gt;&nbsp;</span><span class="phpdocumentor-signature__argument__name">$options</span></span><span>)</span><span> : </span><span class="phpdocumentor-signature__response_type">void</span></code>
 
     <div class="phpdocumentor-label-line">
         </div>
     
-    
-    
+        <section class="phpdocumentor-description"><p>This should only be called by serializer entry points (JsonSerializer,
+CborSerializer, etc.) at the beginning of an encoding operation.</p>
+</section>
+
+        <h5 class="phpdocumentor-argument-list__heading">Parameters</h5>
+    <dl class="phpdocumentor-argument-list">
+                    <dt class="phpdocumentor-argument-list__entry">
+                <span class="phpdocumentor-argument-list__argument__name">$options</span>
+                : <span class="phpdocumentor-argument-list__argument__type">array&lt;string, mixed&gt;</span>
+                            </dt>
+            <dd class="phpdocumentor-argument-list__definition">
+                    <section class="phpdocumentor-description"><p>The temporary serialization options.</p>
+</section>
+
+            </dd>
+            </dl>
+
     
 
         
     
-            <section>
-        <h5 class="phpdocumentor-return-value__heading">Return values</h5>
-        <span class="phpdocumentor-signature__response_type">array&lt;string|int, mixed&gt;</span>
-            </section>
-
+    
 </article>
             </section>
 
@@ -350,7 +444,7 @@ need consistent formatting rules.</li>
     <div class="phpdocumentor-modal-bg" data-exit-button></div>
     <div class="phpdocumentor-modal-container">
         <div class="phpdocumentor-modal-content">
-            <pre style="max-height: 500px; overflow-y: scroll" data-src="files/src/oihana/reflect/utils/JsonSerializer.php.txt" class="language-php line-numbers linkable-line-numbers"></pre>
+            <pre style="max-height: 500px; overflow-y: scroll" data-src="files/src/oihana/reflect/utils/SerializationContext.php.txt" class="language-php line-numbers linkable-line-numbers"></pre>
         </div>
         <button data-exit-button class="phpdocumentor-modal__close">&times;</button>
     </div>
@@ -451,16 +545,24 @@ need consistent formatting rules.</li>
             <li class="phpdocumentor-on-this-page-section__title">Table Of Contents</li>
             <li>
                 <ul class="phpdocumentor-list -clean">
-                                                                                <li><a href="classes/oihana-reflect-utils-JsonSerializer.html#toc-methods">Methods</a></li>
+                                                            <li><a href="classes/oihana-reflect-utils-SerializationContext.html#toc-properties">Properties</a></li>
+                                                            <li><a href="classes/oihana-reflect-utils-SerializationContext.html#toc-methods">Methods</a></li>
                                     </ul>
             </li>
             
+                            <li class="phpdocumentor-on-this-page-section__title">Properties</li>
+                <li>
+                    <ul class="phpdocumentor-list -clean">
+                                                    <li class=""><a href="classes/oihana-reflect-utils-SerializationContext.html#property_temporaryOptions">$temporaryOptions</a></li>
+                                            </ul>
+                </li>
             
                         <li class="phpdocumentor-on-this-page-section__title">Methods</li>
             <li>
                 <ul class="phpdocumentor-list -clean">
-                                            <li class=""><a href="classes/oihana-reflect-utils-JsonSerializer.html#method_encode">encode()</a></li>
-                                            <li class=""><a href="classes/oihana-reflect-utils-JsonSerializer.html#method_getOptions">getOptions()</a></li>
+                                            <li class=""><a href="classes/oihana-reflect-utils-SerializationContext.html#method_getOptions">getOptions()</a></li>
+                                            <li class=""><a href="classes/oihana-reflect-utils-SerializationContext.html#method_reset">reset()</a></li>
+                                            <li class=""><a href="classes/oihana-reflect-utils-SerializationContext.html#method_setOptions">setOptions()</a></li>
                                     </ul>
             </li>
                     </ul>
@@ -480,7 +582,7 @@ need consistent formatting rules.</li>
     </section>
 </section>
         </div>
-        <a href="classes/oihana-reflect-utils-JsonSerializer.html#top" class="phpdocumentor-back-to-top"><i class="fas fa-chevron-circle-up"></i></a>
+        <a href="classes/oihana-reflect-utils-SerializationContext.html#top" class="phpdocumentor-back-to-top"><i class="fas fa-chevron-circle-up"></i></a>
 
     </main>
 

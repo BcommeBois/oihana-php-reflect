@@ -21,7 +21,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - JsonSchemaTrait : Providing JSON Schema generation and validation capabilities for classes.
 - Utils
   - CborSerializer tool : cbor serializer helper
-  - JsonSerializer tool : an helper class to serialize objects with temporary options.
+  - JsonSerializer tool : json serializer with temporary options.
 
 ### Changed
   - ReflectionTrait : Rename the jsonSerializePublicProperties method in toArray( array $options = [] ) 

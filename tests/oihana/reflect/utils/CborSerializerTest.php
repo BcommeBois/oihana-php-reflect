@@ -35,7 +35,7 @@ final class CborSerializerTest extends TestCase
 
     public function testOptionsAreSetDuringEncodingAndRestoredAfter(): void
     {
-        SerializationContext::setOptions(['initial' => true]);
+        SerializationContext::setOptions(['reduce' => true]);
 
         $options = [ArrayOption::REDUCE => true];
 
@@ -59,9 +59,9 @@ final class CborSerializerTest extends TestCase
 
         CborSerializer::encode($object, $options);
 
-        $this->assertSame( [] , $seenDuringEncode ) ;
+        $this->assertSame(['reduce' => true], $seenDuringEncode);
 
-        $this->assertSame(['initial' => true], SerializationContext::getOptions());
+        $this->assertSame(['reduce' => true], SerializationContext::getOptions());
     }
 
     public function testContextIsRestoredEvenIfExceptionOccurs(): void

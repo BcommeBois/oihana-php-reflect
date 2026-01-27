@@ -806,6 +806,16 @@ Search.appendIndex(
             "summary": "Cached\u0020short\u0020class\u0020name\u0020for\u0020performance.",
             "url": "classes/oihana-reflect-traits-ReflectionTrait.html#property___shortName"
         },                {
+            "fqsen": "\\oihana\\reflect\\utils\\CborSerializer",
+            "name": "CborSerializer",
+            "summary": "CborSerializer\u0020is\u0020an\u0020helper\u0020class\u0020to\u0020serialize\u0020objects\ninto\u0020cbor\u0020while\u0020allowing\u0020temporary,\u0020global\u0020serialization\u0020options.",
+            "url": "classes/oihana-reflect-utils-CborSerializer.html"
+        },                {
+            "fqsen": "\\oihana\\reflect\\utils\\CborSerializer\u003A\u003Aencode\u0028\u0029",
+            "name": "encode",
+            "summary": "Encode\u0020data\u0020to\u0020cbor\u0020with\u0020temporary\u0020options\u0020applied",
+            "url": "classes/oihana-reflect-utils-CborSerializer.html#method_encode"
+        },                {
             "fqsen": "\\oihana\\reflect\\utils\\JsonSerializer",
             "name": "JsonSerializer",
             "summary": "JsonSerializer\u0020is\u0020an\u0020helper\u0020class\u0020to\u0020serialize\u0020objects\u0020into\u0020JSON\u0020while\u0020allowing\u0020temporary,\nglobal\u0020serialization\u0020options.",
@@ -821,10 +831,30 @@ Search.appendIndex(
             "summary": "Get\u0020current\u0020temporary\u0020options",
             "url": "classes/oihana-reflect-utils-JsonSerializer.html#method_getOptions"
         },                {
-            "fqsen": "\\oihana\\reflect\\utils\\JsonSerializer\u003A\u003A\u0024temporaryOptions",
+            "fqsen": "\\oihana\\reflect\\utils\\SerializationContext",
+            "name": "SerializationContext",
+            "summary": "SerializationContext\u0020is\u0020a\u0020global\u0020helper\u0020that\u0020stores\u0020temporary\u0020serialization\u0020options\nduring\u0020an\u0020encoding\u0020scope.",
+            "url": "classes/oihana-reflect-utils-SerializationContext.html"
+        },                {
+            "fqsen": "\\oihana\\reflect\\utils\\SerializationContext\u003A\u003AgetOptions\u0028\u0029",
+            "name": "getOptions",
+            "summary": "Returns\u0020the\u0020current\u0020global\u0020serialization\u0020context\u0020options.",
+            "url": "classes/oihana-reflect-utils-SerializationContext.html#method_getOptions"
+        },                {
+            "fqsen": "\\oihana\\reflect\\utils\\SerializationContext\u003A\u003Areset\u0028\u0029",
+            "name": "reset",
+            "summary": "Resets\u0020the\u0020global\u0020serialization\u0020context\u0020options.",
+            "url": "classes/oihana-reflect-utils-SerializationContext.html#method_reset"
+        },                {
+            "fqsen": "\\oihana\\reflect\\utils\\SerializationContext\u003A\u003AsetOptions\u0028\u0029",
+            "name": "setOptions",
+            "summary": "Sets\u0020the\u0020global\u0020serialization\u0020context\u0020options.",
+            "url": "classes/oihana-reflect-utils-SerializationContext.html#method_setOptions"
+        },                {
+            "fqsen": "\\oihana\\reflect\\utils\\SerializationContext\u003A\u003A\u0024temporaryOptions",
             "name": "temporaryOptions",
-            "summary": "Temporary\u0020options\u0020applied\u0020to\u0020all\u0020Thing\u0020objects\u0020during\u0020serialization",
-            "url": "classes/oihana-reflect-utils-JsonSerializer.html#property_temporaryOptions"
+            "summary": "Temporary\u0020options\u0020applied\u0020during\u0020the\u0020current\u0020serialization\u0020scope.",
+            "url": "classes/oihana-reflect-utils-SerializationContext.html#property_temporaryOptions"
         },                {
             "fqsen": "\\oihana\\reflect\\Version",
             "name": "Version",

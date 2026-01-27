@@ -2,6 +2,7 @@
 
 namespace oihana\reflect\utils;
 
+use Closure;
 use function oihana\core\cbor\cbor_encode;
 
 /**
@@ -46,10 +47,11 @@ final class CborSerializer
      *
      * @param array|object $data    Object or array of Thing instances.
      * @param array        $options Temporary options for extends the serialization behavior.
+     * @param Closure|null $replacer Optional callback applied to each encoded value: fn($key, $value)
      *
      * @return string JSON string
      */
-    public static function encode( mixed $data , array $options = [] ) :string
+    public static function encode( mixed $data , array $options = [] , ?Closure $replacer = null ) :string
     {
         $previous = SerializationContext::getOptions() ;
 
@@ -57,7 +59,7 @@ final class CborSerializer
 
         try
         {
-            return cbor_encode( $data ) ;
+            return cbor_encode( $data , $replacer ) ;
         }
         finally
         {
