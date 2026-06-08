@@ -158,4 +158,12 @@ class ConstantsTraitTest extends TestCase
         ConstantsTraitTestClass::validate('invalid');
     }
 
+    public function testGetConstantKeysReturnsConstantNames()
+    {
+        $this->assertSame(
+            ['FOO', 'BAR', 'BAZ', 'MULTI'],
+            ConstantsTraitTestClass::getConstantKeys()
+        );
+    }
+
 }

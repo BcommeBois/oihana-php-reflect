@@ -54,6 +54,10 @@ class VersionTest extends TestCase
         $this->assertEquals((string)$version2, $versionStr2);
 
         $this->assertNull(Version::fromString(''));
+
+        // A separator-less "0" parses to integer zero, which resets the version
+        // object to null -> the stringified result is the empty string.
+        $this->assertSame('', Version::fromString('0'));
     }
 
     public function testToString()

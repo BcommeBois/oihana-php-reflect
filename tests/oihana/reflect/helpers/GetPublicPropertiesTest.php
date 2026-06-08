@@ -92,6 +92,19 @@ final class GetPublicPropertiesTest extends TestCase
         $this->assertArrayHasKey('childProp', $cache[ChildClass::class]);
     }
 
+    public function testSecondCallReturnsCachedResult()
+    {
+        $cache      = [];
+        $reflection = new ReflectionClass(ChildClass::class);
+
+        $first  = getPublicProperties($reflection, true, $cache);
+        // Same cache, untouched between calls -> the second call returns the
+        // cached entry directly instead of recomputing.
+        $second = getPublicProperties($reflection, true, $cache);
+
+        $this->assertSame($first, $second);
+    }
+
     public function testNonRecursiveOption()
     {
         $reflection = new ReflectionClass(ChildClass::class);

@@ -190,4 +190,30 @@ final class ReflectionTraitTest extends TestCase
             $obj->toArray( [ ArrayOption::FIRST_KEYS => [ 'name' ] ] )
         );
     }
+
+    public function testToArrayIncludeAndExclude(): void
+    {
+        $obj = new class
+        {
+            use ReflectionTrait;
+
+            public string  $name = 'Book' ;
+            public int     $stock = 3 ;
+            public ?string $desc = 'note' ;
+        };
+
+        // INCLUDE keeps only the whitelisted properties (others are skipped).
+        $this->assertSame
+        (
+            [ 'name' => 'Book' ] ,
+            $obj->toArray( [ ArrayOption::INCLUDE => [ 'name' ] ] )
+        );
+
+        // EXCLUDE drops the blacklisted properties (the rest stay).
+        $this->assertSame
+        (
+            [ 'name' => 'Book' , 'stock' => 3 ] ,
+            $obj->toArray( [ ArrayOption::EXCLUDE => [ 'desc' ] ] )
+        );
+    }
 }

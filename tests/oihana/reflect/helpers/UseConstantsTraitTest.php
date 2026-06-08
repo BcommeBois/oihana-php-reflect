@@ -12,7 +12,7 @@ class UseConstantsTraitParentClass { use UseConstantsTraitTestTrait; }
 class UseConstantsTraitChildClass extends UseConstantsTraitParentClass {}
 class UseConstantsTraitNoTraitClass {}
 
-final class UseConstantsTrait extends TestCase
+final class UseConstantsTraitTest extends TestCase
 {
     public function testDirectTrait(): void
     {

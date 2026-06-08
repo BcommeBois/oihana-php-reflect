@@ -91,4 +91,23 @@ class GetFunctionInfoTest extends TestCase
         $info = getFunctionInfo( 42 ); // Not a valid callable
         $this->assertNull($info);
     }
+
+    public function testInvokableObjectReturnsNull() :void
+    {
+        // An invokable object is callable but is neither a string, a
+        // [object, method] pair nor a Closure -> the function bails out to null.
+        $invokable = new class
+        {
+            public function __invoke() : string { return 'x'; }
+        };
+
+        $this->assertNull( getFunctionInfo( $invokable ) );
+    }
+
+    public function testStringMethodOnMissingClassReturnsNull() :void
+    {
+        // "Class::method" referencing an unknown class makes ReflectionMethod
+        // throw a ReflectionException, which the helper swallows into null.
+        $this->assertNull( getFunctionInfo( 'NonExistent\\Class::method' ) );
+    }
 }
