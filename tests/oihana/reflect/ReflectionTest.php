@@ -350,4 +350,104 @@ class ReflectionTest extends TestCase
         $variadic = $this->reflection->isParameterVariadic(MockUser::class, 'addTags', 'tags');
         $this->assertTrue($variadic); // supposons addTags(...$tags)
     }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function testDescribeCallableParametersFromObjectMethodArray()
+    {
+        $params = $this->reflection->describeCallableParameters([ new MockUser(), 'setName' ]);
+
+        $this->assertEquals('name', $params[0]['name']);
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function testDescribeCallableParametersFromInvokableObject()
+    {
+        $invokable = new class
+        {
+            public function __invoke(string $label): string { return $label; }
+        };
+
+        $params = $this->reflection->describeCallableParameters($invokable);
+
+        $this->assertCount(1, $params);
+        $this->assertEquals('label', $params[0]['name']);
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function testDescribeCallableParametersWithUnionType()
+    {
+        $fn = fn(int|string|null $value) => $value;
+
+        $params = $this->reflection->describeCallableParameters($fn);
+
+        // PHP may reorder union members, so assert membership rather than order.
+        $this->assertStringContainsString('int', $params[0]['type']);
+        $this->assertStringContainsString('string', $params[0]['type']);
+        $this->assertStringContainsString('null', $params[0]['type']);
+        $this->assertTrue($params[0]['nullable']);
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function testDescribeCallableParametersThrowsOnUnresolvableCallable()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->reflection->describeCallableParameters('Unknown\\Class::nope');
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function testParametersThrowsWhenMethodIsMissing()
+    {
+        $this->expectException(ReflectionException::class);
+        $this->reflection->parameters(MockUser::class, 'ghostMethod');
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function testParameterTypeReturnsNullWhenParamMissing()
+    {
+        $this->assertNull($this->reflection->parameterType(MockUser::class, 'setName', 'ghost'));
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function testParameterDefaultValueReturnsNullWhenParamMissing()
+    {
+        $this->assertNull($this->reflection->parameterDefaultValue(MockUser::class, 'setName', 'ghost'));
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function testIsParameterNullableReturnsFalseWhenParamMissing()
+    {
+        $this->assertFalse($this->reflection->isParameterNullable(MockUser::class, 'setName', 'ghost'));
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function testIsParameterOptionalReturnsFalseWhenParamMissing()
+    {
+        $this->assertFalse($this->reflection->isParameterOptional(MockUser::class, 'setName', 'ghost'));
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function testIsParameterVariadicReturnsFalseWhenParamMissing()
+    {
+        $this->assertFalse($this->reflection->isParameterVariadic(MockUser::class, 'setName', 'ghost'));
+    }
 }
