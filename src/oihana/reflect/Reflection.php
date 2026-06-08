@@ -20,6 +20,7 @@ use oihana\reflect\attributes\HydrateKey;
 use oihana\reflect\attributes\HydrateWith;
 
 use function oihana\core\arrays\isAssociative;
+use function oihana\core\callables\resolveCallable;
 
 /**
  * High-level helper over PHP's Reflection API and a robust array-to-object hydrator.
@@ -118,31 +119,20 @@ class Reflection
      */
     public function describeCallableParameters( callable|string|array $callable ): array
     {
-        if ( is_array( $callable ) )
+        $resolved = resolveCallable( $callable );
+
+        if ( $resolved === null )
         {
-            $reflection = new ReflectionMethod( $callable[0], $callable[1] );
+            throw new InvalidArgumentException( 'Cannot resolve callable.' );
         }
-        elseif ( is_string( $callable ) && str_contains( $callable , '::' ) )
+
+        $reflection = match( true )
         {
-            [ $class, $method ] = explode( '::', $callable );
-            $reflection = new ReflectionMethod( $class, $method );
-        }
-        elseif ( is_string( $callable ) )
-        {
-            $reflection = new ReflectionFunction( $callable );
-        }
-        elseif ( $callable instanceof Closure )
-        {
-            $reflection = new ReflectionFunction( $callable );
-        }
-        elseif ( is_object( $callable ) && method_exists( $callable, '__invoke' ) )
-        {
-            $reflection = new ReflectionMethod( $callable, '__invoke' );
-        }
-        else
-        {
-            throw new InvalidArgumentException('Unsupported callable type.');
-        }
+            is_array( $resolved )                                             => new ReflectionMethod( $resolved[0], $resolved[1] ),
+            is_object( $resolved ) && ! $resolved instanceof Closure          => new ReflectionMethod( $resolved, '__invoke' ),
+            is_string( $resolved ) && str_contains( $resolved , '::' ) => new ReflectionMethod( ...explode( '::', $resolved, 2 ) ),
+            default                                                           => new ReflectionFunction( $resolved ), // Closure or plain function name
+        };
 
         $result = [];
 
@@ -846,13 +836,8 @@ class Reflection
      * @see self::shortName()                For normalization of class names.
      * @see self::guessClassFromProperties() For heuristic detection based on keys.
      */
-    private function determineArrayItemType( mixed $item , array $possibleClasses ) :?string
+    private function determineArrayItemType( array $item , array $possibleClasses ) :?string
     {
-        if ( !is_array( $item ) )
-        {
-            return null ;
-        }
-
         // Strategy 1: Search for a discriminator (field 'atType', ‘type’ or ‘@type)
 
         $discriminatorKeys = [ 'atType' , '@type' , 'type' ] ;

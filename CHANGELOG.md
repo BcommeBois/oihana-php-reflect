@@ -25,6 +25,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### Changed
   - ReflectionTrait : Rename the jsonSerializePublicProperties method in toArray( array $options = [] ) 
+  - Reflection::describeCallableParameters now resolves the callable through the shared `oihana\core\callables\resolveCallable()` helper. An unresolvable callable (e.g. `"Unknown::method"`) now throws `InvalidArgumentException` instead of `ReflectionException` — both were already declared in the method's `@throws`.
 
 ## [1.0.3] - 2025-08-24
 
