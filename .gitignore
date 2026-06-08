@@ -18,7 +18,8 @@ composer-dev.lock
 .twgit_features_subject
 coverage.xml
 /.phpdoc/cache
-/build/parser
+/build/
+/build/coverage/history.json   # coverage trend log — local only, never committed
 /builds/
 /database/
 /vendor/
