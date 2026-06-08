@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### Added
 
 - Enums
+  - CallableParameter : the keys of the callable-parameter descriptors returned by Reflection::describeCallableParameters()
   - JsonSchemaDraft : the Json Schema draft versions
   - JsonSchemaKeyword : the Json Schema keywords
   - JsonSchemaType : the Json Schema types

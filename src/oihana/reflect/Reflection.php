@@ -18,6 +18,7 @@ use ReflectionUnionType;
 use oihana\reflect\attributes\HydrateAs;
 use oihana\reflect\attributes\HydrateKey;
 use oihana\reflect\attributes\HydrateWith;
+use oihana\reflect\enums\CallableParameter;
 
 use function oihana\core\arrays\isAssociative;
 use function oihana\core\callables\resolveCallable;
@@ -128,9 +129,9 @@ class Reflection
 
         $reflection = match( true )
         {
-            is_array( $resolved )                                             => new ReflectionMethod( $resolved[0], $resolved[1] ),
-            is_object( $resolved ) && ! $resolved instanceof Closure          => new ReflectionMethod( $resolved, '__invoke' ),
-            is_string( $resolved ) && str_contains( $resolved , '::' ) => new ReflectionMethod( ...explode( '::', $resolved, 2 ) ),
+            is_array( $resolved )                                             => new ReflectionMethod( $resolved[0], $resolved[1] ) ,
+            is_object( $resolved ) && ! $resolved instanceof Closure          => new ReflectionMethod( $resolved, '__invoke' ) ,
+            is_string( $resolved ) && str_contains( $resolved , '::' ) => new ReflectionMethod( ...explode( '::', $resolved, 2 ) ) ,
             default                                                           => new ReflectionFunction( $resolved ), // Closure or plain function name
         };
 
@@ -138,9 +139,9 @@ class Reflection
 
         foreach ( $reflection->getParameters() as $p )
         {
-            $type      = $p->getType();
-            $typeName  = null;
-            $nullable  = false;
+            $type      = $p->getType() ;
+            $typeName  = null ;
+            $nullable  = false ;
 
             if ( $type instanceof ReflectionUnionType )
             {
@@ -150,35 +151,35 @@ class Reflection
                     $types[] = $t->getName();
                     if ( $t->getName() === 'null' )
                     {
-                        $nullable = true;
+                        $nullable = true ;
                     }
                 }
-                $typeName = implode('|', $types);
+                $typeName = implode('|', $types) ;
             }
             elseif ( $type instanceof ReflectionNamedType )
             {
-                $typeName = $type->getName();
-                $nullable = $type->allowsNull();
+                $typeName = $type->getName() ;
+                $nullable = $type->allowsNull() ;
             }
 
             $paramData =
             [
-                'name'     => $p->getName(),
-                'type'     => $typeName,
-                'optional' => $p->isOptional(),
-                'nullable' => $nullable,
-                'variadic' => $p->isVariadic(),
+                CallableParameter::NAME     => $p->getName()    ,
+                CallableParameter::TYPE     => $typeName        ,
+                CallableParameter::OPTIONAL => $p->isOptional() ,
+                CallableParameter::NULLABLE => $nullable        ,
+                CallableParameter::VARIADIC => $p->isVariadic() ,
             ];
 
             if ( $p->isDefaultValueAvailable() )
             {
-                $paramData['default'] = $p->getDefaultValue();
+                $paramData[ CallableParameter::DEFAULT ] = $p->getDefaultValue() ;
             }
 
-            $result[] = $paramData;
+            $result[] = $paramData ;
         }
 
-        return $result;
+        return $result ;
     }
 
     /**
