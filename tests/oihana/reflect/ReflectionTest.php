@@ -910,4 +910,23 @@ class ReflectionTest extends TestCase
         $this->expectException( TypeError::class );
         $this->reflection->hydrate( [ 'count' => 'not-a-number' ] , MockScalarCoercion::class );
     }
+
+    // ------------------------------------------------ Hydration plan cache
+
+    /**
+     * Hydrating the same class several times (cached plan) yields independent, correct objects.
+     *
+     * @throws ReflectionException
+     */
+    public function testHydratePlanCacheReuse()
+    {
+        $first  = $this->reflection->hydrate( [ 'name' => 'Alice' , 'address' => [ 'city' => 'Paris'  ] ] , MockUser::class );
+        $second = $this->reflection->hydrate( [ 'name' => 'Bob'   , 'address' => [ 'city' => 'Berlin' ] ] , MockUser::class );
+
+        $this->assertNotSame( $first , $second );
+        $this->assertSame( 'Alice'  , $first->name );
+        $this->assertSame( 'Paris'  , $first->address->city );
+        $this->assertSame( 'Bob'    , $second->name );
+        $this->assertSame( 'Berlin' , $second->address->city );
+    }
 }

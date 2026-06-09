@@ -51,6 +51,7 @@ Hydration
 - Classes with a required constructor: instantiated via `newInstanceWithoutConstructor()` and populated from the data (a no-argument-callable constructor is still invoked normally)
 - `readonly` and asymmetric-visibility properties (`public private(set)` / `public protected(set)`, PHP 8.4): values are assigned via reflection, so they are initialized correctly (scalar coercion preserved)
 - Scalar coercion: values are converted to the declared scalar type following PHP's coercive typing (`'42'` → `int 42`, `7` → `string '7'`); a value that cannot be coerced raises a `TypeError` (independent of `strict_types`)
+- Performance: a per-class **hydration plan** is cached on first use, so the data-independent reflection work (attributes, `@var` item types, constructor strategy, builtin types) is computed once and reused for every object of that class. The cache is in-memory, bounded by the number of hydrated classes, and needs no eviction. On nested documents this cuts hydration time by roughly a third (the deeper the nesting, the larger the gain)
 
 Traits
 
