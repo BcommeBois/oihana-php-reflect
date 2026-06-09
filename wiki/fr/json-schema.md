@@ -1,0 +1,48 @@
+# JSON Schema
+
+[← Retour au sommaire](README.md)
+
+`oihana\reflect\traits\JsonSchemaTrait` génère un **JSON Schema (draft 2020-12)** à partir des propriétés publiques d'une classe, et valide des données contre celui-ci. Il introspecte les types de propriétés, la nullabilité et les doc-comments.
+
+```php
+use oihana\reflect\traits\JsonSchemaTrait;
+
+class User
+{
+    use JsonSchemaTrait;
+
+    /** Le nom complet de l'utilisateur. */
+    public string  $name;
+    public ?int    $age = null;
+    public bool    $active = true;
+}
+```
+
+## Générer un schéma
+
+```php
+User::jsonSchema();          // statique — array (le JSON Schema)
+new User()->toJsonSchema();  // instance — même résultat
+```
+
+Le schéma généré inclut les types de propriétés, les informations requis/nullable et les descriptions extraites des doc-comments. Passez `strict: false` pour assouplir la génération.
+
+## Valider des données
+
+```php
+$errors = User::validateWithJsonSchema( [ 'name' => 'Alice', 'age' => 30 ] );      // statique
+$errors = new User()->validateDataWithJsonSchema( [ 'name' => 'Alice' ] );          // instance
+```
+
+Ces méthodes retournent la liste des erreurs de validation (vide quand les données sont valides).
+
+## Enums associés
+
+Les mots-clés, types et versions de draft sont exposés comme constantes nommées :
+
+- `oihana\reflect\enums\JsonSchemaDraft` — versions de draft ;
+- `oihana\reflect\enums\JsonSchemaKeyword` — mots-clés du schéma ;
+- `oihana\reflect\enums\JsonSchemaType` — types du schéma ;
+- `oihana\reflect\enums\PhpType` — les principaux noms de types PHP.
+
+> Note : le générateur mappe les types de propriétés PHP vers les types JSON Schema. La prise en compte des conventions d'hydratation plus riches (contraintes `enum` pour les enums backed, renommages `#[HydrateKey]`, formats `date-time`) est suivie comme une amélioration future.
