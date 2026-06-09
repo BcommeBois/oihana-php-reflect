@@ -28,6 +28,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - ReflectionTrait : Rename the jsonSerializePublicProperties method in toArray( array $options = [] ) 
   - Reflection::describeCallableParameters now resolves the callable through the shared `oihana\core\callables\resolveCallable()` helper. An unresolvable callable (e.g. `"Unknown::method"`) now throws `InvalidArgumentException` instead of `ReflectionException` — both were already declared in the method's `@throws`.
 
+### Fixed
+  - Reflection::hydrate : the `@var Class[]` / `@var array<Class>` PHPDoc hydration of `array` properties never ran — the parsed item type kept the `[]` / `array<>` wrapper (so `class_exists()` was always false) and the pattern did not accept namespaced or leading-backslash class names. Array elements are now hydrated into the documented class.
+
 ## [1.0.3] - 2025-08-24
 
 ### Added

@@ -449,10 +449,10 @@ class Reflection
                         if
                         (
                             $doc &&
-                            preg_match('/@var\s+((\w+(?:\\\w+)*)\[]|array<(\w+(?:\\\w+)*)>)/' , $doc , $matches )
+                            preg_match('/@var\s+(?:([\w\\\\]+)\[]|array<([\w\\\\]+)>)/' , $doc , $matches )
                         )
                         {
-                            $itemClass = $matches[1] ?: $matches[2] ; // Support both Type[] and array<Type>
+                            $itemClass = ( $matches[1] ?? '' ) ?: ( $matches[2] ?? '' ) ; // bare class name from Type[] or array<Type>
                             if ( class_exists( $itemClass ) )
                             {
                                 $value    = array_map( fn( $v ) => is_array( $v ) ? $this->hydrate( $v , $itemClass ) : $v , $value );

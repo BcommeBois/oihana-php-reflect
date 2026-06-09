@@ -13,6 +13,7 @@ use oihana\reflect\Reflection;
 
 use tests\oihana\reflect\mocks\MockAddress;
 use tests\oihana\reflect\mocks\MockCreativeWork;
+use tests\oihana\reflect\mocks\MockDocCommentArray;
 use tests\oihana\reflect\mocks\MockEnum;
 use tests\oihana\reflect\mocks\MockGeo;
 use tests\oihana\reflect\mocks\MockOrganization;
@@ -232,6 +233,30 @@ class ReflectionTest extends TestCase
         $work4 = $this->reflection->hydrate($data4, MockCreativeWork::class);
 
         $this->assertNull($work4->sponsor);
+    }
+
+    /**
+     * Regression: an `array` property annotated with `@var Class[]` (no
+     * HydrateWith attribute) hydrates each element into the documented class.
+     *
+     * @throws ReflectionException
+     */
+    public function testHydrateArrayFromVarDocComment()
+    {
+        $data = [
+            'addresses' => [
+                [ 'city' => 'Nice' ],
+                [ 'city' => 'Paris' ],
+            ],
+        ];
+
+        $result = $this->reflection->hydrate($data, MockDocCommentArray::class);
+
+        $this->assertCount      ( 2 , $result->addresses ) ;
+        $this->assertInstanceOf ( MockAddress::class , $result->addresses[0] ) ;
+        $this->assertEquals     ( 'Nice' , $result->addresses[0]->city ) ;
+        $this->assertInstanceOf ( MockAddress::class , $result->addresses[1] );
+        $this->assertEquals     ( 'Paris' , $result->addresses[1]->city ) ;
     }
 
     /**
