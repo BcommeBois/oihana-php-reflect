@@ -32,6 +32,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - Reflection::hydrate now assigns property values through `ReflectionProperty::setValue()` instead of a direct assignment, so `readonly` properties and asymmetric-visibility properties (`public private(set)` / `public protected(set)`, PHP 8.4) are initialized correctly instead of throwing. Scalar type coercion and the public-only contract are preserved.
   - Reflection::hydrate now caches a per-class hydration plan (resolved attributes, `@var` item types, constructor strategy, builtin types) so the data-independent reflection work runs once per class instead of once per object. Behaviour is unchanged; in-memory and bounded by the number of hydrated classes (no eviction needed). Measured ~35% faster when hydrating large batches of nested documents (e.g. ArangoDB result sets).
 
+- Attributes
+  - `#[Transient]` and its equivalent alias `#[HydrateIgnore]` : exclude a public property from both hydration (input) and `ReflectionTrait::toArray()` (output). Detection uses `ReflectionAttribute::IS_INSTANCEOF`, so either name triggers the same behaviour. Useful for computed/derived properties.
 - Reflection introspection
   - Reflection : `hasMethod()`, `hasProperty()`, `propertyType()` and `namespace()` (with `ReflectionTrait` wrappers `hasMethod()`, `hasProperty()`, `getPropertyType()`, `getNamespace()`). `propertyType()` renders union types as `A|B` and intersection types as `A&B`.
 

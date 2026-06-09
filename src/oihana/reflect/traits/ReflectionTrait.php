@@ -2,11 +2,13 @@
 
 namespace oihana\reflect\traits ;
 
+use ReflectionAttribute;
 use ReflectionException;
 use ReflectionProperty;
 
 use oihana\core\options\ArrayOption;
 use oihana\reflect\Reflection;
+use oihana\reflect\attributes\Transient;
 
 use function oihana\core\arrays\prepare;
 
@@ -426,6 +428,12 @@ trait ReflectionTrait
         foreach ( $properties as $property )
         {
             $name = $property->getName() ;
+
+            // #[Transient] / #[HydrateIgnore] : never emitted.
+            if ( !empty( $property->getAttributes( Transient::class , ReflectionAttribute::IS_INSTANCEOF ) ) )
+            {
+                continue ;
+            }
 
             if( !$property->isInitialized( $this ) )
             {

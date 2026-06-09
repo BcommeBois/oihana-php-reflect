@@ -46,6 +46,7 @@ Hydration
   - `#[HydrateKey('source_key')]` to rename incoming keys
   - `#[HydrateWith(Foo::class, Bar::class)]` for arrays of objects, including polymorphism via `@type`/`type` or property-guessing
   - `#[HydrateAs(Foo::class)]` to override ambiguous types (`object`, `array`, `mixed`, unions)
+  - `#[Transient]` (or its alias `#[HydrateIgnore]`) to exclude a public property from both hydration (input) and `toArray()` (output) — e.g. computed/derived properties
 - PHPDoc `@var Type[]` and `@var array<Type>` support for array element types
 - Backed enums: scalar values are resolved to enum cases via `Enum::from()` (single values, and arrays of enums via `#[HydrateWith]` or `@var Enum[]`). Pure (non-backed) enums have no scalar representation: hydrating one from a scalar throws an `InvalidArgumentException` — declare a backed enum instead
 - `DateTimeInterface`: scalar values are resolved to date instances (string → parsed date, int → Unix timestamp). In a union with a scalar (e.g. `string|DateTimeInterface`), the raw value is kept unless `#[HydrateAs(DateTimeImmutable::class)]` forces the conversion

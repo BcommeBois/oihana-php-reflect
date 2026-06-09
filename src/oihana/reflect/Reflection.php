@@ -9,6 +9,7 @@ use DateTimeInterface;
 use InvalidArgumentException;
 
 use oihana\reflect\enums\PhpType;
+use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionClassConstant;
 use ReflectionException;
@@ -24,6 +25,7 @@ use ReflectionUnionType;
 use oihana\reflect\attributes\HydrateAs;
 use oihana\reflect\attributes\HydrateKey;
 use oihana\reflect\attributes\HydrateWith;
+use oihana\reflect\attributes\Transient;
 use oihana\reflect\enums\CallableParameter;
 use oihana\reflect\enums\HydrateDiscriminator;
 use oihana\reflect\enums\HydrationPlan;
@@ -46,6 +48,8 @@ use function oihana\core\callables\resolveCallable;
  *   - {@see HydrateKey} to map incoming keys to a different property name
  *   - {@see HydrateWith} to hydrate arrays of objects (supports polymorphic items)
  *   - {@see HydrateAs} to enforce a target class for ambiguous property types
+ *   - {@see Transient} / {@see \oihana\reflect\attributes\HydrateIgnore} to exclude a public
+ *     property from both hydration (input) and {@see ReflectionTrait::toArray()} (output)
  * - PHPDoc support for array element types via `@var `XXX`[]` and `@var array<Type>`
  * - Backed enums: scalar values are resolved to enum cases via `Enum::from()`
  *   (single values and arrays of enums via {@see HydrateWith} or `@var Enum[]`).
@@ -634,6 +638,12 @@ class Reflection
 
         foreach ( $reflectionClass->getProperties() as $property )
         {
+            // #[Transient] / #[HydrateIgnore] : excluded from hydration (and from toArray()).
+            if ( !empty( $property->getAttributes( Transient::class , ReflectionAttribute::IS_INSTANCEOF ) ) )
+            {
+                continue ;
+            }
+
             $key     = $property->getName() ;
             $keyAttr = $property->getAttributes( HydrateKey::class ) ;
             if ( !empty( $keyAttr ) )

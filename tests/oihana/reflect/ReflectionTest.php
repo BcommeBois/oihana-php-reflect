@@ -34,6 +34,7 @@ use tests\oihana\reflect\mocks\MockColor;
 use tests\oihana\reflect\mocks\MockIntrospection;
 use tests\oihana\reflect\mocks\MockPriority;
 use tests\oihana\reflect\mocks\MockStatus;
+use tests\oihana\reflect\mocks\MockTransient;
 use tests\oihana\reflect\mocks\MockWithPureEnum;
 use tests\oihana\reflect\mocks\MockWithDate;
 use tests\oihana\reflect\mocks\MockWithReadonly;
@@ -1050,5 +1051,60 @@ class ReflectionTest extends TestCase
         $parts = explode( '|' , $this->reflection->parameterType( $object::class , 'demo' , 'x' ) );
         sort( $parts );
         $this->assertSame( [ 'int' , 'string' ] , $parts );
+    }
+
+    // ------------------------------------------------ Transient (C3)
+
+    /**
+     * #[Transient] : the property is not populated from the input data.
+     *
+     * @throws ReflectionException
+     */
+    public function testHydrateIgnoresTransientProperty()
+    {
+        $object = $this->reflection->hydrate(
+            [ 'subtotal' => 100.0 , 'tax' => 20.0 , 'total' => 999.0 ] ,
+            MockTransient::class
+        );
+
+        $this->assertSame( 100.0 , $object->subtotal );
+        $this->assertSame( 20.0 , $object->tax );
+        $this->assertSame( 0.0 , $object->total ); // ignored: kept its declared default, not 999
+    }
+
+    /**
+     * #[HydrateIgnore] (alias of #[Transient]) : also ignored on hydration.
+     *
+     * @throws ReflectionException
+     */
+    public function testHydrateIgnoresHydrateIgnoreAliasProperty()
+    {
+        $object = $this->reflection->hydrate(
+            [ 'cachedToken' => 'should-be-ignored' ] ,
+            MockTransient::class
+        );
+
+        $this->assertNull( $object->cachedToken );
+    }
+
+    /**
+     * #[Transient] / #[HydrateIgnore] properties are excluded from toArray() output.
+     *
+     * @throws ReflectionException
+     */
+    public function testToArrayExcludesTransientProperties()
+    {
+        $object = new MockTransient();
+        $object->subtotal    = 100.0;
+        $object->tax         = 20.0;
+        $object->total       = 120.0;
+        $object->cachedToken = 'secret';
+
+        $array = $object->toArray();
+
+        $this->assertArrayHasKey( 'subtotal' , $array );
+        $this->assertArrayHasKey( 'tax' , $array );
+        $this->assertArrayNotHasKey( 'total' , $array );        // #[Transient]
+        $this->assertArrayNotHasKey( 'cachedToken' , $array );  // #[HydrateIgnore]
     }
 }
