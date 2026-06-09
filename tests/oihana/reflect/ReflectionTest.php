@@ -10,9 +10,9 @@ use ReflectionClassConstant;
 use ReflectionException;
 use ReflectionMethod;
 use TypeError;
-use ValueError;
 
 use oihana\reflect\Reflection;
+use oihana\reflect\exceptions\HydrationException;
 
 
 use tests\oihana\reflect\mocks\MockAddress;
@@ -620,7 +620,8 @@ class ReflectionTest extends TestCase
      */
     public function testHydrateInvalidEnumValueThrows()
     {
-        $this->expectException( ValueError::class );
+        // The underlying ValueError is wrapped into a HydrationException (C4).
+        $this->expectException( HydrationException::class );
         $this->reflection->hydrate( [ 'status' => 'unknown' ] , MockWithEnum::class );
     }
 
@@ -938,14 +939,35 @@ class ReflectionTest extends TestCase
     }
 
     /**
-     * Fail loud: a value that cannot be coerced to the declared scalar type throws TypeError.
+     * Fail loud: a value that cannot be coerced to the declared scalar type throws.
+     * The underlying TypeError is wrapped into a HydrationException (C4).
      *
      * @throws ReflectionException
      */
     public function testHydrateNonCoercibleScalarThrows()
     {
-        $this->expectException( TypeError::class );
+        $this->expectException( HydrationException::class );
         $this->reflection->hydrate( [ 'count' => 'not-a-number' ] , MockScalarCoercion::class );
+    }
+
+    /**
+     * A wrapped HydrationException carries the class/property context and the original error.
+     *
+     * @throws ReflectionException
+     */
+    public function testHydrationExceptionCarriesContext()
+    {
+        try
+        {
+            $this->reflection->hydrate( [ 'count' => 'not-a-number' ] , MockScalarCoercion::class );
+            $this->fail( 'Expected a HydrationException' );
+        }
+        catch ( HydrationException $e )
+        {
+            $this->assertSame( MockScalarCoercion::class , $e->getClassName() );
+            $this->assertSame( 'count' , $e->getPropertyName() );
+            $this->assertInstanceOf( TypeError::class , $e->getPrevious() );
+        }
     }
 
     // ------------------------------------------------ Hydration plan cache

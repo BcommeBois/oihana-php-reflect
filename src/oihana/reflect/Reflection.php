@@ -21,6 +21,7 @@ use ReflectionParameter;
 use ReflectionProperty;
 use ReflectionType;
 use ReflectionUnionType;
+use Throwable;
 
 use oihana\reflect\attributes\HydrateAs;
 use oihana\reflect\attributes\HydrateKey;
@@ -29,6 +30,7 @@ use oihana\reflect\attributes\Transient;
 use oihana\reflect\enums\CallableParameter;
 use oihana\reflect\enums\HydrateDiscriminator;
 use oihana\reflect\enums\HydrationPlan;
+use oihana\reflect\exceptions\HydrationException;
 
 use function oihana\core\arrays\isAssociative;
 use function oihana\core\callables\resolveCallable;
@@ -294,7 +296,10 @@ class Reflection
      *
      * @return object The hydrated object instance.
      *
-     * @throws InvalidArgumentException If the class does not exist or required non-nullable property is null.
+     * @throws HydrationException If hydration fails (missing class, non-nullable property set to
+     *         null, invalid enum value, non-coercible scalar, unparsable date, ...). It extends
+     *         `InvalidArgumentException` and exposes the class/property context and the original
+     *         error via `getPrevious()`.
      * @throws ReflectionException If property introspection fails.
      *
      * @example Flat object hydration
@@ -401,7 +406,7 @@ class Reflection
     {
         if ( !class_exists( $class ) )
         {
-            throw new InvalidArgumentException("hydrate failed, the class '$class' does not exist.");
+            throw new HydrationException( "hydrate failed, the class '$class' does not exist." , $class );
         }
 
         // Per-class hydration plan : the data-independent reflection work (attributes,
@@ -427,6 +432,10 @@ class Reflection
             $value    = $thing[ $propertyKey ] ;
             $property = $meta[ HydrationPlan::PROPERTY ] ;
 
+            // Any lower-level failure (invalid enum value, non-coercible scalar, unparsable
+            // date, ...) is unified under HydrationException, with the class/property context.
+            try
+            {
             if ( $meta[ HydrationPlan::HAS_TYPE ] )
             {
                 $types            = $meta[ HydrationPlan::TYPES ] ;
@@ -597,7 +606,7 @@ class Reflection
 
                 if ( !$hydrated && $value === null && !$meta[ HydrationPlan::ALLOWS_NULL ] )
                 {
-                    throw new InvalidArgumentException("Property {$property->getName()} does not allow null" ) ;
+                    throw new HydrationException( "Property {$property->getName()} does not allow null" , $class , $property->getName() ) ;
                 }
             }
 
@@ -607,6 +616,16 @@ class Reflection
                 // asymmetric-visibility properties (public private(set)/protected(set))
                 // can be initialized; scalar type coercion is preserved.
                 $property->setValue( $object , $value ) ;
+            }
+            }
+            catch ( HydrationException $e )
+            {
+                throw $e ; // already carries context (our explicit throws or a nested hydrate)
+            }
+            catch ( Throwable $e )
+            {
+                $name = $property->getName() ;
+                throw new HydrationException( "Failed to hydrate property '$name' of '$class': " . $e->getMessage() , $class , $name , $e ) ;
             }
         }
 
@@ -1144,9 +1163,10 @@ class Reflection
             }
 
             // Pure (non-backed) enum: no scalar representation -> fail loud with a clear message.
-            throw new InvalidArgumentException
+            throw new HydrationException
             (
-                "Cannot hydrate the pure (non-backed) enum '$enumClass' from a scalar value; declare it as a backed enum instead."
+                "Cannot hydrate the pure (non-backed) enum '$enumClass' from a scalar value; declare it as a backed enum instead." ,
+                $enumClass
             ) ;
         }
 
