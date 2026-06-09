@@ -2,6 +2,7 @@
 
 namespace oihana\reflect;
 
+use BackedEnum;
 use Closure;
 use InvalidArgumentException;
 
@@ -39,6 +40,8 @@ use function oihana\core\callables\resolveCallable;
  *   - {@see HydrateWith} to hydrate arrays of objects (supports polymorphic items)
  *   - {@see HydrateAs} to enforce a target class for ambiguous property types
  * - PHPDoc support for array element types via `@var `XXX`[]` and `@var array<Type>`
+ * - Backed enums: scalar values are resolved to enum cases via `Enum::from()`
+ *   (single values and arrays of enums via {@see HydrateWith} or `@var Enum[]`)
  * - Assigns public properties only (private/protected are ignored by design)
  *
  * Caching:
@@ -413,6 +416,18 @@ class Reflection
                         }
                     }
 
+                    // Backed enum : scalar value -> enum instance (e.g. 'active' -> Status::Active)
+                    if ( enum_exists( $typeName ) )
+                    {
+                        $value = $this->castEnum( $typeName , $value ) ;
+                        if ( $value instanceof $typeName )
+                        {
+                            $hydrated = true ;
+                            break ;
+                        }
+                        // null / non-scalar / pure enum : fall through to default handling
+                    }
+
                     if ( $typeName === 'array' && is_array( $value ) )
                     {
                         // 1. #[HydrateWith(MyClass::class, AnotherClass::class)]
@@ -433,6 +448,10 @@ class Reflection
                                     {
                                         $hydratedArray[] = $item ; // Do nothing
                                     }
+                                }
+                                else if ( count( $possibleClasses ) === 1 && enum_exists( $possibleClasses[0] ) )
+                                {
+                                    $hydratedArray[] = $this->castEnum( $possibleClasses[0] , $item ) ;
                                 }
                                 else
                                 {
@@ -455,7 +474,14 @@ class Reflection
                             $itemClass = ( $matches[1] ?? '' ) ?: ( $matches[2] ?? '' ) ; // bare class name from Type[] or array<Type>
                             if ( class_exists( $itemClass ) )
                             {
-                                $value    = array_map( fn( $v ) => is_array( $v ) ? $this->hydrate( $v , $itemClass ) : $v , $value );
+                                $isEnum   = enum_exists( $itemClass ) ;
+                                $value    = array_map
+                                (
+                                    fn( $v ) => is_array( $v )
+                                              ? $this->hydrate( $v , $itemClass )
+                                              : ( $isEnum ? $this->castEnum( $itemClass , $v ) : $v ) ,
+                                    $value
+                                );
                                 $hydrated = true ;
                                 break;
                             }
@@ -805,6 +831,44 @@ class Reflection
      * @var array<string, ReflectionClass>
      */
     protected array $reflections = [] ;
+
+    /**
+     * Converts a scalar value into a backed-enum instance when possible.
+     *
+     * Resolution rules:
+     * - If `$value` is already an instance of `$enumClass`, it is returned unchanged.
+     * - If `$enumClass` is a {@see BackedEnum} and `$value` is an int or a string,
+     *   the matching case is resolved via `$enumClass::from()` (throws {@see \ValueError}
+     *   on an unknown value, by design — invalid input must fail loudly).
+     * - Otherwise (null, non-scalar value, or a pure/non-backed enum) the original
+     *   `$value` is returned unchanged so the caller can apply its default handling.
+     *
+     * @param class-string $enumClass The fully-qualified enum class name.
+     * @param mixed        $value     The incoming value to convert.
+     *
+     * @return mixed The enum instance, or the original value when no conversion applies.
+     *
+     * @example
+     * ```php
+     * enum Status: string { case Active = 'active'; }
+     * $this->castEnum( Status::class , 'active' ); // Status::Active
+     * $this->castEnum( Status::class , Status::Active ); // Status::Active (unchanged)
+     * ```
+     */
+    private function castEnum( string $enumClass , mixed $value ) : mixed
+    {
+        if ( $value instanceof $enumClass )
+        {
+            return $value ;
+        }
+
+        if ( is_subclass_of( $enumClass , BackedEnum::class ) && ( is_int( $value ) || is_string( $value ) ) )
+        {
+            return $enumClass::from( $value ) ;
+        }
+
+        return $value ;
+    }
 
     /**
      * Determines the most appropriate class type for a given array item.

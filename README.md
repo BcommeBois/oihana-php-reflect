@@ -46,6 +46,7 @@ Hydration
   - `#[HydrateWith(Foo::class, Bar::class)]` for arrays of objects, including polymorphism via `@type`/`type` or property-guessing
   - `#[HydrateAs(Foo::class)]` to override ambiguous types (`object`, `array`, `mixed`, unions)
 - PHPDoc `@var Type[]` and `@var array<Type>` support for array element types
+- Backed enums: scalar values are resolved to enum cases via `Enum::from()` (single values, and arrays of enums via `#[HydrateWith]` or `@var Enum[]`)
 
 Traits
 

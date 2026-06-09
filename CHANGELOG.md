@@ -23,6 +23,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Utils
   - CborSerializer tool : cbor serializer helper
   - JsonSerializer tool : json serializer with temporary options.
+- Hydration
+  - Reflection::hydrate now resolves backed enums : a scalar value whose target property is a `BackedEnum` is converted to the matching case via `Enum::from()` (throws `ValueError` on an unknown value). Also applies to arrays of enums declared via `#[HydrateWith(Enum::class)]` or `@var Enum[]`. Values already holding an enum instance are kept as-is ; pure (non-backed) enums are left untouched.
 
 ### Changed
   - ReflectionTrait : Rename the jsonSerializePublicProperties method in toArray( array $options = [] ) 

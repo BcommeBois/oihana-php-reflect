@@ -7,6 +7,7 @@ use InvalidArgumentException;
 use ReflectionClassConstant;
 use ReflectionException;
 use ReflectionMethod;
+use ValueError;
 
 use oihana\reflect\Reflection;
 
@@ -23,6 +24,9 @@ use tests\oihana\reflect\mocks\MockGeo;
 use tests\oihana\reflect\mocks\MockOrganization;
 use tests\oihana\reflect\mocks\MockPerson;
 use tests\oihana\reflect\mocks\MockPolymorphicContainer;
+use tests\oihana\reflect\mocks\MockPriority;
+use tests\oihana\reflect\mocks\MockStatus;
+use tests\oihana\reflect\mocks\MockWithEnum;
 use tests\oihana\reflect\mocks\MockUser;
 use tests\oihana\reflect\mocks\MockWithRenameKey;
 
@@ -559,5 +563,70 @@ class ReflectionTest extends TestCase
 
         $this->assertSame(42, $result->items[0]);
         $this->assertInstanceOf(MockAddress::class, $result->items[1]);
+    }
+
+    // ------------------------------------------------------------------ Enums
+
+    /**
+     * @throws ReflectionException
+     */
+    public function testHydrateStringBackedEnumFromScalar()
+    {
+        $object = $this->reflection->hydrate( [ 'status' => 'inactive' ] , MockWithEnum::class );
+        $this->assertSame( MockStatus::Inactive , $object->status );
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function testHydrateIntBackedEnumFromScalar()
+    {
+        $object = $this->reflection->hydrate( [ 'status' => 'active' , 'priority' => 10 ] , MockWithEnum::class );
+        $this->assertSame( MockPriority::High , $object->priority );
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function testHydrateEnumKeepsExistingInstance()
+    {
+        $object = $this->reflection->hydrate( [ 'status' => MockStatus::Active ] , MockWithEnum::class );
+        $this->assertSame( MockStatus::Active , $object->status );
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function testHydrateNullableEnumWithNullStaysNull()
+    {
+        $object = $this->reflection->hydrate( [ 'status' => 'active' , 'priority' => null ] , MockWithEnum::class );
+        $this->assertNull( $object->priority );
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function testHydrateInvalidEnumValueThrows()
+    {
+        $this->expectException( ValueError::class );
+        $this->reflection->hydrate( [ 'status' => 'unknown' ] , MockWithEnum::class );
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function testHydrateArrayOfEnumsViaHydrateWith()
+    {
+        $object = $this->reflection->hydrate( [ 'status' => 'active' , 'history' => [ 'active' , 'inactive' ] ] , MockWithEnum::class );
+        $this->assertSame( [ MockStatus::Active , MockStatus::Inactive ] , $object->history );
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function testHydrateArrayOfEnumsViaVarDocComment()
+    {
+        $object = $this->reflection->hydrate( [ 'status' => 'active' , 'levels' => [ 1 , 10 ] ] , MockWithEnum::class );
+        $this->assertSame( [ MockPriority::Low , MockPriority::High ] , $object->levels );
     }
 }

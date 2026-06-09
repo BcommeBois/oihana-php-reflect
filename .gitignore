@@ -30,3 +30,6 @@ coverage.xml
 
 # Node
 node_modules/
+
+# Working notes / planning (local only, never committed)
+/todo/
