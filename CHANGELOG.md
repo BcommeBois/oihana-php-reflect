@@ -25,6 +25,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - JsonSerializer tool : json serializer with temporary options.
 - Hydration
   - Reflection::hydrate now resolves backed enums : a scalar value whose target property is a `BackedEnum` is converted to the matching case via `Enum::from()` (throws `ValueError` on an unknown value). Also applies to arrays of enums declared via `#[HydrateWith(Enum::class)]` or `@var Enum[]`. Values already holding an enum instance are kept as-is ; pure (non-backed) enums are left untouched.
+  - Reflection::hydrate now resolves `DateTimeInterface` properties : a `string` is parsed as a date (ISO 8601 or any format the constructor understands, throws on an unparsable value) and an `int` is read as a Unix timestamp. The concrete class is preserved (`DateTime` stays mutable, `DateTimeImmutable`/subclasses immutable, the abstract `DateTimeInterface` defaults to `DateTimeImmutable`). In a union that also accepts a builtin scalar (e.g. `string|DateTimeInterface`, `null|string|int`) the raw value is kept as-is, unless `#[HydrateAs(DateTimeImmutable::class)]` explicitly forces the conversion. Values already holding a date instance are kept as-is. Also applies to arrays of dates declared via `@var DateTimeImmutable[]`.
 
 ### Changed
   - ReflectionTrait : Rename the jsonSerializePublicProperties method in toArray( array $options = [] ) 

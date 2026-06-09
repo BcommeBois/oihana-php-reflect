@@ -2,6 +2,8 @@
 
 namespace tests\oihana\reflect;
 
+use DateTime;
+use DateTimeImmutable;
 use InvalidArgumentException;
 
 use ReflectionClassConstant;
@@ -26,6 +28,7 @@ use tests\oihana\reflect\mocks\MockPerson;
 use tests\oihana\reflect\mocks\MockPolymorphicContainer;
 use tests\oihana\reflect\mocks\MockPriority;
 use tests\oihana\reflect\mocks\MockStatus;
+use tests\oihana\reflect\mocks\MockWithDate;
 use tests\oihana\reflect\mocks\MockWithEnum;
 use tests\oihana\reflect\mocks\MockUser;
 use tests\oihana\reflect\mocks\MockWithRenameKey;
@@ -628,5 +631,110 @@ class ReflectionTest extends TestCase
     {
         $object = $this->reflection->hydrate( [ 'status' => 'active' , 'levels' => [ 1 , 10 ] ] , MockWithEnum::class );
         $this->assertSame( [ MockPriority::Low , MockPriority::High ] , $object->levels );
+    }
+
+    // -------------------------------------------------------------- DateTime
+
+    /**
+     * @throws ReflectionException
+     */
+    public function testHydrateImmutableDateFromIsoString()
+    {
+        $object = $this->reflection->hydrate( [ 'createdAt' => '2024-01-02T03:04:05+00:00' ] , MockWithDate::class );
+        $this->assertInstanceOf( DateTimeImmutable::class , $object->createdAt );
+        $this->assertSame( '2024-01-02T03:04:05+00:00' , $object->createdAt->format( 'c' ) );
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function testHydrateMutableDateKeepsConcreteClass()
+    {
+        $object = $this->reflection->hydrate( [ 'updatedAt' => '2024-05-06' ] , MockWithDate::class );
+        $this->assertInstanceOf( DateTime::class , $object->updatedAt );
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function testHydrateDateInterfaceDefaultsToImmutable()
+    {
+        $object = $this->reflection->hydrate( [ 'publishedAt' => '2024-05-06' ] , MockWithDate::class );
+        $this->assertInstanceOf( DateTimeImmutable::class , $object->publishedAt );
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function testHydrateDateFromIntTimestamp()
+    {
+        $object = $this->reflection->hydrate( [ 'createdAt' => 1704067200 ] , MockWithDate::class );
+        $this->assertInstanceOf( DateTimeImmutable::class , $object->createdAt );
+        $this->assertSame( 1704067200 , $object->createdAt->getTimestamp() );
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function testHydrateDateKeepsExistingInstance()
+    {
+        $date   = new DateTimeImmutable( '2020-01-01' );
+        $object = $this->reflection->hydrate( [ 'createdAt' => $date ] , MockWithDate::class );
+        $this->assertSame( $date , $object->createdAt );
+    }
+
+    /**
+     * Scalar wins : a union containing string keeps the raw string (schema.org value object style).
+     *
+     * @throws ReflectionException
+     */
+    public function testHydrateUnionWithStringKeepsRawString()
+    {
+        $object = $this->reflection->hydrate( [ 'endDate' => '2024-12-31' ] , MockWithDate::class );
+        $this->assertSame( '2024-12-31' , $object->endDate );
+    }
+
+    /**
+     * Real schema.org pattern (null|string|int) : never converted.
+     *
+     * @throws ReflectionException
+     */
+    public function testHydrateNonDateUnionIsUntouched()
+    {
+        $asString = $this->reflection->hydrate( [ 'startDate' => '2024-12-31' ] , MockWithDate::class );
+        $this->assertSame( '2024-12-31' , $asString->startDate );
+
+        $asInt = $this->reflection->hydrate( [ 'startDate' => 1704067200 ] , MockWithDate::class );
+        $this->assertSame( 1704067200 , $asInt->startDate );
+    }
+
+    /**
+     * Explicit #[HydrateAs] forces date parsing even when the union accepts a string.
+     *
+     * @throws ReflectionException
+     */
+    public function testHydrateForcedDateViaHydrateAs()
+    {
+        $object = $this->reflection->hydrate( [ 'forcedDate' => '2024-12-31' ] , MockWithDate::class );
+        $this->assertInstanceOf( DateTimeImmutable::class , $object->forcedDate );
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function testHydrateNullableDateWithNullStaysNull()
+    {
+        $object = $this->reflection->hydrate( [ 'createdAt' => null ] , MockWithDate::class );
+        $this->assertNull( $object->createdAt );
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function testHydrateArrayOfDatesViaVarDocComment()
+    {
+        $object = $this->reflection->hydrate( [ 'milestones' => [ '2024-01-01' , '2024-06-01' ] ] , MockWithDate::class );
+        $this->assertCount( 2 , $object->milestones );
+        $this->assertContainsOnlyInstancesOf( DateTimeImmutable::class , $object->milestones );
     }
 }

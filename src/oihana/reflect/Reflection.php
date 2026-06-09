@@ -4,6 +4,8 @@ namespace oihana\reflect;
 
 use BackedEnum;
 use Closure;
+use DateTimeImmutable;
+use DateTimeInterface;
 use InvalidArgumentException;
 
 use ReflectionClass;
@@ -42,6 +44,9 @@ use function oihana\core\callables\resolveCallable;
  * - PHPDoc support for array element types via `@var `XXX`[]` and `@var array<Type>`
  * - Backed enums: scalar values are resolved to enum cases via `Enum::from()`
  *   (single values and arrays of enums via {@see HydrateWith} or `@var Enum[]`)
+ * - DateTimeInterface: scalar values are resolved to date instances (string → parsed date,
+ *   int → Unix timestamp). A builtin scalar member of a union (e.g. `string|DateTimeInterface`)
+ *   keeps the raw value unless {@see HydrateAs} explicitly forces the date class.
  * - Assigns public properties only (private/protected are ignored by design)
  *
  * Caching:
@@ -389,6 +394,17 @@ class Reflection
                     }
                 }
 
+                // Builtin scalar types declared on the property (used to let a raw scalar
+                // win over a DateTime conversion when the union also accepts it, e.g. string|DateTimeInterface).
+                $builtinTypeNames = [] ;
+                foreach ( $types as $t )
+                {
+                    if ( $t->isBuiltin() )
+                    {
+                        $builtinTypeNames[] = $t->getName() ;
+                    }
+                }
+
                 foreach ( $types as $type )
                 {
                     $typeName = $type->getName();
@@ -426,6 +442,36 @@ class Reflection
                             break ;
                         }
                         // null / non-scalar / pure enum : fall through to default handling
+                    }
+
+                    // DateTimeInterface : scalar value -> date instance.
+                    // A builtin scalar member of the union (string/int/mixed) keeps the raw value,
+                    // unless an explicit #[HydrateAs] forces the date class.
+                    if ( is_a( $typeName , DateTimeInterface::class , true ) )
+                    {
+                        $valueKind = match( true )
+                        {
+                            is_string( $value ) => 'string' ,
+                            is_int( $value )    => 'int'    ,
+                            is_float( $value )  => 'float'  ,
+                            is_bool( $value )   => 'bool'   ,
+                            default             => null     ,
+                        } ;
+
+                        $scalarWins = empty( $hydrateAs )
+                                   && ( in_array( 'mixed' , $builtinTypeNames , true )
+                                     || ( $valueKind !== null && in_array( $valueKind , $builtinTypeNames , true ) ) ) ;
+
+                        if ( !$scalarWins )
+                        {
+                            $value = $this->castDate( $typeName , $value ) ;
+                            if ( $value instanceof DateTimeInterface )
+                            {
+                                $hydrated = true ;
+                                break ;
+                            }
+                        }
+                        // scalar wins / null / non-scalar : fall through to default handling
                     }
 
                     if ( $typeName === 'array' && is_array( $value ) )
@@ -475,11 +521,16 @@ class Reflection
                             if ( class_exists( $itemClass ) )
                             {
                                 $isEnum   = enum_exists( $itemClass ) ;
+                                $isDate   = is_a( $itemClass , DateTimeInterface::class , true ) ;
                                 $value    = array_map
                                 (
-                                    fn( $v ) => is_array( $v )
-                                              ? $this->hydrate( $v , $itemClass )
-                                              : ( $isEnum ? $this->castEnum( $itemClass , $v ) : $v ) ,
+                                    fn( $v ) => match( true )
+                                    {
+                                        is_array( $v ) => $this->hydrate( $v , $itemClass ) ,
+                                        $isEnum        => $this->castEnum( $itemClass , $v ) ,
+                                        $isDate        => $this->castDate( $itemClass , $v ) ,
+                                        default        => $v ,
+                                    } ,
                                     $value
                                 );
                                 $hydrated = true ;
@@ -865,6 +916,56 @@ class Reflection
         if ( is_subclass_of( $enumClass , BackedEnum::class ) && ( is_int( $value ) || is_string( $value ) ) )
         {
             return $enumClass::from( $value ) ;
+        }
+
+        return $value ;
+    }
+
+    /**
+     * Converts a scalar value into a {@see DateTimeInterface} instance when possible.
+     *
+     * Resolution rules:
+     * - If `$value` is already a {@see DateTimeInterface}, it is returned unchanged.
+     * - The concrete class instantiated mirrors the declared type: `DateTime` stays
+     *   mutable, `DateTimeImmutable` (and any subclass) stays immutable, and the abstract
+     *   `DateTimeInterface` defaults to {@see DateTimeImmutable}.
+     * - An `int` is interpreted as a Unix timestamp (seconds).
+     * - A non-empty `string` is parsed as a date (ISO 8601 or any format understood by the
+     *   date constructor) and throws on an unparsable value (fail loud, by design).
+     * - Otherwise (null, empty string, ...) the original `$value` is returned unchanged so
+     *   the caller can apply its default handling.
+     *
+     * Note: a numeric timestamp must be passed as an `int`; a numeric *string* is treated
+     * as a date string, not a timestamp.
+     *
+     * @param class-string $dateClass The declared date class (DateTime, DateTimeImmutable, ... or DateTimeInterface).
+     * @param mixed        $value     The incoming value to convert.
+     *
+     * @return mixed The date instance, or the original value when no conversion applies.
+     *
+     * @example
+     * ```php
+     * $this->castDate( DateTimeImmutable::class , '2024-01-01T00:00:00Z' ); // DateTimeImmutable
+     * $this->castDate( DateTimeImmutable::class , 1704067200 );             // DateTimeImmutable (from timestamp)
+     * ```
+     */
+    private function castDate( string $dateClass , mixed $value ) : mixed
+    {
+        if ( $value instanceof DateTimeInterface )
+        {
+            return $value ;
+        }
+
+        $target = $dateClass === DateTimeInterface::class ? DateTimeImmutable::class : $dateClass ;
+
+        if ( is_int( $value ) )
+        {
+            return ( new $target() )->setTimestamp( $value ) ;
+        }
+
+        if ( is_string( $value ) && $value !== '' )
+        {
+            return new $target( $value ) ;
         }
 
         return $value ;
