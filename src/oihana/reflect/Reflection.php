@@ -48,7 +48,9 @@ use function oihana\core\callables\resolveCallable;
  * - DateTimeInterface: scalar values are resolved to date instances (string → parsed date,
  *   int → Unix timestamp). A builtin scalar member of a union (e.g. `string|DateTimeInterface`)
  *   keeps the raw value unless {@see HydrateAs} explicitly forces the date class.
- * - Assigns public properties only (private/protected are ignored by design)
+ * - Assigns public properties only (private/protected are ignored by design); values are
+ *   set via reflection, so `readonly` and asymmetric-visibility properties
+ *   (`public private(set)`/`public protected(set)`) are supported
  *
  * Caching:
  * - Internally caches {@see ReflectionClass} instances per fully-qualified class name for better performance
@@ -575,7 +577,10 @@ class Reflection
 
             if ( $property->isPublic() )
             {
-                $object->{ $property->getName() } = $value;
+                // setValue() (instead of a direct assignment) so readonly and
+                // asymmetric-visibility properties (public private(set)/protected(set))
+                // can be initialized; scalar type coercion is preserved.
+                $property->setValue( $object , $value ) ;
             }
         }
 

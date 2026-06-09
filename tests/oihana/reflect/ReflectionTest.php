@@ -31,6 +31,7 @@ use tests\oihana\reflect\mocks\MockRequiredCtor;
 use tests\oihana\reflect\mocks\MockPriority;
 use tests\oihana\reflect\mocks\MockStatus;
 use tests\oihana\reflect\mocks\MockWithDate;
+use tests\oihana\reflect\mocks\MockWithReadonly;
 use tests\oihana\reflect\mocks\MockWithEnum;
 use tests\oihana\reflect\mocks\MockUser;
 use tests\oihana\reflect\mocks\MockWithRenameKey;
@@ -801,5 +802,51 @@ class ReflectionTest extends TestCase
         $object = $this->reflection->hydrate( [] , MockOptionalCtor::class );
         $this->assertTrue( $object->constructed );
         $this->assertSame( 'fallback' , $object->name ); // constructor default applied
+    }
+
+    // -------------------------------------- Readonly / asymmetric visibility
+
+    /**
+     * A readonly property is initialized through reflection.
+     *
+     * @throws ReflectionException
+     */
+    public function testHydrateReadonlyProperty()
+    {
+        $object = $this->reflection->hydrate( [ 'id' => 'abc-123' ] , MockWithReadonly::class );
+        $this->assertSame( 'abc-123' , $object->id );
+    }
+
+    /**
+     * A public-read / private-write property is written through reflection.
+     *
+     * @throws ReflectionException
+     */
+    public function testHydratePrivateSetProperty()
+    {
+        $object = $this->reflection->hydrate( [ 'score' => 5 ] , MockWithReadonly::class );
+        $this->assertSame( 5 , $object->score );
+    }
+
+    /**
+     * A public-read / protected-write property is written through reflection.
+     *
+     * @throws ReflectionException
+     */
+    public function testHydrateProtectedSetProperty()
+    {
+        $object = $this->reflection->hydrate( [ 'tag' => 'vip' ] , MockWithReadonly::class );
+        $this->assertSame( 'vip' , $object->tag );
+    }
+
+    /**
+     * Non-regression: plain mutable property still works, with scalar coercion preserved.
+     *
+     * @throws ReflectionException
+     */
+    public function testHydratePlainPropertyWithScalarCoercionViaSetValue()
+    {
+        $object = $this->reflection->hydrate( [ 'count' => '42' ] , MockWithReadonly::class );
+        $this->assertSame( 42 , $object->count ); // string '42' coerced to int 42
     }
 }
