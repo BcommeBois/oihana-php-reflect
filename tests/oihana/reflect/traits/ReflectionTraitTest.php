@@ -216,4 +216,35 @@ final class ReflectionTraitTest extends TestCase
             $obj->toArray( [ ArrayOption::EXCLUDE => [ 'desc' ] ] )
         );
     }
+
+    public function testGetNamespace(): void
+    {
+        $object = new class { use ReflectionTrait; };
+        $this->assertSame( 'PHPUnit\Framework' , $object->getNamespace( \PHPUnit\Framework\TestCase::class ) );
+    }
+
+    public function testHasMethod(): void
+    {
+        $object = new class { use ReflectionTrait; };
+        $target = new class { public function run(): void {} };
+        $this->assertTrue( $object->hasMethod( $target::class , 'run' ) );
+        $this->assertFalse( $object->hasMethod( $target::class , 'ghost' ) );
+    }
+
+    public function testHasProperty(): void
+    {
+        $object = new class { use ReflectionTrait; };
+        $target = new class { public int $age = 0; };
+        $this->assertTrue( $object->hasProperty( $target::class , 'age' ) );
+        $this->assertFalse( $object->hasProperty( $target::class , 'ghost' ) );
+    }
+
+    public function testGetPropertyType(): void
+    {
+        $object = new class { use ReflectionTrait; };
+        $target = new class { public int|string $id = 0; };
+        $parts  = explode( '|' , $object->getPropertyType( $target::class , 'id' ) );
+        sort( $parts );
+        $this->assertSame( [ 'int' , 'string' ] , $parts );
+    }
 }

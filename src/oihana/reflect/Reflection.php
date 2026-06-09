@@ -13,10 +13,12 @@ use ReflectionClass;
 use ReflectionClassConstant;
 use ReflectionException;
 use ReflectionFunction;
+use ReflectionIntersectionType;
 use ReflectionMethod;
 use ReflectionNamedType;
 use ReflectionParameter;
 use ReflectionProperty;
+use ReflectionType;
 use ReflectionUnionType;
 
 use oihana\reflect\attributes\HydrateAs;
@@ -224,6 +226,46 @@ class Reflection
     {
         $parameters = $this->parameters( $class , $method ) ;
         return array_any( $parameters , fn( $p ) => $p->getName() === $param );
+    }
+
+    /**
+     * Checks whether the given class (or object) declares the given method.
+     *
+     * Unlike {@see self::parameters()}, this never throws when the method is missing.
+     *
+     * @param object|string $class  The object or class name.
+     * @param string        $method The method name.
+     *
+     * @return bool True if the method exists, false otherwise.
+     * @throws ReflectionException If the class cannot be reflected.
+     *
+     * @example
+     * ```php
+     * new Reflection()->hasMethod(MyClass::class, 'doThing'); // true|false
+     * ```
+     */
+    public function hasMethod( object|string $class, string $method ): bool
+    {
+        return $this->reflection( $class )->hasMethod( $method );
+    }
+
+    /**
+     * Checks whether the given class (or object) declares the given property.
+     *
+     * @param object|string $class    The object or class name.
+     * @param string        $property The property name.
+     *
+     * @return bool True if the property exists, false otherwise.
+     * @throws ReflectionException If the class cannot be reflected.
+     *
+     * @example
+     * ```php
+     * new Reflection()->hasProperty(User::class, 'name'); // true|false
+     * ```
+     */
+    public function hasProperty( object|string $class, string $property ): bool
+    {
+        return $this->reflection( $class )->hasProperty( $property );
     }
 
     /**
@@ -884,10 +926,44 @@ class Reflection
         {
             if ( $p->getName() === $param && $p->hasType() )
             {
-                return $p->getType()->getName() ;
+                return $this->typeToString( $p->getType() ) ;
             }
         }
         return null ;
+    }
+
+    /**
+     * Returns the declared type of a property as a string, or null when untyped/absent.
+     *
+     * Union types are rendered as `A|B` and intersection types as `A&B` (consistent with
+     * {@see self::describeCallableParameters()} and {@see self::parameterType()}).
+     *
+     * @param object|string $class    The object or class name.
+     * @param string        $property The property name.
+     *
+     * @return string|null The type name (e.g. `int`, `?string`→`string`, `int|string`), or null.
+     * @throws ReflectionException If the class cannot be reflected.
+     *
+     * @example
+     * ```php
+     * class User { public int $age; public int|string $id; public $misc; }
+     *
+     * $ref = new \oihana\reflect\Reflection();
+     * echo $ref->propertyType(User::class, 'age'); // 'int'
+     * echo $ref->propertyType(User::class, 'id');  // 'int|string'
+     * var_dump($ref->propertyType(User::class, 'misc')); // null (untyped)
+     * ```
+     */
+    public function propertyType( object|string $class, string $property ): ?string
+    {
+        $reflection = $this->reflection( $class ) ;
+
+        if ( !$reflection->hasProperty( $property ) )
+        {
+            return null ;
+        }
+
+        return $this->typeToString( $reflection->getProperty( $property )->getType() ) ;
     }
 
     /**
@@ -962,6 +1038,44 @@ class Reflection
     public function shortName( object|string $class ): string
     {
         return $this->reflection( $class )->getShortName() ;
+    }
+
+    /**
+     * Returns the namespace of the class (empty string for the global namespace).
+     *
+     * @param object|string $class The object or class name.
+     * @return string The namespace name, or '' when the class is in the global namespace.
+     * @throws ReflectionException If reflection fails.
+     *
+     * @example
+     * ```php
+     * echo new Reflection()->namespace(\App\Models\Product::class);
+     * // Output: 'App\Models'
+     * ```
+     */
+    public function namespace( object|string $class ): string
+    {
+        return $this->reflection( $class )->getNamespaceName() ;
+    }
+
+    /**
+     * Renders a {@see ReflectionType} as a string.
+     *
+     * Named types return their name, union types are joined with `|`, intersection types
+     * with `&`, and a null/unsupported type returns null.
+     *
+     * @param ReflectionType|null $type The type to render.
+     * @return string|null The rendered type name, or null when untyped.
+     */
+    private function typeToString( ?ReflectionType $type ): ?string
+    {
+        return match( true )
+        {
+            $type instanceof ReflectionNamedType        => $type->getName() ,
+            $type instanceof ReflectionUnionType        => implode( '|' , array_map( fn( $t ) => $this->typeToString( $t ) , $type->getTypes() ) ) ,
+            $type instanceof ReflectionIntersectionType => implode( '&' , array_map( fn( $t ) => $this->typeToString( $t ) , $type->getTypes() ) ) ,
+            default                                     => null ,
+        } ;
     }
 
     /**

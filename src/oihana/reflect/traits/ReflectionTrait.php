@@ -112,6 +112,70 @@ trait ReflectionTrait
     }
 
     /**
+     * Returns the namespace of a given class or object ('' for the global namespace).
+     *
+     * @param object|string $class The object instance or fully-qualified class name.
+     *
+     * @return string The namespace name.
+     *
+     * @throws ReflectionException
+     *
+     * @example
+     * ```php
+     * $trait->getNamespace(\App\Models\User::class); // 'App\Models'
+     * ```
+     */
+    public function getNamespace( object|string $class ) : string
+    {
+        return $this->reflection()->namespace( $class );
+    }
+
+    /**
+     * Checks whether a class or object declares the given method (never throws if absent).
+     *
+     * @param object|string $class  The object instance or fully-qualified class name.
+     * @param string        $method The method name.
+     *
+     * @return bool True if the method exists, false otherwise.
+     *
+     * @throws ReflectionException
+     */
+    public function hasMethod( object|string $class, string $method ) : bool
+    {
+        return $this->reflection()->hasMethod( $class, $method );
+    }
+
+    /**
+     * Checks whether a class or object declares the given property.
+     *
+     * @param object|string $class    The object instance or fully-qualified class name.
+     * @param string        $property The property name.
+     *
+     * @return bool True if the property exists, false otherwise.
+     *
+     * @throws ReflectionException
+     */
+    public function hasProperty( object|string $class, string $property ) : bool
+    {
+        return $this->reflection()->hasProperty( $class, $property );
+    }
+
+    /**
+     * Returns the declared type of a property as a string (union → `A|B`), or null when untyped/absent.
+     *
+     * @param object|string $class    The object instance or fully-qualified class name.
+     * @param string        $property The property name.
+     *
+     * @return string|null The property type name, or null.
+     *
+     * @throws ReflectionException
+     */
+    public function getPropertyType( object|string $class, string $property ) : ?string
+    {
+        return $this->reflection()->propertyType( $class, $property );
+    }
+
+    /**
      * Returns all parameters of a given method as ReflectionParameter objects.
      *
      * @param object|string $class  The object instance or fully-qualified class name.

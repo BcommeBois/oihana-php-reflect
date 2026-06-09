@@ -31,6 +31,7 @@ use tests\oihana\reflect\mocks\MockPolymorphicContainer;
 use tests\oihana\reflect\mocks\MockRequiredCtor;
 use tests\oihana\reflect\mocks\MockScalarCoercion;
 use tests\oihana\reflect\mocks\MockColor;
+use tests\oihana\reflect\mocks\MockIntrospection;
 use tests\oihana\reflect\mocks\MockPriority;
 use tests\oihana\reflect\mocks\MockStatus;
 use tests\oihana\reflect\mocks\MockWithPureEnum;
@@ -963,5 +964,91 @@ class ReflectionTest extends TestCase
         $this->assertSame( 'Paris'  , $first->address->city );
         $this->assertSame( 'Bob'    , $second->name );
         $this->assertSame( 'Berlin' , $second->address->city );
+    }
+
+    // ------------------------------------------------ Introspection (C1)
+
+    /**
+     * @throws ReflectionException
+     */
+    public function testHasMethod()
+    {
+        $this->assertTrue( $this->reflection->hasMethod( MockIntrospection::class , 'doThing' ) );
+        $this->assertFalse( $this->reflection->hasMethod( MockIntrospection::class , 'ghost' ) );
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function testHasProperty()
+    {
+        $this->assertTrue( $this->reflection->hasProperty( MockIntrospection::class , 'age' ) );
+        $this->assertFalse( $this->reflection->hasProperty( MockIntrospection::class , 'ghost' ) );
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function testPropertyTypeNamed()
+    {
+        $this->assertSame( 'int' , $this->reflection->propertyType( MockIntrospection::class , 'age' ) );
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function testPropertyTypeUnion()
+    {
+        // PHP normalizes union member order, so compare the set, not the literal order.
+        $parts = explode( '|' , $this->reflection->propertyType( MockIntrospection::class , 'id' ) );
+        sort( $parts );
+        $this->assertSame( [ 'int' , 'string' ] , $parts );
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function testPropertyTypeIntersection()
+    {
+        $this->assertSame( 'Countable&ArrayAccess' , $this->reflection->propertyType( MockIntrospection::class , 'collection' ) );
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function testPropertyTypeUntypedReturnsNull()
+    {
+        $this->assertNull( $this->reflection->propertyType( MockIntrospection::class , 'untyped' ) );
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function testPropertyTypeMissingPropertyReturnsNull()
+    {
+        $this->assertNull( $this->reflection->propertyType( MockIntrospection::class , 'ghost' ) );
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function testNamespace()
+    {
+        $this->assertSame( 'tests\oihana\reflect\mocks' , $this->reflection->namespace( MockIntrospection::class ) );
+    }
+
+    /**
+     * parameterType() now renders union parameter types as A|B (harmonized with propertyType()).
+     *
+     * @throws ReflectionException
+     */
+    public function testParameterTypeUnionHarmonized()
+    {
+        $object = new class {
+            public function demo( int|string $x ): void {}
+        };
+        $parts = explode( '|' , $this->reflection->parameterType( $object::class , 'demo' , 'x' ) );
+        sort( $parts );
+        $this->assertSame( [ 'int' , 'string' ] , $parts );
     }
 }
