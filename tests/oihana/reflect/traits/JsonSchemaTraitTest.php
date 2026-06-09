@@ -12,6 +12,8 @@ use PHPUnit\Framework\TestCase;
 
 use oihana\reflect\traits\JsonSchemaTrait;
 
+use tests\oihana\reflect\mocks\MockJsonSchema;
+
 final class JsonSchemaTraitTest extends TestCase
 {
     public function createTestClass(): object
@@ -134,6 +136,91 @@ final class JsonSchemaTraitTest extends TestCase
 
         $this->assertArrayHasKey('type', $mapped);
         $this->assertEquals('integer', $mapped['type']);
+    }
+
+    public function testJsonSchemaCoversAllPropertyShapes(): void
+    {
+        $schema = MockJsonSchema::jsonSchema( true ); // strict
+        $props  = $schema['properties'];
+
+        // @see https URL in the class docblock becomes $id (strict mode).
+        $this->assertEquals('https://example.com/mock-schema', $schema['$id']);
+
+        // JSON-LD metadata property is skipped.
+        $this->assertArrayNotHasKey('atType', $props);
+
+        // No type hint -> oneOf of all primitive types.
+        $this->assertArrayHasKey('oneOf', $props['untyped']);
+
+        // Union without null -> oneOf of its members.
+        $this->assertArrayHasKey('oneOf', $props['code']);
+
+        // Union with null.
+        $this->assertArrayHasKey('oneOf', $props['codeOrNull']);
+
+        // Union of two classes collapses to a single object type.
+        $this->assertEquals('object', $props['entity']['type']);
+
+        // Class-typed property -> $ref to its definition.
+        $this->assertEquals('object', $props['address']['type']);
+        $this->assertEquals('#/definitions/MockAddress', $props['address']['$ref']);
+
+        // Unmapped, non-class type (iterable) -> mixed (array of types).
+        $this->assertIsArray($props['stream']['type']);
+
+        // Property without a docblock has no description.
+        $this->assertArrayNotHasKey('description', $props['noDoc']);
+    }
+
+    public function testValidateDataWithJsonSchemaInstance(): void
+    {
+        $obj    = new MockJsonSchema();
+        $result = $obj->validateDataWithJsonSchema([ 'name' => 'ok' ]);
+
+        $this->assertArrayHasKey('valid', $result);
+        $this->assertArrayHasKey('errors', $result);
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function testValidateAgainstSchemaWithoutPropertiesIsValid(): void
+    {
+        $obj = $this->createTestClass();
+
+        $result = $this->getObjectMethod($obj, 'validateAgainstSchema')(
+            [ 'anything' => 1 ],
+            [ 'type' => 'object' ] // no 'properties' key
+        );
+
+        $this->assertTrue($result['valid']);
+        $this->assertEmpty($result['errors']);
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function testValidateValueWithoutTypeConstraintIsValid(): void
+    {
+        $obj = $this->createTestClass();
+
+        // Schema with neither oneOf nor type -> no constraint -> no errors.
+        $errors = $this->getObjectMethod($obj, 'validateValue')('whatever', [], 'path');
+
+        $this->assertSame([], $errors);
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function testValidateValueWithUnknownTypeReportsError(): void
+    {
+        $obj = $this->createTestClass();
+
+        // An unknown required type falls into the match() default (no match).
+        $errors = $this->getObjectMethod($obj, 'validateValue')('x', [ 'type' => 'weird' ], 'path');
+
+        $this->assertNotEmpty($errors);
     }
 
     /**
