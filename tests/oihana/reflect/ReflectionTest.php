@@ -14,6 +14,10 @@ use oihana\reflect\Reflection;
 use tests\oihana\reflect\mocks\MockAddress;
 use tests\oihana\reflect\mocks\MockCreativeWork;
 use tests\oihana\reflect\mocks\MockDocCommentArray;
+use tests\oihana\reflect\mocks\MockHydrateAs;
+use tests\oihana\reflect\mocks\MockHydrateWithBogus;
+use tests\oihana\reflect\mocks\MockHydrateWithEmpty;
+use tests\oihana\reflect\mocks\MockHydrateWithRenameKey;
 use tests\oihana\reflect\mocks\MockEnum;
 use tests\oihana\reflect\mocks\MockGeo;
 use tests\oihana\reflect\mocks\MockOrganization;
@@ -474,5 +478,86 @@ class ReflectionTest extends TestCase
     public function testIsParameterVariadicReturnsFalseWhenParamMissing()
     {
         $this->assertFalse($this->reflection->isParameterVariadic(MockUser::class, 'setName', 'ghost'));
+    }
+
+    /**
+     * #[HydrateAs] forces the target class for an otherwise loosely-typed property.
+     *
+     * @throws ReflectionException
+     */
+    public function testHydrateWithHydrateAsAttribute()
+    {
+        // Associative value -> single object.
+        $single = $this->reflection->hydrate([ 'payload' => [ 'city' => 'Nice' ] ], MockHydrateAs::class);
+        $this->assertInstanceOf(MockAddress::class, $single->payload);
+        $this->assertEquals('Nice', $single->payload->city);
+
+        // List value -> array of objects (array_map branch).
+        $list = $this->reflection->hydrate(
+            [ 'payload' => [ [ 'city' => 'A' ], [ 'city' => 'B' ] ] ],
+            MockHydrateAs::class
+        );
+        $this->assertCount(2, $list->payload);
+        $this->assertInstanceOf(MockAddress::class, $list->payload[0]);
+        $this->assertEquals('B', $list->payload[1]->city);
+    }
+
+    /**
+     * #[HydrateWith] scores candidate classes by their HydrateKey alternative key.
+     *
+     * @throws ReflectionException
+     */
+    public function testHydrateWithSelectsClassByHydrateKeyScore()
+    {
+        $data   = [ 'items' => [ [ 'user_name' => 'Bob' ] ] ];
+        $result = $this->reflection->hydrate($data, MockHydrateWithRenameKey::class);
+
+        $this->assertInstanceOf(MockWithRenameKey::class, $result->items[0]);
+        $this->assertEquals('Bob', $result->items[0]->name);
+    }
+
+    /**
+     * #[HydrateWith] containing only a non-existent class leaves array items untouched.
+     *
+     * @throws ReflectionException
+     */
+    public function testHydrateWithUnknownClassLeavesItemsAsArrays()
+    {
+        $data   = [ 'items' => [ [ 'x' => 1 ] ] ];
+        $result = $this->reflection->hydrate($data, MockHydrateWithBogus::class);
+
+        $this->assertSame([ 'x' => 1 ], $result->items[0]);
+    }
+
+    /**
+     * An empty #[HydrateWith()] cannot guess a type, so array items stay raw.
+     *
+     * @throws ReflectionException
+     */
+    public function testHydrateWithEmptyAttributeLeavesItemsAsArrays()
+    {
+        $data   = [ 'items' => [ [ 'x' => 1 ] ] ];
+        $result = $this->reflection->hydrate($data, MockHydrateWithEmpty::class);
+
+        $this->assertSame([ 'x' => 1 ], $result->items[0]);
+    }
+
+    /**
+     * Non-array elements in a #[HydrateWith] array are passed through unchanged.
+     *
+     * @throws ReflectionException
+     */
+    public function testHydrateWithPassesThroughNonArrayItems()
+    {
+        $data = [
+            'items' => [
+                42,
+                [ '@type' => 'MockAddress', 'city' => 'X' ],
+            ],
+        ];
+        $result = $this->reflection->hydrate($data, MockPolymorphicContainer::class);
+
+        $this->assertSame(42, $result->items[0]);
+        $this->assertInstanceOf(MockAddress::class, $result->items[1]);
     }
 }
