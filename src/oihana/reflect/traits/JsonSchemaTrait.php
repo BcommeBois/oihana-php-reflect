@@ -455,16 +455,9 @@ trait JsonSchemaTrait
         else if ( class_exists( $typeName ) )
         {
             $shortName = new ReflectionClass( $typeName )->getShortName();
-            $schema[ Keyword::TYPE ] = Type::OBJECT ;
-            $schema[ Keyword::REF  ] = "#/definitions/$shortName";
-            if ( isset($schema[ Keyword::DESCRIPTION ]) )
-            {
-                $schema[ Keyword::DESCRIPTION ] .= " (Type: $shortName)" ;
-            }
-            else
-            {
-                $schema[ Keyword::DESCRIPTION ] = "Type: $shortName" ;
-            }
+            $schema[ Keyword::TYPE        ] = Type::OBJECT ;
+            $schema[ Keyword::REF         ] = "#/definitions/$shortName";
+            $schema[ Keyword::DESCRIPTION ] = "Type: $shortName" ;
         }
         else
         {
