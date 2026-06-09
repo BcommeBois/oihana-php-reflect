@@ -24,8 +24,10 @@ use tests\oihana\reflect\mocks\MockHydrateWithRenameKey;
 use tests\oihana\reflect\mocks\MockEnum;
 use tests\oihana\reflect\mocks\MockGeo;
 use tests\oihana\reflect\mocks\MockOrganization;
+use tests\oihana\reflect\mocks\MockOptionalCtor;
 use tests\oihana\reflect\mocks\MockPerson;
 use tests\oihana\reflect\mocks\MockPolymorphicContainer;
+use tests\oihana\reflect\mocks\MockRequiredCtor;
 use tests\oihana\reflect\mocks\MockPriority;
 use tests\oihana\reflect\mocks\MockStatus;
 use tests\oihana\reflect\mocks\MockWithDate;
@@ -736,5 +738,68 @@ class ReflectionTest extends TestCase
         $object = $this->reflection->hydrate( [ 'milestones' => [ '2024-01-01' , '2024-06-01' ] ] , MockWithDate::class );
         $this->assertCount( 2 , $object->milestones );
         $this->assertContainsOnlyInstancesOf( DateTimeImmutable::class , $object->milestones );
+    }
+
+    // ----------------------------------------------------------- Constructors
+
+    /**
+     * A class whose constructor requires arguments is hydrated without invoking it.
+     *
+     * @throws ReflectionException
+     */
+    public function testHydrateClassWithRequiredConstructor()
+    {
+        $object = $this->reflection->hydrate( [ 'currency' => 'EUR' , 'amount' => 100 ] , MockRequiredCtor::class );
+        $this->assertInstanceOf( MockRequiredCtor::class , $object );
+        $this->assertSame( 'EUR' , $object->currency );
+        $this->assertSame( 100 , $object->amount );
+    }
+
+    /**
+     * Declared property defaults still apply when bypassing the constructor.
+     *
+     * @throws ReflectionException
+     */
+    public function testHydrateRequiredConstructorKeepsDeclaredDefault()
+    {
+        $object = $this->reflection->hydrate( [ 'currency' => 'USD' ] , MockRequiredCtor::class );
+        $this->assertSame( 0 , $object->amount ); // declared default preserved
+    }
+
+    /**
+     * A required property absent from the data stays uninitialized (no constructor ran).
+     *
+     * @throws ReflectionException
+     */
+    public function testHydrateRequiredConstructorLeavesMissingPropertyUninitialized()
+    {
+        $object = $this->reflection->hydrate( [ 'amount' => 5 ] , MockRequiredCtor::class );
+
+        $property = new \ReflectionProperty( MockRequiredCtor::class , 'currency' );
+        $this->assertFalse( $property->isInitialized( $object ) );
+    }
+
+    /**
+     * Non-regression: a constructor callable with no arguments is still invoked.
+     *
+     * @throws ReflectionException
+     */
+    public function testHydrateOptionalConstructorStillRuns()
+    {
+        $object = $this->reflection->hydrate( [ 'name' => 'Bob' ] , MockOptionalCtor::class );
+        $this->assertTrue( $object->constructed ); // constructor body executed
+        $this->assertSame( 'Bob' , $object->name ); // then overwritten by hydration
+    }
+
+    /**
+     * Non-regression: the no-argument constructor runs even with empty data.
+     *
+     * @throws ReflectionException
+     */
+    public function testHydrateOptionalConstructorRunsWithEmptyData()
+    {
+        $object = $this->reflection->hydrate( [] , MockOptionalCtor::class );
+        $this->assertTrue( $object->constructed );
+        $this->assertSame( 'fallback' , $object->name ); // constructor default applied
     }
 }

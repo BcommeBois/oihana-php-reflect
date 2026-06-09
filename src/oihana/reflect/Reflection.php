@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use InvalidArgumentException;
 
+use oihana\reflect\enums\PhpType;
 use ReflectionClass;
 use ReflectionClassConstant;
 use ReflectionException;
@@ -221,6 +222,13 @@ class Reflection
      * - Array hydration via `#[HydrateWith]`, `#[HydrateAs]`, or PHPDoc `@ var Type[]`,
      * - Public properties only (private/protected are ignored).
      *
+     * Instantiation: a constructor that is callable with no arguments is invoked normally
+     * (preserving its side effects). When the constructor declares required arguments, the
+     * object is created via `newInstanceWithoutConstructor()` and populated from the data;
+     * declared property defaults still apply, but a required property absent from the data
+     * stays uninitialized (accessing it later raises the usual "must not be accessed before
+     * initialization" error).
+     *
      * @param array  $thing Associative array of data (keys must match public properties or be aliased via attributes).
      * @param string $class Fully qualified class name of the object to instantiate.
      *
@@ -337,8 +345,16 @@ class Reflection
         }
 
         $reflectionClass = $this->reflection( $class ) ;
-        $object          = new $class() ;
-        $properties      = $reflectionClass->getProperties() ;
+
+        // Instantiate without invoking the constructor only when it has required arguments
+        // (which `new $class()` could not satisfy). Constructors that are callable with no
+        // arguments still run, preserving any side effects / default initialization.
+        $constructor = $reflectionClass->getConstructor() ;
+        $object      = ( $constructor === null || $constructor->getNumberOfRequiredParameters() === 0 )
+                     ? new $class()
+                     : $reflectionClass->newInstanceWithoutConstructor() ;
+
+        $properties = $reflectionClass->getProperties() ;
 
         foreach ( $properties as $property )
         {
@@ -451,10 +467,10 @@ class Reflection
                     {
                         $valueKind = match( true )
                         {
-                            is_string( $value ) => 'string' ,
-                            is_int( $value )    => 'int'    ,
-                            is_float( $value )  => 'float'  ,
-                            is_bool( $value )   => 'bool'   ,
+                            is_string( $value ) => PhpType::STRING  ,
+                            is_int( $value )    => PhpType::INTEGER ,
+                            is_float( $value )  => PhpType::FLOAT   ,
+                            is_bool( $value )   => PhpType::BOOLEAN ,
                             default             => null     ,
                         } ;
 
@@ -474,7 +490,7 @@ class Reflection
                         // scalar wins / null / non-scalar : fall through to default handling
                     }
 
-                    if ( $typeName === 'array' && is_array( $value ) )
+                    if ( $typeName === PhpType::ARRAY && is_array( $value ) )
                     {
                         // 1. #[HydrateWith(MyClass::class, AnotherClass::class)]
                         if ( !empty( $hydrateWith ) )

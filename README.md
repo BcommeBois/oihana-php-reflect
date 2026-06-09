@@ -48,6 +48,7 @@ Hydration
 - PHPDoc `@var Type[]` and `@var array<Type>` support for array element types
 - Backed enums: scalar values are resolved to enum cases via `Enum::from()` (single values, and arrays of enums via `#[HydrateWith]` or `@var Enum[]`)
 - `DateTimeInterface`: scalar values are resolved to date instances (string → parsed date, int → Unix timestamp). In a union with a scalar (e.g. `string|DateTimeInterface`), the raw value is kept unless `#[HydrateAs(DateTimeImmutable::class)]` forces the conversion
+- Classes with a required constructor: instantiated via `newInstanceWithoutConstructor()` and populated from the data (a no-argument-callable constructor is still invoked normally)
 
 Traits
 
