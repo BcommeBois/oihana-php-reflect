@@ -9,6 +9,7 @@ use InvalidArgumentException;
 use ReflectionClassConstant;
 use ReflectionException;
 use ReflectionMethod;
+use TypeError;
 use ValueError;
 
 use oihana\reflect\Reflection;
@@ -28,6 +29,7 @@ use tests\oihana\reflect\mocks\MockOptionalCtor;
 use tests\oihana\reflect\mocks\MockPerson;
 use tests\oihana\reflect\mocks\MockPolymorphicContainer;
 use tests\oihana\reflect\mocks\MockRequiredCtor;
+use tests\oihana\reflect\mocks\MockScalarCoercion;
 use tests\oihana\reflect\mocks\MockPriority;
 use tests\oihana\reflect\mocks\MockStatus;
 use tests\oihana\reflect\mocks\MockWithDate;
@@ -848,5 +850,64 @@ class ReflectionTest extends TestCase
     {
         $object = $this->reflection->hydrate( [ 'count' => '42' ] , MockWithReadonly::class );
         $this->assertSame( 42 , $object->count ); // string '42' coerced to int 42
+    }
+
+    // ------------------------------------------ Scalar coercion contract (lock-in)
+
+    /**
+     * Numeric string is coerced to int.
+     *
+     * @throws ReflectionException
+     */
+    public function testHydrateCoercesStringToInt()
+    {
+        $object = $this->reflection->hydrate( [ 'count' => '42' ] , MockScalarCoercion::class );
+        $this->assertSame( 42 , $object->count );
+    }
+
+    /**
+     * Numeric string is coerced to float.
+     *
+     * @throws ReflectionException
+     */
+    public function testHydrateCoercesStringToFloat()
+    {
+        $object = $this->reflection->hydrate( [ 'ratio' => '3.14' ] , MockScalarCoercion::class );
+        $this->assertSame( 3.14 , $object->ratio );
+    }
+
+    /**
+     * '1' / '0' strings are coerced to bool.
+     *
+     * @throws ReflectionException
+     */
+    public function testHydrateCoercesStringToBool()
+    {
+        $true  = $this->reflection->hydrate( [ 'enabled' => '1' ] , MockScalarCoercion::class );
+        $false = $this->reflection->hydrate( [ 'enabled' => '0' ] , MockScalarCoercion::class );
+        $this->assertTrue( $true->enabled );
+        $this->assertFalse( $false->enabled );
+    }
+
+    /**
+     * int is coerced to string.
+     *
+     * @throws ReflectionException
+     */
+    public function testHydrateCoercesIntToString()
+    {
+        $object = $this->reflection->hydrate( [ 'label' => 7 ] , MockScalarCoercion::class );
+        $this->assertSame( '7' , $object->label );
+    }
+
+    /**
+     * Fail loud: a value that cannot be coerced to the declared scalar type throws TypeError.
+     *
+     * @throws ReflectionException
+     */
+    public function testHydrateNonCoercibleScalarThrows()
+    {
+        $this->expectException( TypeError::class );
+        $this->reflection->hydrate( [ 'count' => 'not-a-number' ] , MockScalarCoercion::class );
     }
 }

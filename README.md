@@ -50,6 +50,7 @@ Hydration
 - `DateTimeInterface`: scalar values are resolved to date instances (string → parsed date, int → Unix timestamp). In a union with a scalar (e.g. `string|DateTimeInterface`), the raw value is kept unless `#[HydrateAs(DateTimeImmutable::class)]` forces the conversion
 - Classes with a required constructor: instantiated via `newInstanceWithoutConstructor()` and populated from the data (a no-argument-callable constructor is still invoked normally)
 - `readonly` and asymmetric-visibility properties (`public private(set)` / `public protected(set)`, PHP 8.4): values are assigned via reflection, so they are initialized correctly (scalar coercion preserved)
+- Scalar coercion: values are converted to the declared scalar type following PHP's coercive typing (`'42'` → `int 42`, `7` → `string '7'`); a value that cannot be coerced raises a `TypeError` (independent of `strict_types`)
 
 Traits
 

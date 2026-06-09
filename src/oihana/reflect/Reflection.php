@@ -51,6 +51,9 @@ use function oihana\core\callables\resolveCallable;
  * - Assigns public properties only (private/protected are ignored by design); values are
  *   set via reflection, so `readonly` and asymmetric-visibility properties
  *   (`public private(set)`/`public protected(set)`) are supported
+ * - Scalar coercion: values are converted to the declared scalar type following PHP's
+ *   coercive typing (e.g. `'42'` → `int 42`, `7` → `string '7'`); a value that cannot be
+ *   coerced to the declared type raises a `TypeError` (independent of `strict_types`)
  *
  * Caching:
  * - Internally caches {@see ReflectionClass} instances per fully-qualified class name for better performance
