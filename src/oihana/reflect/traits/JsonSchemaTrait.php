@@ -2,7 +2,6 @@
 
 namespace oihana\reflect\traits ;
 
-use oihana\reflect\Reflection;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionNamedType;
@@ -13,8 +12,8 @@ use oihana\reflect\enums\JsonSchemaDraft;
 use oihana\reflect\enums\JsonSchemaKeyword as Keyword;
 use oihana\reflect\enums\JsonSchemaType    as Type ;
 use oihana\reflect\enums\PhpType;
+use oihana\reflect\Reflection;
 
-use tests\oihana\reflect\traits\ReflectionTraitTest;
 use function oihana\core\json\getJsonType;
 use function oihana\reflect\helpers\getPublicProperties;
 
@@ -296,17 +295,10 @@ trait JsonSchemaTrait
         // Get default value if property is initialized and instance is provided
         if ( $instance !== null && $property->isInitialized( $instance ) )
         {
-            try
+            $defaultValue = $property->getValue( $instance ) ;
+            if ( $defaultValue !== null )
             {
-                $defaultValue = $property->getValue( $instance ) ;
-                if ( $defaultValue !== null )
-                {
-                    $schema[ Keyword::DEFAULT ] = $defaultValue ;
-                }
-            }
-            catch( ReflectionException )
-            {
-
+                $schema[ Keyword::DEFAULT ] = $defaultValue ;
             }
         }
 
