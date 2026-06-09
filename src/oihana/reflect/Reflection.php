@@ -46,7 +46,9 @@ use function oihana\core\callables\resolveCallable;
  *   - {@see HydrateAs} to enforce a target class for ambiguous property types
  * - PHPDoc support for array element types via `@var `XXX`[]` and `@var array<Type>`
  * - Backed enums: scalar values are resolved to enum cases via `Enum::from()`
- *   (single values and arrays of enums via {@see HydrateWith} or `@var Enum[]`)
+ *   (single values and arrays of enums via {@see HydrateWith} or `@var Enum[]`).
+ *   Pure (non-backed) enums have no scalar representation: hydrating one from a scalar
+ *   throws an `InvalidArgumentException` (declare a backed enum instead)
  * - DateTimeInterface: scalar values are resolved to date instances (string → parsed date,
  *   int → Unix timestamp). A builtin scalar member of a union (e.g. `string|DateTimeInterface`)
  *   keeps the raw value unless {@see HydrateAs} explicitly forces the date class.
@@ -983,13 +985,18 @@ class Reflection
      * - If `$enumClass` is a {@see BackedEnum} and `$value` is an int or a string,
      *   the matching case is resolved via `$enumClass::from()` (throws {@see \ValueError}
      *   on an unknown value, by design — invalid input must fail loudly).
-     * - Otherwise (null, non-scalar value, or a pure/non-backed enum) the original
-     *   `$value` is returned unchanged so the caller can apply its default handling.
+     * - If `$enumClass` is a pure (non-backed) enum and `$value` is a scalar, an
+     *   {@see InvalidArgumentException} is thrown: a pure enum has no scalar representation,
+     *   so it cannot be hydrated from data — declare it as a backed enum instead.
+     * - Otherwise (null, non-scalar value) the original `$value` is returned unchanged so
+     *   the caller can apply its default handling.
      *
      * @param class-string $enumClass The fully-qualified enum class name.
      * @param mixed        $value     The incoming value to convert.
      *
      * @return mixed The enum instance, or the original value when no conversion applies.
+     *
+     * @throws InvalidArgumentException If a pure (non-backed) enum is hydrated from a scalar.
      *
      * @example
      * ```php
@@ -1005,9 +1012,18 @@ class Reflection
             return $value ;
         }
 
-        if ( is_subclass_of( $enumClass , BackedEnum::class ) && ( is_int( $value ) || is_string( $value ) ) )
+        if ( is_int( $value ) || is_string( $value ) )
         {
-            return $enumClass::from( $value ) ;
+            if ( is_subclass_of( $enumClass , BackedEnum::class ) )
+            {
+                return $enumClass::from( $value ) ;
+            }
+
+            // Pure (non-backed) enum: no scalar representation -> fail loud with a clear message.
+            throw new InvalidArgumentException
+            (
+                "Cannot hydrate the pure (non-backed) enum '$enumClass' from a scalar value; declare it as a backed enum instead."
+            ) ;
         }
 
         return $value ;
@@ -1052,7 +1068,7 @@ class Reflection
 
         if ( is_int( $value ) )
         {
-            return ( new $target() )->setTimestamp( $value ) ;
+            return new $target()->setTimestamp( $value ) ;
         }
 
         if ( is_string( $value ) && $value !== '' )

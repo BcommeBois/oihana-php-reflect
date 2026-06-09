@@ -30,8 +30,10 @@ use tests\oihana\reflect\mocks\MockPerson;
 use tests\oihana\reflect\mocks\MockPolymorphicContainer;
 use tests\oihana\reflect\mocks\MockRequiredCtor;
 use tests\oihana\reflect\mocks\MockScalarCoercion;
+use tests\oihana\reflect\mocks\MockColor;
 use tests\oihana\reflect\mocks\MockPriority;
 use tests\oihana\reflect\mocks\MockStatus;
+use tests\oihana\reflect\mocks\MockWithPureEnum;
 use tests\oihana\reflect\mocks\MockWithDate;
 use tests\oihana\reflect\mocks\MockWithReadonly;
 use tests\oihana\reflect\mocks\MockWithEnum;
@@ -636,6 +638,39 @@ class ReflectionTest extends TestCase
     {
         $object = $this->reflection->hydrate( [ 'status' => 'active' , 'levels' => [ 1 , 10 ] ] , MockWithEnum::class );
         $this->assertSame( [ MockPriority::Low , MockPriority::High ] , $object->levels );
+    }
+
+    /**
+     * A pure (non-backed) enum cannot be hydrated from a scalar : fail loud, clear message.
+     *
+     * @throws ReflectionException
+     */
+    public function testHydratePureEnumFromScalarThrows()
+    {
+        $this->expectException( InvalidArgumentException::class );
+        $this->reflection->hydrate( [ 'color' => 'Red' ] , MockWithPureEnum::class );
+    }
+
+    /**
+     * A nullable pure enum with a null value is left untouched (no exception).
+     *
+     * @throws ReflectionException
+     */
+    public function testHydratePureEnumNullableWithNullStaysNull()
+    {
+        $object = $this->reflection->hydrate( [ 'optional' => null ] , MockWithPureEnum::class );
+        $this->assertNull( $object->optional );
+    }
+
+    /**
+     * A value already holding a pure enum instance is kept as-is.
+     *
+     * @throws ReflectionException
+     */
+    public function testHydratePureEnumKeepsExistingInstance()
+    {
+        $object = $this->reflection->hydrate( [ 'color' => MockColor::Blue ] , MockWithPureEnum::class );
+        $this->assertSame( MockColor::Blue , $object->color );
     }
 
     // -------------------------------------------------------------- DateTime
