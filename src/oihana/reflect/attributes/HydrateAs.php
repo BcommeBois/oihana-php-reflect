@@ -26,7 +26,7 @@ use Attribute;
  * }
  *
  * $data = ['payload' => ['name' => 'Alice']];
- * $wrapper = (new Reflection())->hydrate($data, Wrapper::class);
+ * $wrapper = new Reflection()->hydrate($data, Wrapper::class);
  * echo $wrapper->payload->name; // "Alice"
  * ```
  *
@@ -44,7 +44,7 @@ use Attribute;
  * }
  *
  * $data = ['address' => ['city' => 'Paris']];
- * $user = (new Reflection())->hydrate($data, User::class);
+ * $user = new Reflection()->hydrate($data, User::class);
  * echo $user->address->city; // "Paris"
  * ```
  *
@@ -63,7 +63,7 @@ use Attribute;
  * }
  *
  * $data = ['tags' => [['label' => 'PHP'], ['label' => 'Reflections']]];
- * $post = (new Reflection())->hydrate($data, Post::class);
+ * $post = new Reflection()->hydrate($data, Post::class);
  * echo $post->tags[1]->label; // "Reflections"
  * ```
  *

@@ -21,7 +21,7 @@ use Attribute;
  * }
  *
  * $data = ['user_name' => 'Charlie'];
- * $user = (new Reflection())->hydrate($data, User::class);
+ * $user = new Reflection()->hydrate($data, User::class);
  * echo $user->name; // "Charlie"
  * ```
  *

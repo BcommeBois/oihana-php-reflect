@@ -28,7 +28,7 @@ use Attribute;
  * }
  *
  * $data = ['comments' => [['text' => 'Hello'], ['text' => 'World']]];
- * $post = (new Reflection())->hydrate($data, Post::class);
+ * $post = new Reflection()->hydrate($data, Post::class);
  * echo $post->comments[1]->text; // "World"
  * ```
  *

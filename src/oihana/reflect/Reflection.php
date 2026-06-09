@@ -100,7 +100,7 @@ class Reflection
      *     private const SECRET = 'hidden';
      * }
      *
-     * $constants = (new Reflection())->constants(MyStatus::class);
+     * $constants = new Reflection()->constants(MyStatus::class);
      * print_r($constants);
      * // Output: ['ACTIVE' => 'active']
      * ```
@@ -219,7 +219,7 @@ class Reflection
      *
      * @example
      * ```php
-     * $has = (new Reflection())->hasParameter(MyClass::class, 'myMethod', 'input');
+     * $has = new Reflection()->hasParameter(MyClass::class, 'myMethod', 'input');
      * ```
      */
     public function hasParameter( object|string $class, string $method, string $param ): bool
@@ -300,7 +300,7 @@ class Reflection
      * }
      *
      * $data = ['name' => 'Alice'];
-     * $user = (new Reflection())->hydrate($data, User::class);
+     * $user = new Reflection()->hydrate($data, User::class);
      * echo $user->name; // "Alice"
      * ```
      *
@@ -315,7 +315,7 @@ class Reflection
      * }
      *
      * $data = ['name' => 'Alice', 'address' => ['city' => 'Paris']];
-     * $user = (new Reflection())->hydrate($data, User::class);
+     * $user = new Reflection()->hydrate($data, User::class);
      * echo $user->address->city; // "Paris"
      * ```
      *
@@ -329,7 +329,7 @@ class Reflection
      * }
      *
      * $data = ['user_name' => 'Bob'];
-     * $user = (new Reflection())->hydrate($data, User::class);
+     * $user = new Reflection()->hydrate($data, User::class);
      * echo $user->name; // "Bob"
      * ```
      *
@@ -346,7 +346,7 @@ class Reflection
      * }
      *
      * $data = ['locations' => [['city' => 'Paris'], ['city' => 'Berlin']]];
-     * $geo = (new Reflection())->hydrate($data, Geo::class);
+     * $geo = new Reflection()->hydrate($data, Geo::class);
      * echo $geo->locations[1]->city; // "Berlin"
      * ```
      *
@@ -364,7 +364,7 @@ class Reflection
      * }
      *
      * $data = ['locations' => [['city' => 'Lyon'], ['city' => 'Nice']]];
-     * $geo = (new Reflection())->hydrate($data, Geo::class);
+     * $geo = new Reflection()->hydrate($data, Geo::class);
      * echo $geo->locations[0]->city; // "Lyon"
      * ```
      *
@@ -817,7 +817,7 @@ class Reflection
      *     protected function bar() {}
      * }
      *
-     * $methods = (new Reflection())->methods(MyClass::class);
+     * $methods = new Reflection()->methods(MyClass::class);
      * foreach ($methods as $method)
      * {
      *     echo $method->getName(); // 'foo'
@@ -876,7 +876,7 @@ class Reflection
      *
      * @example
      * ```php
-     * $params = (new Reflection())->parameters(MyClass::class, 'myMethod');
+     * $params = new Reflection()->parameters(MyClass::class, 'myMethod');
      * foreach ($params as $param)
      * {
      *     echo $param->getName(); // e.g. 'input'
@@ -980,7 +980,7 @@ class Reflection
      *     public string $name;
      *     private int $id;
      * }
-     * $props = (new Reflection())->properties(Item::class);
+     * $props = new Reflection()->properties(Item::class);
      * foreach ($props as $prop)
      * {
      *     echo $prop->getName(); // 'name'
@@ -1006,7 +1006,7 @@ class Reflection
      *
      * @example
      * ```php
-     * $reflectionClass = (new Reflection())->reflection(\App\Entity\User::class);
+     * $reflectionClass = new Reflection()->reflection(\App\Entity\User::class);
      * echo $reflectionClass->getName(); // 'App\Entity\User'
      * ```
      */
@@ -1031,7 +1031,7 @@ class Reflection
      *
      * @example
      * ```php
-     * echo (new Reflection())->shortName(\App\Models\Product::class);
+     * echo new Reflection()->shortName(\App\Models\Product::class);
      * // Output: 'Product'
      * ```
      */
