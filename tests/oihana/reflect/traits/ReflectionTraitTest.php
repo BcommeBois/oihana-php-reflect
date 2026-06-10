@@ -5,8 +5,13 @@ namespace tests\oihana\reflect\traits;
 use oihana\core\options\ArrayOption;
 use oihana\reflect\traits\ReflectionTrait;
 
+use oihana\reflect\enums\SerializeOption;
+
 use tests\oihana\reflect\mocks\MockAttributed;
 use tests\oihana\reflect\mocks\MockMarker;
+use tests\oihana\reflect\mocks\MockSerialize;
+
+use DateTimeImmutable;
 
 use PHPUnit\Framework\TestCase;
 
@@ -270,5 +275,46 @@ final class ReflectionTraitTest extends TestCase
         $object = new class { use ReflectionTrait; };
         $attrs  = $object->getMethodAttributes( MockAttributed::class , 'run' );
         $this->assertSame( 'on-method' , $attrs[0]->tag );
+    }
+
+    // ---------------------------------------------- toArray() symmetry (C8)
+
+    public function testToArrayConvertsDatesToIsoByDefault(): void
+    {
+        $object = new MockSerialize();
+        $object->createdAt = new DateTimeImmutable( '2024-01-02T03:04:05+00:00' );
+
+        $array = $object->toArray();
+
+        $this->assertSame( '2024-01-02T03:04:05+00:00' , $array[ 'createdAt' ] );
+    }
+
+    public function testToArrayDateFormatIsOverridable(): void
+    {
+        $object = new MockSerialize();
+        $object->createdAt = new DateTimeImmutable( '2024-01-02T03:04:05+00:00' );
+
+        $array = $object->toArray( [ SerializeOption::DATE_FORMAT => 'Y-m-d' ] );
+
+        $this->assertSame( '2024-01-02' , $array[ 'createdAt' ] );
+    }
+
+    public function testToArrayUsesPropertyNameByDefault(): void
+    {
+        $array = new MockSerialize()->toArray();
+
+        $this->assertArrayHasKey( 'name' , $array );
+        $this->assertArrayNotHasKey( 'user_name' , $array );
+        $this->assertSame( 'Bob' , $array[ 'name' ] );
+    }
+
+    public function testToArrayEmitsHydrateKeyWhenOptedIn(): void
+    {
+        $array = new MockSerialize()->toArray( [ SerializeOption::USE_HYDRATE_KEYS => true ] );
+
+        $this->assertArrayHasKey( 'user_name' , $array );      // #[HydrateKey('user_name')]
+        $this->assertArrayNotHasKey( 'name' , $array );
+        $this->assertSame( 'Bob' , $array[ 'user_name' ] );
+        $this->assertArrayHasKey( 'age' , $array );            // no #[HydrateKey] → property name kept
     }
 }

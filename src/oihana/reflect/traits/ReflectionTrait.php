@@ -2,13 +2,17 @@
 
 namespace oihana\reflect\traits ;
 
+use DateTimeInterface;
+
 use ReflectionAttribute;
 use ReflectionException;
 use ReflectionProperty;
 
 use oihana\core\options\ArrayOption;
 use oihana\reflect\Reflection;
+use oihana\reflect\attributes\HydrateKey;
 use oihana\reflect\attributes\Transient;
+use oihana\reflect\enums\SerializeOption;
 
 use function oihana\core\arrays\prepare;
 
@@ -428,6 +432,12 @@ trait ReflectionTrait
      *  - **SORT**       (bool) Sort remaining keys alphabetically (default: true).
      *  - **DEFAULTS**   (array<string,mixed>) Default values for missing or null properties.
      *
+     * Package-specific options (see {@see SerializeOption}):
+     *  - **USE_HYDRATE_KEYS** (bool) Emit each property under its `#[HydrateKey]` source key
+     *     instead of its property name (symmetric with `hydrate()`). Default: false.
+     *  - **DATE_FORMAT**      (string) Format applied to `DateTimeInterface` values
+     *     (default: `DateTimeInterface::ATOM`, i.e. ISO 8601).
+     *
      * @return array The resulting associative array of properties.
      *
      * @throws ReflectionException
@@ -463,6 +473,10 @@ trait ReflectionTrait
      */
     public function toArray( array $options = [] ) :array
     {
+        // Package-specific options, read before normalize() (which keeps only the ArrayOption keys).
+        $useHydrateKeys = (bool) ( $options[ SerializeOption::USE_HYDRATE_KEYS ] ?? false ) ;
+        $dateFormat     = $options[ SerializeOption::DATE_FORMAT ] ?? DateTimeInterface::ATOM ;
+
         $options    = ArrayOption::normalize( $options ) ;
         $properties = $this->reflection()->properties( $this ) ;
 
@@ -497,7 +511,26 @@ trait ReflectionTrait
                 continue ;
             }
 
-            $data[ $name ] = $this->{ $name } ?? $defaults[ $name ] ?? null ;
+            $value = $this->{ $name } ?? $defaults[ $name ] ?? null ;
+
+            // DateTimeInterface values are serialized to a string (ISO 8601 by default).
+            if ( $value instanceof DateTimeInterface )
+            {
+                $value = $value->format( $dateFormat ) ;
+            }
+
+            // Opt-in: emit the #[HydrateKey] source key instead of the property name (round-trip symmetry).
+            $outputKey = $name ;
+            if ( $useHydrateKeys )
+            {
+                $keyAttr = $property->getAttributes( HydrateKey::class ) ;
+                if ( !empty( $keyAttr ) )
+                {
+                    $outputKey = $keyAttr[0]->newInstance()->key ;
+                }
+            }
+
+            $data[ $outputKey ] = $value ;
         }
 
         return prepare( $data , $options ) ;

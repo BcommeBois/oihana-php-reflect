@@ -16,6 +16,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - JsonSchemaKeyword : the Json Schema keywords
   - JsonSchemaType : the Json Schema types
   - PhpType : the main PHP types (+ helpers `PhpType::isScalar()` and `PhpType::isNumeric()`)
+  - SerializeOption : `toArray()` options specific to this package (`DATE_FORMAT`, `USE_HYDRATE_KEYS`)
+- Serialization symmetry
+  - ReflectionTrait::toArray() now serializes `DateTimeInterface` property values to a string (ISO 8601 by default, overridable via `SerializeOption::DATE_FORMAT`), and can emit each property under its `#[HydrateKey]` source key when `SerializeOption::USE_HYDRATE_KEYS` is enabled — making `toArray()` symmetric with `hydrate()`.
 - Helpers
   - getPublicProperties : Get all public non-static properties from a class, including traits and parent classes, with optional external cache.
   - hasTrait : Check if a class uses a specific trait, including traits from parent classes and nested traits, with optional external cache.

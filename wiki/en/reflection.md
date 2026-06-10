@@ -121,6 +121,18 @@ new User()->toArray(
 
 Properties marked [`#[Transient]` / `#[HydrateIgnore]`](hydration/attributes.md#transient--hydrateignore) are never emitted.
 
+Two package-specific options (from `oihana\reflect\enums\SerializeOption`) make `toArray()` symmetric with `hydrate()`:
+
+```php
+use oihana\reflect\enums\SerializeOption;
+
+// DateTimeInterface values are serialized to ISO 8601 by default; override the format:
+$user->toArray( [ SerializeOption::DATE_FORMAT => 'Y-m-d' ] );
+
+// Opt-in: emit each property under its #[HydrateKey] source key instead of its name:
+$user->toArray( [ SerializeOption::USE_HYDRATE_KEYS => true ] ); // 'user_name' instead of 'name'
+```
+
 ## See also
 
 - [Hydration](hydration/README.md) · [JSON Schema](json-schema.md) · [Serialization](serialization.md)

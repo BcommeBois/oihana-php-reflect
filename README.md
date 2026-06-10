@@ -55,6 +55,7 @@ Hydration
 - `readonly` and asymmetric-visibility properties (`public private(set)` / `public protected(set)`, PHP 8.4): values are assigned via reflection, so they are initialized correctly (scalar coercion preserved)
 - Scalar coercion: values are converted to the declared scalar type following PHP's coercive typing (`'42'` → `int 42`, `7` → `string '7'`); a value that cannot be coerced raises a `HydrationException` (independent of `strict_types`)
 - Error handling: every hydration failure throws a single catchable `HydrationException` (extends `InvalidArgumentException`), exposing `getClassName()`, `getPropertyName()` and the original error via `getPrevious()` — handy to skip an invalid record when hydrating a batch/stream
+- Symmetric serialization: `ReflectionTrait::toArray()` serializes `DateTimeInterface` values to ISO 8601 (overridable), and can emit `#[HydrateKey]` source keys (opt-in via `SerializeOption`) — round-trip with `hydrate()`
 - Performance: a per-class **hydration plan** is cached on first use, so the data-independent reflection work (attributes, `@var` item types, constructor strategy, builtin types) is computed once and reused for every object of that class. The cache is in-memory, bounded by the number of hydrated classes, and needs no eviction. On nested documents this cuts hydration time by roughly a third (the deeper the nesting, the larger the gain)
 
 Traits
