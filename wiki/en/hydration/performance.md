@@ -48,3 +48,11 @@ When you hydrate through [`ReflectionTrait`](../reflection.md), the trait alread
 - **In-memory**, no external store (no APCu/Redis/etc.).
 - **Bounded** by the number of distinct hydrated classes (one entry per class, not per object) — typically a few KB total.
 - **No eviction needed**: PHP frees everything at the end of the request/process. The behavior is identical with or without the cache — it only removes redundant work.
+
+## Clearing the cache
+
+Usually unnecessary, but in tests or long-running workers (RoadRunner, Swoole, queues) you can drop every cached entry — both the `ReflectionClass` instances and the hydration plans — with:
+
+```php
+$reflection->clearCache(); // caches are transparently rebuilt on the next call
+```

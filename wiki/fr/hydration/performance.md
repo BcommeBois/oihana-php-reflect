@@ -48,3 +48,11 @@ Lorsque vous hydratez via [`ReflectionTrait`](../reflection.md), le trait détie
 - **En mémoire**, sans store externe (pas d'APCu/Redis/etc.).
 - **Borné** par le nombre de classes distinctes hydratées (une entrée par classe, pas par objet) — typiquement quelques Ko au total.
 - **Aucune éviction nécessaire** : PHP libère tout en fin de requête/process. Le comportement est identique avec ou sans le cache — il ne fait que supprimer le travail redondant.
+
+## Vider le cache
+
+Généralement inutile, mais dans les tests ou les workers longue-durée (RoadRunner, Swoole, queues) vous pouvez supprimer toutes les entrées mises en cache — à la fois les instances `ReflectionClass` et les plans d'hydratation — avec :
+
+```php
+$reflection->clearCache(); // les caches sont reconstruits de façon transparente au prochain appel
+```

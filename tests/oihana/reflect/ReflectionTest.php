@@ -1129,4 +1129,32 @@ class ReflectionTest extends TestCase
         $this->assertArrayNotHasKey( 'total' , $array );        // #[Transient]
         $this->assertArrayNotHasKey( 'cachedToken' , $array );  // #[HydrateIgnore]
     }
+
+    // ------------------------------------------------ clearCache (C9)
+
+    /**
+     * clearCache() empties both the ReflectionClass cache and the hydration-plan cache,
+     * which are transparently rebuilt afterwards.
+     *
+     * @throws ReflectionException
+     */
+    public function testClearCache()
+    {
+        $reflection = new Reflection();
+
+        $firstClass = $reflection->reflection( MockUser::class );
+        $reflection->hydrate( [ 'name' => 'Alice' ] , MockUser::class ); // builds the plan
+
+        $plans = new \ReflectionProperty( Reflection::class , 'plans' );
+        $this->assertArrayHasKey( MockUser::class , $plans->getValue( $reflection ) );
+
+        $reflection->clearCache();
+
+        $this->assertEmpty( $plans->getValue( $reflection ) );                  // plans cleared
+        $this->assertNotSame( $firstClass , $reflection->reflection( MockUser::class ) ); // reflections cleared
+
+        // Still works after clearing (caches rebuilt).
+        $object = $reflection->hydrate( [ 'name' => 'Bob' ] , MockUser::class );
+        $this->assertSame( 'Bob' , $object->name );
+    }
 }

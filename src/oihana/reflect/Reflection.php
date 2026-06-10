@@ -1052,6 +1052,28 @@ class Reflection
     }
 
     /**
+     * Clears the internal caches (the cached {@see ReflectionClass} instances and the per-class
+     * hydration plans). The caches are transparently rebuilt on the next call.
+     *
+     * Mostly useful in tests or in long-running processes (RoadRunner, Swoole, queue workers)
+     * where a single instance lives across many requests.
+     *
+     * @return void
+     *
+     * @example
+     * ```php
+     * $reflection = new Reflection();
+     * $reflection->hydrate( $data , User::class ); // builds and caches the plan
+     * $reflection->clearCache();                   // drops every cached entry
+     * ```
+     */
+    public function clearCache(): void
+    {
+        $this->reflections = [] ;
+        $this->plans       = [] ;
+    }
+
+    /**
      * Returns the short (unqualified) name of the class.
      *
      * @param object|string $class The object or class name.

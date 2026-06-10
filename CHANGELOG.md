@@ -37,6 +37,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Attributes
   - `#[Transient]` and its equivalent alias `#[HydrateIgnore]` : exclude a public property from both hydration (input) and `ReflectionTrait::toArray()` (output). Detection uses `ReflectionAttribute::IS_INSTANCEOF`, so either name triggers the same behaviour. Useful for computed/derived properties.
 - Reflection introspection
+  - Reflection : `clearCache()` empties the internal caches (cached `ReflectionClass` instances and per-class hydration plans), transparently rebuilt on the next call — useful in tests and long-running workers.
   - Reflection : `hasMethod()`, `hasProperty()`, `propertyType()` and `namespace()` (with `ReflectionTrait` wrappers `hasMethod()`, `hasProperty()`, `getPropertyType()`, `getNamespace()`). `propertyType()` renders union types as `A|B` and intersection types as `A&B`.
 
 ### Changed
