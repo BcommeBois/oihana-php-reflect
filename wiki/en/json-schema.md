@@ -86,6 +86,30 @@ class Event
 
 This applies to standalone date-typed properties. In a union that also accepts a scalar (e.g. `string|DateTimeInterface`), `hydrate()` keeps the raw value as-is, so no `format` constraint is emitted.
 
+## Typed arrays
+
+An `array` property whose element type is known describes that element under the `items` keyword. The element type is resolved exactly as `hydrate()` resolves it — from a `#[HydrateWith]` attribute first, then from a `@var Type[]` / `@var array<Type>` doc-block — and each element is mapped like a standalone property (enum, `date-time`, or object `$ref`):
+
+```php
+use oihana\reflect\attributes\HydrateWith;
+
+class Catalog
+{
+    use JsonSchemaTrait;
+
+    #[HydrateWith( Product::class )]
+    public array $products;        // { "type": "array", "items": { "type": "object", "$ref": "#/definitions/Product" } }
+
+    /** @var \App\Status[] */
+    public array $statuses;        // items: { "type": "string", "enum": [ ... ] }
+
+    /** @var \DateTimeImmutable[] */
+    public array $dates;           // items: { "type": "string", "format": "date-time" }
+}
+```
+
+A polymorphic `#[HydrateWith(A::class, B::class)]` yields `items: { "oneOf": [ { "$ref": ... }, { "$ref": ... } ] }`. Untyped arrays — and arrays of scalars (which `hydrate()` leaves untouched) — stay `{ "type": "array" }` with no `items`.
+
 ## Enum names
 
 The keywords, types and draft versions are exposed as named constants:
@@ -96,4 +120,4 @@ The keywords, types and draft versions are exposed as named constants:
 - `oihana\reflect\enums\JsonSchemaFormat` — the standard string formats (e.g. `date-time`);
 - `oihana\reflect\enums\PhpType` — the main PHP type names.
 
-> Note: the generator maps PHP property types to JSON Schema types, including backed-enum `enum` constraints and `date-time` formats for `DateTimeInterface` properties. Awareness of the remaining richer hydration conventions (`#[HydrateKey]` renames, typed-array `items`) is tracked as a future enhancement.
+> Note: the generator maps PHP property types to JSON Schema types, including backed-enum `enum` constraints, `date-time` formats for `DateTimeInterface` properties, and `items` for typed arrays. Awareness of the remaining `#[HydrateKey]` source-key renames is tracked as a future enhancement.

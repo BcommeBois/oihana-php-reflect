@@ -5,6 +5,7 @@ namespace tests\oihana\reflect\mocks;
 use DateTime;
 use DateTimeImmutable;
 
+use oihana\reflect\attributes\HydrateWith;
 use oihana\reflect\traits\JsonSchemaTrait;
 
 /**
@@ -52,4 +53,61 @@ class MockJsonSchema
     public DateTimeImmutable $createdAt ;        // date type -> { type: string, format: date-time }
 
     public ?DateTime $updatedAt = null ;         // nullable date -> oneOf: [ null, { string, format: date-time } ]
+
+    // ---- Typed arrays -> items (S4) -----------------------------------------------------------
+
+    /**
+     * Array of enums via #[HydrateWith] -> items: backed-enum schema.
+     */
+    #[HydrateWith( MockStatus::class )]
+    public array $history = [] ;
+
+    /**
+     * Polymorphic array via #[HydrateWith(A, B)] -> items: oneOf of $refs.
+     */
+    #[HydrateWith( MockAddress::class , MockUser::class )]
+    public array $mixedEntities = [] ;
+
+    /**
+     * Array of int-backed enums via PHPDoc -> items: { integer, enum }.
+     *
+     * @var \tests\oihana\reflect\mocks\MockPriority[]
+     */
+    public array $levels = [] ;
+
+    /**
+     * Array of dates via PHPDoc (leading backslash) -> items: { string, format: date-time }.
+     *
+     * @var \DateTimeImmutable[]
+     */
+    public array $milestones = [] ;
+
+    /**
+     * Array of objects via PHPDoc `Type[]` -> items: { object, $ref }.
+     *
+     * @var \tests\oihana\reflect\mocks\MockAddress[]
+     */
+    public array $contacts = [] ;
+
+    /**
+     * Array of objects via PHPDoc `array<Type>` -> items: { object, $ref }.
+     *
+     * @var array<\tests\oihana\reflect\mocks\MockUser>
+     */
+    public array $members = [] ;
+
+    /**
+     * Array of scalars via PHPDoc -> no items (hydrate() leaves it untouched).
+     *
+     * @var string[]
+     */
+    public array $names = [] ;
+
+    /**
+     * #[HydrateWith] with no resolvable class -> no items.
+     */
+    #[HydrateWith( 'Bogus\\Does\\NotExist' )]
+    public array $bogusItems = [] ;
+
+    public array $tags = [] ;                     // untyped array -> { type: array } with no items
 }

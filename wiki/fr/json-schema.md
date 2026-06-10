@@ -86,6 +86,30 @@ class Event
 
 Cela s'applique aux propriétés date « simples ». Dans une union qui accepte aussi un scalaire (ex. `string|DateTimeInterface`), `hydrate()` conserve la valeur brute telle quelle : aucune contrainte `format` n'est alors émise.
 
+## Tableaux typés
+
+Une propriété `array` dont le type d'élément est connu décrit cet élément via le mot-clé `items`. Le type d'élément est résolu exactement comme `hydrate()` le résout — d'abord depuis un attribut `#[HydrateWith]`, puis depuis un doc-block `@var Type[]` / `@var array<Type>` — et chaque élément est mappé comme une propriété simple (enum, `date-time`, ou `$ref` objet) :
+
+```php
+use oihana\reflect\attributes\HydrateWith;
+
+class Catalog
+{
+    use JsonSchemaTrait;
+
+    #[HydrateWith( Product::class )]
+    public array $products;        // { "type": "array", "items": { "type": "object", "$ref": "#/definitions/Product" } }
+
+    /** @var \App\Status[] */
+    public array $statuses;        // items: { "type": "string", "enum": [ ... ] }
+
+    /** @var \DateTimeImmutable[] */
+    public array $dates;           // items: { "type": "string", "format": "date-time" }
+}
+```
+
+Un `#[HydrateWith(A::class, B::class)]` polymorphe produit `items: { "oneOf": [ { "$ref": ... }, { "$ref": ... } ] }`. Les tableaux non typés — et les tableaux de scalaires (que `hydrate()` ne touche pas) — restent `{ "type": "array" }` sans `items`.
+
 ## Enums associés
 
 Les mots-clés, types et versions de draft sont exposés comme constantes nommées :
@@ -96,4 +120,4 @@ Les mots-clés, types et versions de draft sont exposés comme constantes nommé
 - `oihana\reflect\enums\JsonSchemaFormat` — les formats de chaîne standard (ex. `date-time`) ;
 - `oihana\reflect\enums\PhpType` — les principaux noms de types PHP.
 
-> Note : le générateur mappe les types de propriétés PHP vers les types JSON Schema, y compris les contraintes `enum` pour les enums backed et les formats `date-time` pour les propriétés `DateTimeInterface`. La prise en compte des conventions d'hydratation plus riches restantes (renommages `#[HydrateKey]`, `items` des tableaux typés) est suivie comme une amélioration future.
+> Note : le générateur mappe les types de propriétés PHP vers les types JSON Schema, y compris les contraintes `enum` pour les enums backed, les formats `date-time` pour les propriétés `DateTimeInterface`, et les `items` des tableaux typés. La prise en compte du renommage par clé source `#[HydrateKey]` restant est suivie comme une amélioration future.

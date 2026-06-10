@@ -225,6 +225,40 @@ final class JsonSchemaTraitTest extends TestCase
         $this->assertSame('date-time', $props['updatedAt']['oneOf'][1]['format']);
     }
 
+    public function testTypedArraysProduceItemsSchema(): void
+    {
+        $props = MockJsonSchema::jsonSchema( false )['properties'];
+
+        // #[HydrateWith(Enum)] -> items is the backed-enum schema.
+        $this->assertSame('array', $props['history']['type']);
+        $this->assertSame('string', $props['history']['items']['type']);
+        $this->assertSame(['active', 'inactive'], $props['history']['items']['enum']);
+
+        // Polymorphic #[HydrateWith(A, B)] -> items: oneOf of $refs.
+        $oneOf = $props['mixedEntities']['items']['oneOf'];
+        $this->assertSame('#/definitions/MockAddress', $oneOf[0]['$ref']);
+        $this->assertSame('#/definitions/MockUser', $oneOf[1]['$ref']);
+
+        // @var Enum[] (int-backed) via PHPDoc.
+        $this->assertSame('integer', $props['levels']['items']['type']);
+        $this->assertSame([1, 10], $props['levels']['items']['enum']);
+
+        // @var DateTimeImmutable[] -> date-time items.
+        $this->assertSame('string', $props['milestones']['items']['type']);
+        $this->assertSame('date-time', $props['milestones']['items']['format']);
+
+        // @var Type[] and @var array<Type> -> object $ref items (no "Type: X" description).
+        $this->assertSame('#/definitions/MockAddress', $props['contacts']['items']['$ref']);
+        $this->assertArrayNotHasKey('description', $props['contacts']['items']);
+        $this->assertSame('#/definitions/MockUser', $props['members']['items']['$ref']);
+
+        // Scalar arrays, unresolvable #[HydrateWith], and untyped arrays -> no items.
+        $this->assertArrayNotHasKey('items', $props['names']);
+        $this->assertArrayNotHasKey('items', $props['bogusItems']);
+        $this->assertSame('array', $props['tags']['type']);
+        $this->assertArrayNotHasKey('items', $props['tags']);
+    }
+
     public function testValidateDataWithJsonSchemaInstance(): void
     {
         $obj    = new MockJsonSchema();

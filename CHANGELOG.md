@@ -28,6 +28,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - JsonSchemaTrait : Providing JSON Schema generation and validation capabilities for classes.
   - JsonSchemaTrait now describes enum-typed properties richly : a backed enum maps to its scalar backing type (`string`/`integer`) plus an `enum` constraint listing the case values, matching what `hydrate()` accepts ; a pure (non-backed) enum lists its case names and is flagged with a `$comment` as not hydratable from a scalar. Nullable enums — and nullable class `$ref`s — now keep their full sub-schema inside `oneOf` instead of collapsing to a bare type.
   - JsonSchemaTrait now maps `DateTimeInterface` properties (`DateTime`, `DateTimeImmutable`, the interface itself) to `{ "type": "string", "format": "date-time" }` instead of an opaque object `$ref`, matching the ISO 8601 string that `hydrate()` parses (nullable dates are wrapped in `oneOf`).
+  - JsonSchemaTrait now emits the `items` sub-schema for typed arrays : the element type is resolved like `hydrate()` does (from `#[HydrateWith]`, then from a `@var Type[]` / `@var array<Type>` doc-block) and mapped accordingly (enum, `date-time`, or object `$ref`). A polymorphic `#[HydrateWith(A, B)]` produces an `items.oneOf` of the candidate `$ref`s. Untyped arrays and arrays of scalars stay `{ "type": "array" }` with no `items`.
 - Utils
   - CborSerializer tool : cbor serializer helper
   - JsonSerializer tool : json serializer with temporary options.

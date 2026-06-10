@@ -12,6 +12,7 @@ use ReflectionNamedType;
 use ReflectionProperty;
 use ReflectionUnionType;
 
+use oihana\reflect\attributes\HydrateWith;
 use oihana\reflect\enums\JsonSchemaDraft;
 use oihana\reflect\enums\JsonSchemaFormat  as Format ;
 use oihana\reflect\enums\JsonSchemaKeyword as Keyword;
@@ -327,7 +328,17 @@ trait JsonSchemaTrait
 
         if ( $type instanceof ReflectionNamedType )
         {
-            $mapped     = self::mapPhpTypeToJsonSchema( $type ) ;
+            $mapped = self::mapPhpTypeToJsonSchema( $type ) ;
+
+            if ( ( $mapped[ Keyword::TYPE ] ?? null ) === Type::ARRAY )
+            {
+                $items = self::resolveArrayItemsSchema( $property ) ;
+                if ( $items !== null )
+                {
+                    $mapped[ Keyword::ITEMS ] = $items ;
+                }
+            }
+
             $mappedType = $mapped[ Keyword::TYPE ] ?? null ;
 
             if ( $type->allowsNull() && $mappedType !== Type::NULL ) // If nullable, use oneOf
@@ -516,6 +527,82 @@ trait JsonSchemaTrait
             Keyword::TYPE    => Type::STRING ,
             Keyword::ENUM    => array_column( $cases , 'name' ) ,
             Keyword::COMMENT => 'Pure (non-backed) enum: not hydratable from a scalar value.' ,
+        ];
+    }
+
+    /**
+     * Resolve the `items` sub-schema of an `array`-typed property.
+     *
+     * The element class is resolved exactly like {@see Reflection::hydrate()} does — from a
+     * `#[HydrateWith]` attribute first, then from a `@var Type[]` / `@var array<Type>` doc-block —
+     * and mapped through {@see self::mapItemClassToJsonSchema()}. A polymorphic `#[HydrateWith(A, B)]`
+     * yields a `oneOf` of the candidate schemas. Untyped arrays (and arrays of scalars, which
+     * `hydrate()` leaves untouched) return `null`, so no `items` keyword is emitted.
+     *
+     * @param  ReflectionProperty $property
+     * @return array|null
+     */
+    private static function resolveArrayItemsSchema( ReflectionProperty $property ): ?array
+    {
+        // 1. #[HydrateWith(MyClass::class, AnotherClass::class)] — possibly polymorphic.
+        $withAttr = $property->getAttributes( HydrateWith::class ) ;
+        if ( !empty( $withAttr ) )
+        {
+            $classes = array_values( array_filter( $withAttr[0]->newInstance()->classes , 'class_exists' ) ) ;
+
+            if ( count( $classes ) === 1 )
+            {
+                return self::mapItemClassToJsonSchema( $classes[0] ) ;
+            }
+
+            if ( count( $classes ) > 1 )
+            {
+                return [ Keyword::ONE_OF => array_map( fn( $c ) => self::mapItemClassToJsonSchema( $c ) , $classes ) ] ;
+            }
+        }
+
+        // 2. PHPDoc @var Type[] / @var array<Type> (class names only, mirroring the hydration plan).
+        $doc = $property->getDocComment() ;
+        if ( $doc && preg_match( '/@var\s+(?:([\w\\\\]+)\[]|array<([\w\\\\]+)>)/' , $doc , $matches ) )
+        {
+            $candidate = ( $matches[1] ?? '' ) ?: ( $matches[2] ?? '' ) ;
+            if ( class_exists( $candidate ) )
+            {
+                return self::mapItemClassToJsonSchema( $candidate ) ;
+            }
+        }
+
+        return null ;
+    }
+
+    /**
+     * Map a single array-element class to its JSON Schema fragment.
+     *
+     * Routes the class the same way single properties are mapped : a backed/pure enum to its
+     * `enum` constraint, any {@see DateTimeInterface} to a `date-time` string, and any other
+     * class to an object `$ref`.
+     *
+     * @param  class-string $className
+     * @return array
+     */
+    private static function mapItemClassToJsonSchema( string $className ): array
+    {
+        if ( enum_exists( $className ) )
+        {
+            return self::mapEnumToJsonSchema( $className ) ;
+        }
+
+        if ( is_a( $className , DateTimeInterface::class , true ) )
+        {
+            return [ Keyword::TYPE => Type::STRING , Keyword::FORMAT => Format::DATE_TIME ] ;
+        }
+
+        $shortName = new ReflectionClass( $className )->getShortName() ;
+
+        return
+        [
+            Keyword::TYPE => Type::OBJECT ,
+            Keyword::REF  => "#/definitions/$shortName" ,
         ];
     }
 
