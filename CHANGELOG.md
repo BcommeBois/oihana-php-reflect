@@ -15,7 +15,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - JsonSchemaDraft : the Json Schema draft versions
   - JsonSchemaKeyword : the Json Schema keywords
   - JsonSchemaType : the Json Schema types
-  - PhpType : the main PHP types
+  - PhpType : the main PHP types (+ helpers `PhpType::isScalar()` and `PhpType::isNumeric()`)
 - Helpers
   - getPublicProperties : Get all public non-static properties from a class, including traits and parent classes, with optional external cache.
   - hasTrait : Check if a class uses a specific trait, including traits from parent classes and nested traits, with optional external cache.

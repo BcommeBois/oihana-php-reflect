@@ -64,4 +64,37 @@ final class PhpType
      */
     public const string STRING = 'string';
 
+    /**
+     * Indicates whether the given type name is a numeric type (`int` or `float`).
+     *
+     * @param string $type The PHP type name (e.g. the result of `ReflectionNamedType::getName()`).
+     * @return bool True if the type is numeric, false otherwise.
+     *
+     * @example
+     * ```php
+     * PhpType::isNumeric( PhpType::FLOAT ); // true
+     * PhpType::isNumeric( 'string' );       // false
+     * ```
+     */
+    public static function isNumeric( string $type ): bool
+    {
+        return in_array( $type , [ self::INTEGER , self::FLOAT ] , true );
+    }
+
+    /**
+     * Indicates whether the given type name is a scalar type (`string`, `int`, `float`, `bool`).
+     *
+     * @param string $type The PHP type name (e.g. the result of `ReflectionNamedType::getName()`).
+     * @return bool True if the type is a scalar type, false otherwise.
+     *
+     * @example
+     * ```php
+     * PhpType::isScalar( PhpType::INTEGER ); // true
+     * PhpType::isScalar( 'array' );          // false
+     * ```
+     */
+    public static function isScalar( string $type ): bool
+    {
+        return in_array( $type , [ self::STRING , self::INTEGER , self::FLOAT , self::BOOLEAN ] , true );
+    }
 }
