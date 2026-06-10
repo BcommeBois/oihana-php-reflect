@@ -28,6 +28,8 @@ class MockJsonSchema
 
     public MockAddress $address ;               // class type -> $ref
 
+    public ?MockAddress $maybeAddress = null ;  // nullable class -> oneOf keeps the $ref and its "Type: X" description
+
     public iterable $stream ;                   // unmapped, non-class type -> mixed
 
     public string $noDoc = 'plain' ;            // no docblock -> null description
@@ -35,4 +37,12 @@ class MockJsonSchema
     public \Stringable|int $iface ;             // union member mapping to a list of types (interface -> mixed)
 
     public ?string $atType = null ;             // JSON-LD metadata -> skipped
+
+    public MockStatus $status ;                 // string-backed enum -> { type: string, enum: [...values...] }
+
+    public ?MockPriority $priority = null ;     // int-backed nullable enum -> oneOf: [ null, { integer, enum } ]
+
+    public MockColor $color ;                   // pure enum -> case names + $comment "not hydratable"
+
+    public ?MockColor $optionalColor = null ;   // nullable pure enum -> oneOf wrapping the enum sub-schema
 }

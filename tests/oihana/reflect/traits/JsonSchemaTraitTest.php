@@ -165,11 +165,49 @@ final class JsonSchemaTraitTest extends TestCase
         $this->assertEquals('object', $props['address']['type']);
         $this->assertEquals('#/definitions/MockAddress', $props['address']['$ref']);
 
+        // Nullable class -> oneOf keeps the $ref (and lifts the "Type: X" description to the property).
+        $this->assertSame(['type' => 'null'], $props['maybeAddress']['oneOf'][0]);
+        $this->assertEquals('#/definitions/MockAddress', $props['maybeAddress']['oneOf'][1]['$ref']);
+        $this->assertEquals('Type: MockAddress', $props['maybeAddress']['description']);
+
         // Unmapped, non-class type (iterable) -> mixed (array of types).
         $this->assertIsArray($props['stream']['type']);
 
         // Property without a docblock has no description.
         $this->assertArrayNotHasKey('description', $props['noDoc']);
+    }
+
+    public function testBackedEnumProducesScalarTypeAndEnumValues(): void
+    {
+        $props = MockJsonSchema::jsonSchema( false )['properties'];
+
+        // String-backed enum (non-null) -> { type: string, enum: [...values...] }.
+        $this->assertSame('string', $props['status']['type']);
+        $this->assertSame(['active', 'inactive'], $props['status']['enum']);
+        $this->assertArrayNotHasKey('$ref', $props['status']);
+
+        // Int-backed nullable enum -> oneOf: [ {null}, { type: integer, enum: [...] } ].
+        $this->assertArrayHasKey('oneOf', $props['priority']);
+        $this->assertSame(['type' => 'null'], $props['priority']['oneOf'][0]);
+        $this->assertSame('integer', $props['priority']['oneOf'][1]['type']);
+        $this->assertSame([1, 10], $props['priority']['oneOf'][1]['enum']);
+    }
+
+    public function testPureEnumListsCaseNamesAndFlagsItNotHydratable(): void
+    {
+        $props = MockJsonSchema::jsonSchema( false )['properties'];
+
+        // Pure (non-backed) enum (non-null) -> case names + a $comment warning.
+        $this->assertSame('string', $props['color']['type']);
+        $this->assertSame(['Red', 'Blue'], $props['color']['enum']);
+        $this->assertStringContainsString('not hydratable', $props['color']['$comment']);
+
+        // Nullable pure enum -> the full enum sub-schema (type + enum + $comment) is kept inside oneOf.
+        $this->assertSame(['type' => 'null'], $props['optionalColor']['oneOf'][0]);
+        $nonNull = $props['optionalColor']['oneOf'][1];
+        $this->assertSame('string', $nonNull['type']);
+        $this->assertSame(['Red', 'Blue'], $nonNull['enum']);
+        $this->assertArrayHasKey('$comment', $nonNull);
     }
 
     public function testValidateDataWithJsonSchemaInstance(): void

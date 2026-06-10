@@ -36,6 +36,38 @@ $errors = new User()->validateDataWithJsonSchema( [ 'name' => 'Alice' ] );      
 
 Ces méthodes retournent la liste des erreurs de validation (vide quand les données sont valides).
 
+## Propriétés typées par un enum
+
+Une propriété typée par un enum PHP est décrite selon ce que `hydrate()` accepte réellement, plutôt que comme un `$ref` objet opaque.
+
+Un **enum backed** est mappé vers son type scalaire de backing, accompagné du mot-clé `enum` listant les valeurs des cas :
+
+```php
+enum Status: string { case Active = 'active'; case Inactive = 'inactive'; }
+enum Priority: int  { case Low = 1; case High = 10; }
+
+class Task
+{
+    use JsonSchemaTrait;
+
+    public Status    $status;            // { "type": "string",  "enum": ["active", "inactive"] }
+    public ?Priority $priority = null;   // { "oneOf": [ { "type": "null" }, { "type": "integer", "enum": [1, 10] } ] }
+}
+```
+
+Un **enum pur (non-backed)** n'a aucune représentation scalaire : il ne peut donc pas être hydraté depuis des données. Les noms de ses cas sont tout de même listés à titre documentaire, et un `$comment` signale la limitation :
+
+```php
+enum Color { case Red; case Blue; }
+
+// public Color $color;
+// {
+//     "type": "string",
+//     "enum": ["Red", "Blue"],
+//     "$comment": "Pure (non-backed) enum: not hydratable from a scalar value."
+// }
+```
+
 ## Enums associés
 
 Les mots-clés, types et versions de draft sont exposés comme constantes nommées :
@@ -45,4 +77,4 @@ Les mots-clés, types et versions de draft sont exposés comme constantes nommé
 - `oihana\reflect\enums\JsonSchemaType` — types du schéma ;
 - `oihana\reflect\enums\PhpType` — les principaux noms de types PHP.
 
-> Note : le générateur mappe les types de propriétés PHP vers les types JSON Schema. La prise en compte des conventions d'hydratation plus riches (contraintes `enum` pour les enums backed, renommages `#[HydrateKey]`, formats `date-time`) est suivie comme une amélioration future.
+> Note : le générateur mappe les types de propriétés PHP vers les types JSON Schema, y compris les contraintes `enum` pour les enums backed. La prise en compte des conventions d'hydratation plus riches restantes (renommages `#[HydrateKey]`, formats `date-time`, `items` des tableaux typés) est suivie comme une amélioration future.

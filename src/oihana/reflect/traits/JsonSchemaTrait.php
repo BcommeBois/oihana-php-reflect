@@ -2,7 +2,10 @@
 
 namespace oihana\reflect\traits ;
 
+use BackedEnum;
+
 use ReflectionClass;
+use ReflectionEnum;
 use ReflectionException;
 use ReflectionNamedType;
 use ReflectionProperty;
@@ -322,28 +325,29 @@ trait JsonSchemaTrait
 
         if ( $type instanceof ReflectionNamedType )
         {
-            $mapped = array_merge( $schema , self::mapPhpTypeToJsonSchema($type) ) ;
+            $mapped     = self::mapPhpTypeToJsonSchema( $type ) ;
+            $mappedType = $mapped[ Keyword::TYPE ] ?? null ;
 
-            if ( $type->allowsNull() && $mapped[ Keyword::TYPE ] !== Type::NULL ) // If nullable, use oneOf
+            if ( $type->allowsNull() && $mappedType !== Type::NULL ) // If nullable, use oneOf
             {
-                $oneOfTypes = [[ Keyword::TYPE => Type::NULL ]];
+                $oneOfTypes = [ [ Keyword::TYPE => Type::NULL ] ] ;
 
-                if ( isset($mapped[ Keyword::TYPE ] ) )
+                if ( is_array( $mappedType ) )
                 {
-                    if (is_array($mapped[ Keyword::TYPE ]))
+                    foreach ( $mappedType as $t )
                     {
-                        foreach ($mapped[ Keyword::TYPE ] as $t)
+                        if ( $t !== Type::NULL ) // Avoid duplicate null type
                         {
-                            if ( $t !== Type::NULL ) // Avoid duplicate null type
-                            {
-                                $oneOfTypes[] = [ Keyword::TYPE => $t ] ;
-                            }
+                            $oneOfTypes[] = [ Keyword::TYPE => $t ] ;
                         }
                     }
-                    else
-                    {
-                        $oneOfTypes[] = [ Keyword::TYPE => $mapped[ Keyword::TYPE ] ] ; // For simple nullable types like ?int
-                    }
+                }
+                else if ( $mappedType !== null )
+                {
+                    // Keep the full mapped sub-schema (type + enum/format/$ref ...), not just the bare type.
+                    $nonNull = $mapped ;
+                    unset( $nonNull[ Keyword::DESCRIPTION ] ) ; // description is lifted to the property level
+                    $oneOfTypes[] = $nonNull ;
                 }
 
                 $schema[ Keyword::ONE_OF ] = $oneOfTypes;
@@ -452,6 +456,10 @@ trait JsonSchemaTrait
         {
             $schema[ Keyword::TYPE ] = $mapping[ $typeName ] ;
         }
+        else if ( enum_exists( $typeName ) )
+        {
+            $schema = self::mapEnumToJsonSchema( $typeName ) ;
+        }
         else if ( class_exists( $typeName ) )
         {
             $shortName = new ReflectionClass( $typeName )->getShortName();
@@ -465,6 +473,42 @@ trait JsonSchemaTrait
         }
 
         return $schema ;
+    }
+
+    /**
+     * Map a PHP enum to a JSON Schema fragment.
+     *
+     * A backed enum is described by its backing type and the list of its case values,
+     * which is exactly what {@see Reflection::hydrate()} accepts (`Enum::from($value)`).
+     *
+     * A pure (non-backed) enum has no scalar representation and is therefore not
+     * hydratable from data; its case names are listed for documentation and a `$comment`
+     * flags the limitation.
+     *
+     * @param  class-string $enumClass The fully-qualified enum class name.
+     * @return array
+     */
+    private static function mapEnumToJsonSchema( string $enumClass ): array
+    {
+        $cases = $enumClass::cases() ;
+
+        if ( is_subclass_of( $enumClass , BackedEnum::class ) )
+        {
+            $backing = new ReflectionEnum( $enumClass )->getBackingType()?->getName() ;
+
+            return
+            [
+                Keyword::TYPE => $backing === PhpType::INTEGER ? Type::INTEGER : Type::STRING ,
+                Keyword::ENUM => array_column( $cases , 'value' ) ,
+            ];
+        }
+
+        return
+        [
+            Keyword::TYPE    => Type::STRING ,
+            Keyword::ENUM    => array_column( $cases , 'name' ) ,
+            Keyword::COMMENT => 'Pure (non-backed) enum: not hydratable from a scalar value.' ,
+        ];
     }
 
     /**

@@ -36,6 +36,38 @@ $errors = new User()->validateDataWithJsonSchema( [ 'name' => 'Alice' ] );      
 
 These return the list of validation errors (empty when the data is valid).
 
+## Enum-typed properties
+
+A property typed with a PHP enum is described by what `hydrate()` actually accepts, rather than as an opaque object `$ref`.
+
+A **backed enum** maps to its scalar backing type plus the `enum` keyword listing the case values:
+
+```php
+enum Status: string { case Active = 'active'; case Inactive = 'inactive'; }
+enum Priority: int  { case Low = 1; case High = 10; }
+
+class Task
+{
+    use JsonSchemaTrait;
+
+    public Status    $status;            // { "type": "string",  "enum": ["active", "inactive"] }
+    public ?Priority $priority = null;   // { "oneOf": [ { "type": "null" }, { "type": "integer", "enum": [1, 10] } ] }
+}
+```
+
+A **pure (non-backed) enum** has no scalar representation, so it cannot be hydrated from data. Its case names are still listed for documentation and a `$comment` flags the limitation:
+
+```php
+enum Color { case Red; case Blue; }
+
+// public Color $color;
+// {
+//     "type": "string",
+//     "enum": ["Red", "Blue"],
+//     "$comment": "Pure (non-backed) enum: not hydratable from a scalar value."
+// }
+```
+
 ## Enum names
 
 The keywords, types and draft versions are exposed as named constants:
@@ -45,4 +77,4 @@ The keywords, types and draft versions are exposed as named constants:
 - `oihana\reflect\enums\JsonSchemaType` — schema types;
 - `oihana\reflect\enums\PhpType` — the main PHP type names.
 
-> Note: the generator maps PHP property types to JSON Schema types. Awareness of richer hydration conventions (backed-enum `enum` constraints, `#[HydrateKey]` renames, `date-time` formats) is tracked as a future enhancement.
+> Note: the generator maps PHP property types to JSON Schema types, including backed-enum `enum` constraints. Awareness of the remaining richer hydration conventions (`#[HydrateKey]` renames, `date-time` formats, typed-array `items`) is tracked as a future enhancement.

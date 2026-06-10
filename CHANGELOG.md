@@ -25,6 +25,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - useConstantsTrait : Checks if a given class uses the `ConstantsTrait`, either directly or via parent classes.
 - Traits
   - JsonSchemaTrait : Providing JSON Schema generation and validation capabilities for classes.
+  - JsonSchemaTrait now describes enum-typed properties richly : a backed enum maps to its scalar backing type (`string`/`integer`) plus an `enum` constraint listing the case values, matching what `hydrate()` accepts ; a pure (non-backed) enum lists its case names and is flagged with a `$comment` as not hydratable from a scalar. Nullable enums — and nullable class `$ref`s — now keep their full sub-schema inside `oneOf` instead of collapsing to a bare type.
 - Utils
   - CborSerializer tool : cbor serializer helper
   - JsonSerializer tool : json serializer with temporary options.
