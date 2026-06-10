@@ -2,6 +2,11 @@
 
 namespace oihana\reflect\utils;
 
+use JsonException;
+
+use oihana\reflect\Reflection;
+use ReflectionException;
+
 /**
  * JsonSerializer is an helper class to serialize objects into JSON while allowing temporary,
  * global serialization options.
@@ -62,6 +67,38 @@ final class JsonSerializer
         {
             SerializationContext::reset( $previous ) ;
         }
+    }
+
+    /**
+     * Decodes a JSON string into an array, or directly into a hydrated object.
+     *
+     * Invalid JSON fails loud: a {@see JsonException} is always thrown on malformed input
+     * (`JSON_THROW_ON_ERROR` is forced).
+     *
+     * @param string $json The JSON string to decode.
+     * @param string|null $class Optional fully-qualified class name. When provided, the decoded
+     *                           associative array is hydrated into an instance of that class via
+     *                           {@see Reflection::hydrate()}. When null, the decoded value is returned as-is.
+     * @param int $flags Additional `json_decode()` flags (associative mode is always enabled).
+     *
+     * @return mixed The decoded array/value, or the hydrated object when `$class` is given.
+     *
+     * @throws JsonException If the JSON is malformed.
+     * @throws ReflectionException
+     *
+     * @example
+     * ```php
+     * JsonSerializer::decode( '{"name":"Alice"}' );              // ['name' => 'Alice']
+     * JsonSerializer::decode( '{"name":"Alice"}' , User::class ); // User { name: 'Alice' }
+     * ```
+     */
+    public static function decode( string $json , ?string $class = null , int $flags = 0 ) : mixed
+    {
+        $data = json_decode( $json , true , 512 , $flags | JSON_THROW_ON_ERROR ) ;
+
+        return $class !== null
+             ? new Reflection()->hydrate( $data , $class )
+             : $data ;
     }
 
     /**

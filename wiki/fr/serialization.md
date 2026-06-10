@@ -16,7 +16,13 @@ echo JsonSerializer::encode( [ $person1, $person2 ] , JSON_PRETTY_PRINT , [ Arra
 ```
 
 - `encode( mixed $data , int $jsonFlags = 0 , array $options = [] ) : string`
+- `decode( string $json , ?string $class = null , int $flags = 0 ) : mixed` — décode une chaîne JSON en tableau, ou directement en objet hydraté quand `$class` est fourni. Un JSON malformé **échoue explicitement** (`JSON_THROW_ON_ERROR` est forcé → `JsonException`).
 - `getOptions() : array` — les options temporaires courantes.
+
+```php
+JsonSerializer::decode( '{"name":"Alice"}' );               // ['name' => 'Alice']
+JsonSerializer::decode( '{"name":"Alice"}' , User::class ); // User { name: 'Alice' } (enums/dates résolus par hydrate)
+```
 
 Les options sont globales **uniquement pour la durée de l'appel `encode()`**, et réinitialisées ensuite (même en cas d'erreur). Pratique quand de nombreux objets doivent partager des règles de formatage cohérentes pendant un seul encodage (ex. sortie JSON-LD).
 
@@ -48,4 +54,4 @@ SerializationContext::reset( $previous );  // restaurer (dans un bloc finally)
 
 En général vous ne l'appelez pas directement — les sérialiseurs la gèrent via try/finally. Les objets métier lisent `SerializationContext::getOptions()` dans leur `jsonSerialize()` pour respecter les options actives.
 
-> Des helpers de décodage (`JsonSerializer::decode()`, `CborSerializer::decode()`) sont prévus. Pour retransformer aujourd'hui des données décodées en objets typés, décodez avec `json_decode($json, true)` / `cbor_decode($bytes)` et passez le tableau à [`Reflection::hydrate()`](hydration/README.md).
+> Un équivalent `CborSerializer::decode()` est prévu. Pour retransformer aujourd'hui du CBOR décodé en objets typés, décodez avec `cbor_decode($bytes)` et passez le tableau à [`Reflection::hydrate()`](hydration/README.md).

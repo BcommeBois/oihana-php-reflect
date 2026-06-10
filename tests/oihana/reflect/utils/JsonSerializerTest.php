@@ -2,11 +2,13 @@
 
 namespace tests\oihana\reflect\utils ;
 
+use JsonException;
 use oihana\reflect\utils\JsonSerializer;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\CoversClass;
 use stdClass;
+use tests\oihana\reflect\mocks\MockUser;
 
 /**
  * Unit tests for JsonSerializer class
@@ -212,4 +214,35 @@ class JsonSerializerTest extends TestCase
         $this->assertStringContainsString('https://example.com', $result);
     }
 
+    #[Test]
+    public function decodeToArray(): void
+    {
+        $this->assertSame(
+            [ 'name' => 'Alice', 'age' => 30 ],
+            JsonSerializer::decode( '{"name":"Alice","age":30}' )
+        );
+    }
+
+    #[Test]
+    public function decodeToHydratedObject(): void
+    {
+        $user = JsonSerializer::decode( '{"name":"Alice"}' , MockUser::class );
+
+        $this->assertInstanceOf( MockUser::class , $user );
+        $this->assertSame( 'Alice' , $user->name );
+    }
+
+    #[Test]
+    public function decodeInvalidJsonThrows(): void
+    {
+        $this->expectException( JsonException::class );
+        JsonSerializer::decode( '{ not valid json' );
+    }
+
+    #[Test]
+    public function decodeRoundTrip(): void
+    {
+        $json = JsonSerializer::encode( [ 'name' => 'Bob' ] );
+        $this->assertSame( [ 'name' => 'Bob' ] , JsonSerializer::decode( $json ) );
+    }
 }
