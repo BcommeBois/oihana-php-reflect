@@ -37,8 +37,14 @@ $bytes = CborSerializer::encode( $data , [ ArrayOption::REDUCE => true ] );
 ```
 
 - `encode( mixed $data , array $options = [] , ?Closure $replacer = null ) : string`
+- `decode( string $data , ?string $class = null , ?Closure $replacer = null ) : mixed` — decode a CBOR string into an array/value, or directly into a hydrated object when `$class` is given.
 
-An optional `$replacer` callback `fn( $key , $value )` can transform each encoded value.
+An optional `$replacer` callback `fn( $key , $value )` can transform each encoded/decoded value.
+
+```php
+$bytes = CborSerializer::encode( $user );
+$user2 = CborSerializer::decode( $bytes , User::class ); // full round-trip
+```
 
 ## SerializationContext
 
@@ -53,5 +59,3 @@ SerializationContext::reset( $previous );  // restore (in a finally block)
 ```
 
 Typically you don't call it directly — the serializers manage it via try/finally. Domain objects read `SerializationContext::getOptions()` inside their `jsonSerialize()` to honor the active options.
-
-> A `CborSerializer::decode()` counterpart is planned. To turn decoded CBOR back into typed objects today, decode with `cbor_decode($bytes)` and pass the array to [`Reflection::hydrate()`](hydration/README.md).

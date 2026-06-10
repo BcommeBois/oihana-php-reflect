@@ -3,6 +3,11 @@
 namespace oihana\reflect\utils;
 
 use Closure;
+
+use oihana\reflect\Reflection;
+
+use ReflectionException;
+use function oihana\core\cbor\cbor_decode;
 use function oihana\core\cbor\cbor_encode;
 
 /**
@@ -65,5 +70,31 @@ final class CborSerializer
         {
             SerializationContext::reset( $previous ) ;
         }
+    }
+
+    /**
+     * Decodes a CBOR string into an array/value, or directly into a hydrated object.
+     *
+     * @param string $data The CBOR-encoded string to decode.
+     * @param string|null $class Optional fully-qualified class name. When provided, the decoded
+     *                               associative array is hydrated into an instance of that class via
+     *                               {@see Reflection::hydrate()}. When null, the decoded value is returned as-is.
+     * @param Closure|null $replacer Optional callback applied to each decoded value: fn($key, $value).
+     *
+     * @return mixed The decoded array/value, or the hydrated object when `$class` is given.
+     *
+     * @throws ReflectionException
+     *
+     * @example
+     * ```php
+     * $bytes = CborSerializer::encode( $user );
+     * $user2 = CborSerializer::decode( $bytes , User::class ); // full round-trip
+     * ```
+     */
+    public static function decode( string $data , ?string $class = null , ?Closure $replacer = null ) : mixed
+    {
+        $decoded = cbor_decode( $data , $replacer ) ;
+
+        return $class !== null ? new Reflection()->hydrate( $decoded , $class ) : $decoded ;
     }
 }

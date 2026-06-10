@@ -8,6 +8,7 @@ use oihana\reflect\utils\CborSerializer;
 use oihana\reflect\utils\SerializationContext;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
+use tests\oihana\reflect\mocks\MockUser;
 
 /**
  * Unit tests for CborSerializer class
@@ -118,5 +119,22 @@ final class CborSerializerTest extends TestCase
         CborSerializer::encode($object, $options);
 
         $this->assertTrue($called, 'JsonSerializer::encode() should be used as internal encoder');
+    }
+
+    public function testDecodeRoundTripToArray(): void
+    {
+        $data    = [ 'name' => 'Alice', 'age' => 30 ];
+        $decoded = CborSerializer::decode( CborSerializer::encode( $data ) );
+
+        $this->assertSame( $data , $decoded );
+    }
+
+    public function testDecodeToHydratedObject(): void
+    {
+        $bytes = CborSerializer::encode( [ 'name' => 'Alice' ] );
+        $user  = CborSerializer::decode( $bytes , MockUser::class );
+
+        $this->assertInstanceOf( MockUser::class , $user );
+        $this->assertSame( 'Alice' , $user->name );
     }
 }
