@@ -12,6 +12,7 @@ use ReflectionNamedType;
 use ReflectionProperty;
 use ReflectionUnionType;
 
+use oihana\reflect\attributes\HydrateKey;
 use oihana\reflect\attributes\HydrateWith;
 use oihana\reflect\enums\JsonSchemaDraft;
 use oihana\reflect\enums\JsonSchemaFormat  as Format ;
@@ -269,10 +270,33 @@ trait JsonSchemaTrait
                 continue;
             }
 
-            $schema[ Keyword::PROPERTIES ][ $propertyName ] = self::getPropertyJsonSchema( $property , $instance ) ;
+            // The schema property is named after the primary #[HydrateKey] source key (what hydrate()
+            // actually reads from the input), falling back to the PHP property name.
+            $schemaKey = self::resolveSchemaPropertyName( $property ) ;
+
+            $schema[ Keyword::PROPERTIES ][ $schemaKey ] = self::getPropertyJsonSchema( $property , $instance ) ;
         }
 
         return $schema ;
+    }
+
+    /**
+     * Resolve the schema property name for a property.
+     *
+     * Mirrors {@see Reflection::hydrate()} : when a `#[HydrateKey]` attribute is present, the
+     * primary source key (`keys[0]`) is used so the schema describes the input shape that
+     * `hydrate()` consumes. Otherwise the PHP property name is kept.
+     *
+     * @param  ReflectionProperty $property
+     * @return string
+     */
+    private static function resolveSchemaPropertyName( ReflectionProperty $property ): string
+    {
+        $keyAttr = $property->getAttributes( HydrateKey::class ) ;
+
+        return empty( $keyAttr )
+             ? $property->getName()
+             : $keyAttr[0]->newInstance()->keys[0] ;
     }
 
     /**

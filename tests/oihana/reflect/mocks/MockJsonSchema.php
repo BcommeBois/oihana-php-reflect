@@ -5,6 +5,7 @@ namespace tests\oihana\reflect\mocks;
 use DateTime;
 use DateTimeImmutable;
 
+use oihana\reflect\attributes\HydrateKey;
 use oihana\reflect\attributes\HydrateWith;
 use oihana\reflect\traits\JsonSchemaTrait;
 
@@ -110,4 +111,18 @@ class MockJsonSchema
     public array $bogusItems = [] ;
 
     public array $tags = [] ;                     // untyped array -> { type: array } with no items
+
+    // ---- #[HydrateKey] : schema property named after the source key (S3) ----------------------
+
+    /**
+     * Renamed via a single source key.
+     */
+    #[HydrateKey( 'user_name' )]
+    public string $renamed = 'x' ;
+
+    /**
+     * Renamed via multiple source keys -> the primary key (`keys[0]`) wins.
+     */
+    #[HydrateKey( 'created_on' , 'createdOn' )]
+    public ?string $primaryKeyed = null ;
 }

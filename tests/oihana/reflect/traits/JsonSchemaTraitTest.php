@@ -259,6 +259,31 @@ final class JsonSchemaTraitTest extends TestCase
         $this->assertArrayNotHasKey('items', $props['tags']);
     }
 
+    public function testHydrateKeyRenamesSchemaProperty(): void
+    {
+        $props = MockJsonSchema::jsonSchema( false )['properties'];
+
+        // Single source key -> the schema property is named after it, not the PHP name.
+        $this->assertArrayHasKey('user_name', $props);
+        $this->assertArrayNotHasKey('renamed', $props);
+        $this->assertSame('string', $props['user_name']['type']);
+
+        // Multiple source keys -> the primary key (keys[0]) wins.
+        $this->assertArrayHasKey('created_on', $props);
+        $this->assertArrayNotHasKey('createdOn', $props);
+        $this->assertArrayNotHasKey('primaryKeyed', $props);
+    }
+
+    public function testHydrateKeyRenamedPropertyDrivesValidation(): void
+    {
+        // Data must use the source key; the PHP name is rejected as an unknown property (strict).
+        $okay = MockJsonSchema::validateWithJsonSchema([ 'user_name' => 'Alice' ], true);
+        $this->assertNotContains("Property 'user_name' is not defined in schema", $okay['errors']);
+
+        $bad = MockJsonSchema::validateWithJsonSchema([ 'renamed' => 'Alice' ], true);
+        $this->assertContains("Property 'renamed' is not defined in schema", $bad['errors']);
+    }
+
     public function testValidateDataWithJsonSchemaInstance(): void
     {
         $obj    = new MockJsonSchema();

@@ -110,6 +110,27 @@ class Catalog
 
 A polymorphic `#[HydrateWith(A::class, B::class)]` yields `items: { "oneOf": [ { "$ref": ... }, { "$ref": ... } ] }`. Untyped arrays — and arrays of scalars (which `hydrate()` leaves untouched) — stay `{ "type": "array" }` with no `items`.
 
+## Renamed properties (`#[HydrateKey]`)
+
+When a property declares a `#[HydrateKey]` source key, the schema names that property after the **primary source key** — the same key `hydrate()` reads from the input — instead of the PHP property name. Validation follows suit: data must use the source key.
+
+```php
+use oihana\reflect\attributes\HydrateKey;
+
+class Account
+{
+    use JsonSchemaTrait;
+
+    #[HydrateKey( 'user_name' )]
+    public string $name;                       // schema property: "user_name"
+
+    #[HydrateKey( 'created_on', 'createdOn' )]
+    public ?string $createdAt = null;          // primary key wins -> "created_on"
+}
+```
+
+With several fallback keys, the first one (the primary key) is used in the schema.
+
 ## Enum names
 
 The keywords, types and draft versions are exposed as named constants:
@@ -120,4 +141,4 @@ The keywords, types and draft versions are exposed as named constants:
 - `oihana\reflect\enums\JsonSchemaFormat` — the standard string formats (e.g. `date-time`);
 - `oihana\reflect\enums\PhpType` — the main PHP type names.
 
-> Note: the generator maps PHP property types to JSON Schema types, including backed-enum `enum` constraints, `date-time` formats for `DateTimeInterface` properties, and `items` for typed arrays. Awareness of the remaining `#[HydrateKey]` source-key renames is tracked as a future enhancement.
+> Note: the generated schema mirrors what `hydrate()` accepts — backed-enum `enum` constraints, `date-time` formats for `DateTimeInterface` properties, `items` for typed arrays, and `#[HydrateKey]` source-key renames.

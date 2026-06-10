@@ -110,6 +110,27 @@ class Catalog
 
 Un `#[HydrateWith(A::class, B::class)]` polymorphe produit `items: { "oneOf": [ { "$ref": ... }, { "$ref": ... } ] }`. Les tableaux non typés — et les tableaux de scalaires (que `hydrate()` ne touche pas) — restent `{ "type": "array" }` sans `items`.
 
+## Propriétés renommées (`#[HydrateKey]`)
+
+Lorsqu'une propriété déclare une clé source `#[HydrateKey]`, le schéma nomme cette propriété d'après la **clé source primaire** — la clé que `hydrate()` lit dans l'entrée — au lieu du nom PHP. La validation suit : les données doivent utiliser la clé source.
+
+```php
+use oihana\reflect\attributes\HydrateKey;
+
+class Account
+{
+    use JsonSchemaTrait;
+
+    #[HydrateKey( 'user_name' )]
+    public string $name;                       // propriété du schéma : "user_name"
+
+    #[HydrateKey( 'created_on', 'createdOn' )]
+    public ?string $createdAt = null;          // la clé primaire l'emporte -> "created_on"
+}
+```
+
+Avec plusieurs clés de repli, la première (la clé primaire) est utilisée dans le schéma.
+
 ## Enums associés
 
 Les mots-clés, types et versions de draft sont exposés comme constantes nommées :
@@ -120,4 +141,4 @@ Les mots-clés, types et versions de draft sont exposés comme constantes nommé
 - `oihana\reflect\enums\JsonSchemaFormat` — les formats de chaîne standard (ex. `date-time`) ;
 - `oihana\reflect\enums\PhpType` — les principaux noms de types PHP.
 
-> Note : le générateur mappe les types de propriétés PHP vers les types JSON Schema, y compris les contraintes `enum` pour les enums backed, les formats `date-time` pour les propriétés `DateTimeInterface`, et les `items` des tableaux typés. La prise en compte du renommage par clé source `#[HydrateKey]` restant est suivie comme une amélioration future.
+> Note : le schéma généré reflète ce que `hydrate()` accepte — contraintes `enum` pour les enums backed, formats `date-time` pour les propriétés `DateTimeInterface`, `items` des tableaux typés, et renommage par clé source `#[HydrateKey]`.
