@@ -41,9 +41,32 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class HydrateKey
 {
-    public function __construct
-    (
-        public string $key
-    )
-    {}
+    /**
+     * The primary source key (the first one). Kept for backward compatibility.
+     */
+    public string $key ;
+
+    /**
+     * All accepted source keys, in priority order. During hydration, the first key
+     * present in the data wins.
+     *
+     * @var string[]
+     */
+    public array $keys ;
+
+    /**
+     * @param string $key  The primary source key.
+     * @param string ...$keys Additional fallback keys, tried in order when the primary is absent.
+     *
+     * @example
+     * ```php
+     * #[HydrateKey( 'user_name' )]                 // single key
+     * #[HydrateKey( 'user_name' , 'username' )]    // 'user_name' first, else 'username'
+     * ```
+     */
+    public function __construct( string $key , string ...$keys )
+    {
+        $this->key  = $key ;
+        $this->keys = [ $key , ...$keys ] ;
+    }
 }

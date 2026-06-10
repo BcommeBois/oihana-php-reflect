@@ -34,6 +34,7 @@ use tests\oihana\reflect\mocks\MockAttributed;
 use tests\oihana\reflect\mocks\MockColor;
 use tests\oihana\reflect\mocks\MockIntrospection;
 use tests\oihana\reflect\mocks\MockMarker;
+use tests\oihana\reflect\mocks\MockMultiKey;
 use tests\oihana\reflect\mocks\MockPriority;
 use tests\oihana\reflect\mocks\MockStatus;
 use tests\oihana\reflect\mocks\MockTransient;
@@ -1199,5 +1200,57 @@ class ReflectionTest extends TestCase
     public function testAttributesFilterNoMatch()
     {
         $this->assertSame( [] , $this->reflection->classAttributes( MockAttributed::class , MockUser::class ) );
+    }
+
+    // ------------------------------------------------ HydrateKey multi-keys (C5)
+
+    /**
+     * The primary #[HydrateKey] key is used when present.
+     *
+     * @throws ReflectionException
+     */
+    public function testHydrateMultiKeyUsesPrimary()
+    {
+        $object = $this->reflection->hydrate( [ 'user_name' => 'Alice' ] , MockMultiKey::class );
+        $this->assertSame( 'Alice' , $object->name );
+    }
+
+    /**
+     * A fallback key is used when the primary is absent (first present wins, in order).
+     *
+     * @throws ReflectionException
+     */
+    public function testHydrateMultiKeyUsesFallback()
+    {
+        $byUsername = $this->reflection->hydrate( [ 'username' => 'Bob' ] , MockMultiKey::class );
+        $this->assertSame( 'Bob' , $byUsername->name );
+
+        $byLogin = $this->reflection->hydrate( [ 'login' => 'Zoe' ] , MockMultiKey::class );
+        $this->assertSame( 'Zoe' , $byLogin->name );
+    }
+
+    /**
+     * Priority order: the primary wins even when several keys are present.
+     *
+     * @throws ReflectionException
+     */
+    public function testHydrateMultiKeyPriorityOrder()
+    {
+        $object = $this->reflection->hydrate(
+            [ 'login' => 'Zoe' , 'user_name' => 'Alice' , 'username' => 'Bob' ],
+            MockMultiKey::class
+        );
+        $this->assertSame( 'Alice' , $object->name ); // 'user_name' is first in the list
+    }
+
+    /**
+     * When no accepted key is present, the declared default is kept.
+     *
+     * @throws ReflectionException
+     */
+    public function testHydrateMultiKeyNonePresentKeepsDefault()
+    {
+        $object = $this->reflection->hydrate( [ 'other' => 'x' ] , MockMultiKey::class );
+        $this->assertSame( 'default' , $object->name );
     }
 }

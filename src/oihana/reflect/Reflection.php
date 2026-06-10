@@ -492,9 +492,18 @@ class Reflection
 
         foreach ( $plan[ HydrationPlan::PROPERTIES ] as $meta )
         {
-            $propertyKey = $meta[ HydrationPlan::KEY ] ;
+            // First accepted source key present in the data wins (#[HydrateKey] may declare fallbacks).
+            $propertyKey = null ;
+            foreach ( $meta[ HydrationPlan::KEYS ] as $candidate )
+            {
+                if ( array_key_exists( $candidate , $thing ) )
+                {
+                    $propertyKey = $candidate ;
+                    break ;
+                }
+            }
 
-            if ( !array_key_exists( $propertyKey , $thing ) )
+            if ( $propertyKey === null )
             {
                 continue;
             }
@@ -733,11 +742,11 @@ class Reflection
                 continue ;
             }
 
-            $key     = $property->getName() ;
+            $keys    = [ $property->getName() ] ;
             $keyAttr = $property->getAttributes( HydrateKey::class ) ;
             if ( !empty( $keyAttr ) )
             {
-                $key = $keyAttr[0]->newInstance()->key ;
+                $keys = $keyAttr[0]->newInstance()->keys ;
             }
 
             $hasType    = $property->hasType() ;
@@ -779,7 +788,7 @@ class Reflection
             $properties[] =
             [
                 HydrationPlan::PROPERTY    => $property ,
-                HydrationPlan::KEY         => $key ,
+                HydrationPlan::KEYS        => $keys ,
                 HydrationPlan::HAS_TYPE    => $hasType ,
                 HydrationPlan::TYPES       => $types ,
                 HydrationPlan::BUILTINS    => $builtins ,
@@ -1445,14 +1454,17 @@ class Reflection
                     $score += 2 ; // Bonus for existing property
                 }
 
-                // Check HydrateKey attributes
+                // Check HydrateKey attributes (any of the accepted source keys counts)
                 $keyAttr = $property->getAttributes(HydrateKey::class ) ;
                 if ( !empty( $keyAttr ) )
                 {
-                    $alternativeKey = $keyAttr[0]->newInstance()->key ;
-                    if ( array_key_exists( $alternativeKey , $item ) )
+                    foreach ( $keyAttr[0]->newInstance()->keys as $alternativeKey )
                     {
-                        $score += 2 ;
+                        if ( array_key_exists( $alternativeKey , $item ) )
+                        {
+                            $score += 2 ;
+                            break ;
+                        }
                     }
                 }
             }

@@ -20,6 +20,18 @@ class User
 new Reflection()->hydrate( [ 'user_name' => 'Bob' ] , User::class )->name; // 'Bob'
 ```
 
+You can declare **several fallback keys** — the first one present in the data wins (in order):
+
+```php
+class User
+{
+    #[HydrateKey( 'user_name' , 'username' , 'login' )]
+    public string $name = '';
+}
+
+new Reflection()->hydrate( [ 'username' => 'Bob' ] , User::class )->name; // 'Bob' (fallback)
+```
+
 ## `#[HydrateWith]`
 
 Declares the **class(es)** used to hydrate the items of an `array` property. Supports **polymorphic** collections.

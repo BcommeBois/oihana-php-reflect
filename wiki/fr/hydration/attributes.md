@@ -20,6 +20,18 @@ class User
 new Reflection()->hydrate( [ 'user_name' => 'Bob' ] , User::class )->name; // 'Bob'
 ```
 
+Vous pouvez déclarer **plusieurs clés de repli** — la première présente dans les données l'emporte (dans l'ordre) :
+
+```php
+class User
+{
+    #[HydrateKey( 'user_name' , 'username' , 'login' )]
+    public string $name = '';
+}
+
+new Reflection()->hydrate( [ 'username' => 'Bob' ] , User::class )->name; // 'Bob' (repli)
+```
+
 ## `#[HydrateWith]`
 
 Déclare la (les) **classe(s)** servant à hydrater les éléments d'une propriété `array`. Gère les collections **polymorphes**.

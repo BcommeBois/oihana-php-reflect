@@ -44,7 +44,7 @@ Hydration
 - Instantiate and hydrate objects from associative arrays (recursively)
 - Supports union types and nullability
 - Attribute-based mapping:
-  - `#[HydrateKey('source_key')]` to rename incoming keys
+  - `#[HydrateKey('source_key')]` to rename incoming keys (accepts several fallback keys: `#[HydrateKey('user_name', 'username')]` — first present wins)
   - `#[HydrateWith(Foo::class, Bar::class)]` for arrays of objects, including polymorphism via `@type`/`type` or property-guessing
   - `#[HydrateAs(Foo::class)]` to override ambiguous types (`object`, `array`, `mixed`, unions)
   - `#[Transient]` (or its alias `#[HydrateIgnore]`) to exclude a public property from both hydration (input) and `toArray()` (output) — e.g. computed/derived properties

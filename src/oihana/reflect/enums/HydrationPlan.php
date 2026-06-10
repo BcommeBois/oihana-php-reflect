@@ -40,7 +40,7 @@ class HydrationPlan
     public const string BYPASS_CONSTRUCTOR = 'bypassConstructor' ;
 
     /**
-     * The PHPDoc `@var` array-item class resolved once (or null).
+     * The PHPDoc `@ var` array-item class resolved once (or null).
      */
     public const string DOC_ITEM = 'docItem' ;
 
@@ -55,9 +55,10 @@ class HydrationPlan
     public const string IS_PUBLIC = 'isPublic' ;
 
     /**
-     * The source key used to read the value from the data ({@see \oihana\reflect\attributes\HydrateKey}).
+     * The accepted source keys used to read the value from the data, in priority order
+     * ({@see \oihana\reflect\attributes\HydrateKey}). The first key present in the data wins.
      */
-    public const string KEY = 'key' ;
+    public const string KEYS = 'keys' ;
 
     /**
      * The list of per-property plan descriptors.
