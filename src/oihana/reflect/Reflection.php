@@ -275,6 +275,76 @@ class Reflection
     }
 
     /**
+     * Returns the **instantiated** attributes declared on a class.
+     *
+     * @param object|string $class     The object or class name.
+     * @param string|null   $attribute Optional attribute class to filter by (null = all attributes).
+     *
+     * @return object[] The attribute instances (each already `newInstance()`-d).
+     * @throws ReflectionException If the class cannot be reflected.
+     *
+     * @example
+     * ```php
+     * new Reflection()->classAttributes( User::class );                 // all class attributes
+     * new Reflection()->classAttributes( User::class , Entity::class );  // only #[Entity] ones
+     * ```
+     */
+    public function classAttributes( object|string $class, ?string $attribute = null ): array
+    {
+        return array_map(
+            fn( $a ) => $a->newInstance() ,
+            $this->reflection( $class )->getAttributes( $attribute )
+        );
+    }
+
+    /**
+     * Returns the **instantiated** attributes declared on a property.
+     *
+     * @param object|string $class     The object or class name.
+     * @param string        $property  The property name.
+     * @param string|null   $attribute Optional attribute class to filter by (null = all attributes).
+     *
+     * @return object[] The attribute instances (each already `newInstance()`-d).
+     * @throws ReflectionException If the class or property cannot be reflected.
+     *
+     * @example
+     * ```php
+     * $keys = new Reflection()->propertyAttributes( User::class , 'name' , HydrateKey::class );
+     * $keys[0]->key; // 'user_name'
+     * ```
+     */
+    public function propertyAttributes( object|string $class, string $property, ?string $attribute = null ): array
+    {
+        return array_map(
+            fn( $a ) => $a->newInstance() ,
+            $this->reflection( $class )->getProperty( $property )->getAttributes( $attribute )
+        );
+    }
+
+    /**
+     * Returns the **instantiated** attributes declared on a method.
+     *
+     * @param object|string $class     The object or class name.
+     * @param string        $method    The method name.
+     * @param string|null   $attribute Optional attribute class to filter by (null = all attributes).
+     *
+     * @return object[] The attribute instances (each already `newInstance()`-d).
+     * @throws ReflectionException If the class or method cannot be reflected.
+     *
+     * @example
+     * ```php
+     * new Reflection()->methodAttributes( Controller::class , 'index' , Route::class );
+     * ```
+     */
+    public function methodAttributes( object|string $class, string $method, ?string $attribute = null ): array
+    {
+        return array_map(
+            fn( $a ) => $a->newInstance() ,
+            $this->reflection( $class )->getMethod( $method )->getAttributes( $attribute )
+        );
+    }
+
+    /**
      * Instantiates and hydrates an object of a given class using associative array data.
      *
      * It supports:

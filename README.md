@@ -35,6 +35,7 @@ Reflection helpers
 - List constants, methods, properties with visibility filters
 - Inspect method parameters: type, default, nullable, optional, variadic
 - Inspect classes/properties: `hasMethod`, `hasProperty`, `propertyType`, `namespace` (union types rendered as `A|B`, intersection as `A&B`)
+- Read instantiated attributes: `classAttributes`, `propertyAttributes`, `methodAttributes` (optionally filtered by attribute class)
 - Describe any callable’s parameters (`describeCallableParameters`)
 - Cached `ReflectionClass` instances
 

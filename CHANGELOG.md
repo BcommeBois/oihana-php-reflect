@@ -39,6 +39,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Reflection introspection
   - Reflection : `clearCache()` empties the internal caches (cached `ReflectionClass` instances and per-class hydration plans), transparently rebuilt on the next call — useful in tests and long-running workers.
   - Reflection : `hasMethod()`, `hasProperty()`, `propertyType()` and `namespace()` (with `ReflectionTrait` wrappers `hasMethod()`, `hasProperty()`, `getPropertyType()`, `getNamespace()`). `propertyType()` renders union types as `A|B` and intersection types as `A&B`.
+  - Reflection : `classAttributes()`, `propertyAttributes()`, `methodAttributes()` return the **instantiated** attributes of a class/property/method, optionally filtered by an attribute class (with `ReflectionTrait` wrappers `getClassAttributes()`, `getPropertyAttributes()`, `getMethodAttributes()`).
 
 ### Changed
   - ReflectionTrait : Rename the jsonSerializePublicProperties method in toArray( array $options = [] ) 

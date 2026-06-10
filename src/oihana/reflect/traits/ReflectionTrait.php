@@ -178,6 +178,53 @@ trait ReflectionTrait
     }
 
     /**
+     * Returns the instantiated attributes declared on a class.
+     *
+     * @param object|string $class     The object instance or fully-qualified class name.
+     * @param string|null   $attribute Optional attribute class to filter by (null = all).
+     *
+     * @return object[] The attribute instances.
+     *
+     * @throws ReflectionException
+     */
+    public function getClassAttributes( object|string $class, ?string $attribute = null ) : array
+    {
+        return $this->reflection()->classAttributes( $class, $attribute );
+    }
+
+    /**
+     * Returns the instantiated attributes declared on a property.
+     *
+     * @param object|string $class     The object instance or fully-qualified class name.
+     * @param string        $property  The property name.
+     * @param string|null   $attribute Optional attribute class to filter by (null = all).
+     *
+     * @return object[] The attribute instances.
+     *
+     * @throws ReflectionException
+     */
+    public function getPropertyAttributes( object|string $class, string $property, ?string $attribute = null ) : array
+    {
+        return $this->reflection()->propertyAttributes( $class, $property, $attribute );
+    }
+
+    /**
+     * Returns the instantiated attributes declared on a method.
+     *
+     * @param object|string $class     The object instance or fully-qualified class name.
+     * @param string        $method    The method name.
+     * @param string|null   $attribute Optional attribute class to filter by (null = all).
+     *
+     * @return object[] The attribute instances.
+     *
+     * @throws ReflectionException
+     */
+    public function getMethodAttributes( object|string $class, string $method, ?string $attribute = null ) : array
+    {
+        return $this->reflection()->methodAttributes( $class, $method, $attribute );
+    }
+
+    /**
      * Returns all parameters of a given method as ReflectionParameter objects.
      *
      * @param object|string $class  The object instance or fully-qualified class name.

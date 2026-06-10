@@ -30,8 +30,10 @@ use tests\oihana\reflect\mocks\MockPerson;
 use tests\oihana\reflect\mocks\MockPolymorphicContainer;
 use tests\oihana\reflect\mocks\MockRequiredCtor;
 use tests\oihana\reflect\mocks\MockScalarCoercion;
+use tests\oihana\reflect\mocks\MockAttributed;
 use tests\oihana\reflect\mocks\MockColor;
 use tests\oihana\reflect\mocks\MockIntrospection;
+use tests\oihana\reflect\mocks\MockMarker;
 use tests\oihana\reflect\mocks\MockPriority;
 use tests\oihana\reflect\mocks\MockStatus;
 use tests\oihana\reflect\mocks\MockTransient;
@@ -1156,5 +1158,46 @@ class ReflectionTest extends TestCase
         // Still works after clearing (caches rebuilt).
         $object = $reflection->hydrate( [ 'name' => 'Bob' ] , MockUser::class );
         $this->assertSame( 'Bob' , $object->name );
+    }
+
+    // ------------------------------------------------ Attribute readers (C2)
+
+    /**
+     * @throws ReflectionException
+     */
+    public function testClassAttributes()
+    {
+        $attrs = $this->reflection->classAttributes( MockAttributed::class );
+        $this->assertCount( 1 , $attrs );
+        $this->assertInstanceOf( MockMarker::class , $attrs[0] );
+        $this->assertSame( 'on-class' , $attrs[0]->tag );
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function testPropertyAttributes()
+    {
+        $attrs = $this->reflection->propertyAttributes( MockAttributed::class , 'value' , MockMarker::class );
+        $this->assertSame( 'on-prop' , $attrs[0]->tag );
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function testMethodAttributes()
+    {
+        $attrs = $this->reflection->methodAttributes( MockAttributed::class , 'run' , MockMarker::class );
+        $this->assertSame( 'on-method' , $attrs[0]->tag );
+    }
+
+    /**
+     * Filtering by an unrelated attribute class returns an empty array.
+     *
+     * @throws ReflectionException
+     */
+    public function testAttributesFilterNoMatch()
+    {
+        $this->assertSame( [] , $this->reflection->classAttributes( MockAttributed::class , MockUser::class ) );
     }
 }

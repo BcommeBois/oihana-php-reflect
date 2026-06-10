@@ -5,6 +5,9 @@ namespace tests\oihana\reflect\traits;
 use oihana\core\options\ArrayOption;
 use oihana\reflect\traits\ReflectionTrait;
 
+use tests\oihana\reflect\mocks\MockAttributed;
+use tests\oihana\reflect\mocks\MockMarker;
+
 use PHPUnit\Framework\TestCase;
 
 final class ReflectionTraitTest extends TestCase
@@ -246,5 +249,26 @@ final class ReflectionTraitTest extends TestCase
         $parts  = explode( '|' , $object->getPropertyType( $target::class , 'id' ) );
         sort( $parts );
         $this->assertSame( [ 'int' , 'string' ] , $parts );
+    }
+
+    public function testGetClassAttributes(): void
+    {
+        $object = new class { use ReflectionTrait; };
+        $attrs  = $object->getClassAttributes( MockAttributed::class , MockMarker::class );
+        $this->assertSame( 'on-class' , $attrs[0]->tag );
+    }
+
+    public function testGetPropertyAttributes(): void
+    {
+        $object = new class { use ReflectionTrait; };
+        $attrs  = $object->getPropertyAttributes( MockAttributed::class , 'value' );
+        $this->assertSame( 'on-prop' , $attrs[0]->tag );
+    }
+
+    public function testGetMethodAttributes(): void
+    {
+        $object = new class { use ReflectionTrait; };
+        $attrs  = $object->getMethodAttributes( MockAttributed::class , 'run' );
+        $this->assertSame( 'on-method' , $attrs[0]->tag );
     }
 }

@@ -33,6 +33,20 @@ $reflection->shortName( MyClass::class );                 // 'MyClass'
 
 `propertyType()` renders union types as `A|B` and intersection types as `A&B`; it returns `null` for an untyped or missing property.
 
+## Reading attributes
+
+`classAttributes()`, `propertyAttributes()` and `methodAttributes()` return the **instantiated** attributes of a target, optionally filtered by an attribute class:
+
+```php
+use oihana\reflect\attributes\HydrateKey;
+
+$reflection->classAttributes( User::class );                       // all class attributes (instances)
+$reflection->propertyAttributes( User::class , 'name' , HydrateKey::class )[0]->key; // 'user_name'
+$reflection->methodAttributes( Controller::class , 'index' , Route::class );
+```
+
+Each returned element is already `newInstance()`-d. An unrelated filter yields an empty array.
+
 ## Method parameters
 
 ```php
@@ -83,7 +97,7 @@ class User
 }
 ```
 
-Wrappers: `getConstants()`, `getPublicProperties()`, `getShortName()`, `getNamespace()`, `getMethodParameters()`, `getParameterType()`, `getParameterDefaultValue()`, `hasParameter()`, `hasMethod()`, `hasProperty()`, `getPropertyType()`, `isParameterNullable/Optional/Variadic()`, and `hydrate()`.
+Wrappers: `getConstants()`, `getPublicProperties()`, `getShortName()`, `getNamespace()`, `getMethodParameters()`, `getParameterType()`, `getParameterDefaultValue()`, `hasParameter()`, `hasMethod()`, `hasProperty()`, `getPropertyType()`, `getClassAttributes()`, `getPropertyAttributes()`, `getMethodAttributes()`, `isParameterNullable/Optional/Variadic()`, and `hydrate()`.
 
 ### `toArray()`
 
