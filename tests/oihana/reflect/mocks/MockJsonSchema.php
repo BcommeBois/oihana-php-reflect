@@ -2,6 +2,9 @@
 
 namespace tests\oihana\reflect\mocks;
 
+use DateTime;
+use DateTimeImmutable;
+
 use oihana\reflect\traits\JsonSchemaTrait;
 
 /**
@@ -45,4 +48,8 @@ class MockJsonSchema
     public MockColor $color ;                   // pure enum -> case names + $comment "not hydratable"
 
     public ?MockColor $optionalColor = null ;   // nullable pure enum -> oneOf wrapping the enum sub-schema
+
+    public DateTimeImmutable $createdAt ;        // date type -> { type: string, format: date-time }
+
+    public ?DateTime $updatedAt = null ;         // nullable date -> oneOf: [ null, { string, format: date-time } ]
 }

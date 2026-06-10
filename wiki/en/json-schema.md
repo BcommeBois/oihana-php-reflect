@@ -68,6 +68,24 @@ enum Color { case Red; case Blue; }
 // }
 ```
 
+## Date and time properties
+
+A property typed with any `DateTimeInterface` implementation (`DateTime`, `DateTimeImmutable`, or the interface itself) maps to a string carrying the `date-time` format — matching the ISO 8601 string that `hydrate()` parses:
+
+```php
+use DateTimeImmutable;
+
+class Event
+{
+    use JsonSchemaTrait;
+
+    public DateTimeImmutable  $createdAt;          // { "type": "string", "format": "date-time" }
+    public ?DateTime          $updatedAt = null;   // { "oneOf": [ { "type": "null" }, { "type": "string", "format": "date-time" } ] }
+}
+```
+
+This applies to standalone date-typed properties. In a union that also accepts a scalar (e.g. `string|DateTimeInterface`), `hydrate()` keeps the raw value as-is, so no `format` constraint is emitted.
+
 ## Enum names
 
 The keywords, types and draft versions are exposed as named constants:
@@ -75,6 +93,7 @@ The keywords, types and draft versions are exposed as named constants:
 - `oihana\reflect\enums\JsonSchemaDraft` — draft versions;
 - `oihana\reflect\enums\JsonSchemaKeyword` — schema keywords;
 - `oihana\reflect\enums\JsonSchemaType` — schema types;
+- `oihana\reflect\enums\JsonSchemaFormat` — the standard string formats (e.g. `date-time`);
 - `oihana\reflect\enums\PhpType` — the main PHP type names.
 
-> Note: the generator maps PHP property types to JSON Schema types, including backed-enum `enum` constraints. Awareness of the remaining richer hydration conventions (`#[HydrateKey]` renames, `date-time` formats, typed-array `items`) is tracked as a future enhancement.
+> Note: the generator maps PHP property types to JSON Schema types, including backed-enum `enum` constraints and `date-time` formats for `DateTimeInterface` properties. Awareness of the remaining richer hydration conventions (`#[HydrateKey]` renames, typed-array `items`) is tracked as a future enhancement.

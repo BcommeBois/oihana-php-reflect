@@ -3,6 +3,7 @@
 namespace oihana\reflect\traits ;
 
 use BackedEnum;
+use DateTimeInterface;
 
 use ReflectionClass;
 use ReflectionEnum;
@@ -12,6 +13,7 @@ use ReflectionProperty;
 use ReflectionUnionType;
 
 use oihana\reflect\enums\JsonSchemaDraft;
+use oihana\reflect\enums\JsonSchemaFormat  as Format ;
 use oihana\reflect\enums\JsonSchemaKeyword as Keyword;
 use oihana\reflect\enums\JsonSchemaType    as Type ;
 use oihana\reflect\enums\PhpType;
@@ -459,6 +461,12 @@ trait JsonSchemaTrait
         else if ( enum_exists( $typeName ) )
         {
             $schema = self::mapEnumToJsonSchema( $typeName ) ;
+        }
+        else if ( is_a( $typeName , DateTimeInterface::class , true ) )
+        {
+            // Any DateTimeInterface (DateTime, DateTimeImmutable, ...) hydrates from an ISO 8601 string.
+            $schema[ Keyword::TYPE   ] = Type::STRING ;
+            $schema[ Keyword::FORMAT ] = Format::DATE_TIME ;
         }
         else if ( class_exists( $typeName ) )
         {

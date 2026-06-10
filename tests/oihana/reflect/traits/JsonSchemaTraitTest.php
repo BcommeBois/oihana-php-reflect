@@ -210,6 +210,21 @@ final class JsonSchemaTraitTest extends TestCase
         $this->assertArrayHasKey('$comment', $nonNull);
     }
 
+    public function testDateTimePropertyMapsToStringWithDateTimeFormat(): void
+    {
+        $props = MockJsonSchema::jsonSchema( false )['properties'];
+
+        // Any DateTimeInterface (non-null) -> { type: string, format: date-time }.
+        $this->assertSame('string', $props['createdAt']['type']);
+        $this->assertSame('date-time', $props['createdAt']['format']);
+        $this->assertArrayNotHasKey('$ref', $props['createdAt']);
+
+        // Nullable date -> oneOf: [ null, { type: string, format: date-time } ].
+        $this->assertSame(['type' => 'null'], $props['updatedAt']['oneOf'][0]);
+        $this->assertSame('string', $props['updatedAt']['oneOf'][1]['type']);
+        $this->assertSame('date-time', $props['updatedAt']['oneOf'][1]['format']);
+    }
+
     public function testValidateDataWithJsonSchemaInstance(): void
     {
         $obj    = new MockJsonSchema();

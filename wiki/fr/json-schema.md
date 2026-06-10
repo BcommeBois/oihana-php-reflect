@@ -68,6 +68,24 @@ enum Color { case Red; case Blue; }
 // }
 ```
 
+## Propriétés date et heure
+
+Une propriété typée par n'importe quelle implémentation de `DateTimeInterface` (`DateTime`, `DateTimeImmutable`, ou l'interface elle-même) est mappée vers une chaîne portant le format `date-time` — la chaîne ISO 8601 que `hydrate()` sait parser :
+
+```php
+use DateTimeImmutable;
+
+class Event
+{
+    use JsonSchemaTrait;
+
+    public DateTimeImmutable  $createdAt;          // { "type": "string", "format": "date-time" }
+    public ?DateTime          $updatedAt = null;   // { "oneOf": [ { "type": "null" }, { "type": "string", "format": "date-time" } ] }
+}
+```
+
+Cela s'applique aux propriétés date « simples ». Dans une union qui accepte aussi un scalaire (ex. `string|DateTimeInterface`), `hydrate()` conserve la valeur brute telle quelle : aucune contrainte `format` n'est alors émise.
+
 ## Enums associés
 
 Les mots-clés, types et versions de draft sont exposés comme constantes nommées :
@@ -75,6 +93,7 @@ Les mots-clés, types et versions de draft sont exposés comme constantes nommé
 - `oihana\reflect\enums\JsonSchemaDraft` — versions de draft ;
 - `oihana\reflect\enums\JsonSchemaKeyword` — mots-clés du schéma ;
 - `oihana\reflect\enums\JsonSchemaType` — types du schéma ;
+- `oihana\reflect\enums\JsonSchemaFormat` — les formats de chaîne standard (ex. `date-time`) ;
 - `oihana\reflect\enums\PhpType` — les principaux noms de types PHP.
 
-> Note : le générateur mappe les types de propriétés PHP vers les types JSON Schema, y compris les contraintes `enum` pour les enums backed. La prise en compte des conventions d'hydratation plus riches restantes (renommages `#[HydrateKey]`, formats `date-time`, `items` des tableaux typés) est suivie comme une amélioration future.
+> Note : le générateur mappe les types de propriétés PHP vers les types JSON Schema, y compris les contraintes `enum` pour les enums backed et les formats `date-time` pour les propriétés `DateTimeInterface`. La prise en compte des conventions d'hydratation plus riches restantes (renommages `#[HydrateKey]`, `items` des tableaux typés) est suivie comme une amélioration future.
