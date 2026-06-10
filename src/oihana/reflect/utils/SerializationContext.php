@@ -24,7 +24,7 @@ namespace oihana\reflect\utils;
  *
  * @author  Marc Alcaraz (eKameleon)
  * @package oihana\reflect\utils
- * @since   1.0.4
+ * @since   1.1.0
  */
 final class SerializationContext
 {

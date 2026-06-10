@@ -33,3 +33,6 @@ node_modules/
 
 # Working notes / planning (local only, never committed)
 /todo/
+
+# Generated API documentation — built & deployed by the Docs GitHub Action, consulted locally only
+/docs/

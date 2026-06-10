@@ -85,7 +85,7 @@ use ReflectionProperty;
  *
  * @package oihana\core\reflections
  * @author  Marc Alcaraz (ekameleon)
- * @since   1.0.4
+ * @since   1.1.0
  */
 function getPublicProperties
 (

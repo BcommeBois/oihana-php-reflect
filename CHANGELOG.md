@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-06-10
+
 ### Added
 
 - Enums
@@ -56,6 +58,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - ReflectionTrait : Rename the jsonSerializePublicProperties method in toArray( array $options = [] ) 
   - Reflection::parameterType now renders union/intersection parameter types as `A|B` / `A&B` (instead of failing on `ReflectionUnionType::getName()`), consistent with the new `propertyType()`.
   - Reflection::describeCallableParameters now resolves the callable through the shared `oihana\core\callables\resolveCallable()` helper. An unresolvable callable (e.g. `"Unknown::method"`) now throws `InvalidArgumentException` instead of `ReflectionException` — both were already declared in the method's `@throws`.
+  - Documentation : the generated phpDocumentor API site is no longer committed under `docs/`. It is now built and deployed to GitHub Pages by a `Docs` GitHub Action on every push to `main`; run `composer doc` locally to preview it.
 
 ### Fixed
   - Reflection::hydrate : the `@var Class[]` / `@var array<Class>` PHPDoc hydration of `array` properties never ran — the parsed item type kept the `[]` / `array<>` wrapper (so `class_exists()` was always false) and the pattern did not accept namespaced or leading-backslash class names. Array elements are now hydrated into the documented class.

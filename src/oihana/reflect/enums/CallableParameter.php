@@ -12,7 +12,7 @@ use oihana\reflect\traits\ConstantsTrait;
  *
  * @package oihana\reflect\enums
  * @author  Marc Alcaraz
- * @since   1.0.4
+ * @since   1.1.0
  */
 class CallableParameter
 {

@@ -14,7 +14,7 @@ use oihana\reflect\traits\ConstantsTrait;
  *
  * @package oihana\reflect\traits
  * @author Marc Alcaraz (ekameleon)
- * @since 1.0.4
+ * @since 1.1.0
  */
 final class JsonSchemaKeyword
 {

@@ -44,7 +44,7 @@ use ReflectionClass;
  *
  * @package oihana\reflect\helpers
  * @author  Marc Alcaraz (ekameleon)
- * @since   1.0.4
+ * @since   1.1.0
  */
 function useConstantsTrait( string $className , array &$cache = [] ): bool
 {
