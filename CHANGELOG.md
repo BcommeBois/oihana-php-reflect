@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### Changed
+
+- Bump the `phpunit/phpunit` dev dependency from `^12` to `^13` and update the
+  `phpunit.xml` schema reference to `13.2`. No production code change; the full
+  suite (232 tests) stays green with 100% line coverage. PHPUnit 13 requires
+  PHP ≥ 8.4, already the project's minimum.
+
 ## [1.1.0] - 2026-06-10
 
 ### Added
